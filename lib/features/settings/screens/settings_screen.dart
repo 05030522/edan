@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/services/kakao_place_service.dart';
 import '../../../core/services/supabase_service.dart';
 import '../../../core/constants/supabase_constants.dart';
 import '../../../core/theme/app_colors.dart';
@@ -192,7 +194,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  /// 교회 변경 다이얼로그
+  /// 교회 변경 다이얼로그 (카카오 지도 검색)
   Future<void> _showChurchChangeDialog() async {
     String? currentChurch;
     try {
@@ -204,117 +206,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     if (!mounted) return;
 
-    const churches = [
-      '사랑의교회',
-      '온누리교회',
-      '여의도순복음교회',
-      '소망교회',
-      '분당우리교회',
-      '새문안교회',
-      '영락교회',
-      '광림교회',
-    ];
-
-    String? selected = currentChurch;
-
     final result = await showDialog<String?>(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text('교회 변경'),
-              content: SizedBox(
-                width: double.maxFinite,
-                height: 340,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: churches.length,
-                        itemBuilder: (context, index) {
-                          final church = churches[index];
-                          final isSelected = selected == church;
-                          return ListTile(
-                            leading: Icon(
-                              Icons.church_outlined,
-                              color: isSelected
-                                  ? AppColors.primaryDark
-                                  : Colors.grey,
-                              size: 20,
-                            ),
-                            title: Text(church),
-                            trailing: isSelected
-                                ? const Icon(
-                                    Icons.check_circle,
-                                    color: AppColors.primaryDark,
-                                    size: 20,
-                                  )
-                                : null,
-                            onTap: () {
-                              setDialogState(() => selected = church);
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        setDialogState(() => selected = null);
-                      },
-                      child: Text(
-                        '교회를 다니고 있지 않아요',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(currentChurch),
-                  child: const Text('취소'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(selected),
-                  child: const Text('저장'),
-                ),
-              ],
-            );
-          },
-        );
+        return _ChurchSearchDialog(currentChurch: currentChurch);
       },
     );
 
-    if (result != currentChurch && mounted) {
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        if (result != null) {
-          await prefs.setString('church_name', result);
-        } else {
-          await prefs.remove('church_name');
-        }
+    // null = 취소, '' = 교회 삭제 (안 다님)
+    if (result == null || !mounted) return;
 
-        // Auth 프로필 업데이트
-        final profile = ref.read(authProvider).profile;
-        if (profile != null) {
-          await ref
-              .read(authProvider.notifier)
-              .updateProfile(profile.copyWith(churchName: result));
-        }
+    final newChurch = result.isEmpty ? null : result;
+    if (newChurch == currentChurch) return;
 
-        ref.invalidate(localChurchNameProvider);
-        setState(() {});
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('교회 변경에 실패했어요: $e')),
-          );
-        }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (newChurch != null) {
+        await prefs.setString('church_name', newChurch);
+      } else {
+        await prefs.remove('church_name');
+      }
+
+      // Auth 프로필 업데이트
+      final profile = ref.read(authProvider).profile;
+      if (profile != null) {
+        await ref
+            .read(authProvider.notifier)
+            .updateProfile(profile.copyWith(churchName: newChurch));
+      }
+
+      ref.invalidate(localChurchNameProvider);
+      setState(() {});
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('교회 변경에 실패했어요: $e')),
+        );
       }
     }
   }
@@ -613,6 +540,198 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacingXL,
       ),
+    );
+  }
+}
+
+/// 카카오 지도 교회 검색 다이얼로그
+class _ChurchSearchDialog extends StatefulWidget {
+  final String? currentChurch;
+  const _ChurchSearchDialog({this.currentChurch});
+
+  @override
+  State<_ChurchSearchDialog> createState() => _ChurchSearchDialogState();
+}
+
+class _ChurchSearchDialogState extends State<_ChurchSearchDialog> {
+  final _controller = TextEditingController();
+  List<KakaoChurchResult> _results = [];
+  KakaoChurchResult? _selected;
+  bool _isSearching = false;
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _debounce?.cancel();
+    if (query.trim().isEmpty) {
+      setState(() {
+        _results = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() => _isSearching = true);
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      final results = await KakaoPlaceService.searchChurch(query);
+      if (mounted) {
+        setState(() {
+          _results = results;
+          _isSearching = false;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('교회 변경'),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 400,
+        child: Column(
+          children: [
+            // 검색 입력
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: '교회 이름 검색',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: _isSearching
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : null,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 10),
+              ),
+              onChanged: _onSearchChanged,
+            ),
+            const SizedBox(height: 12),
+
+            // 선택된 교회
+            if (_selected != null)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle,
+                        color: AppColors.primaryDark, size: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${_selected!.name} (${_selected!.shortAddress})',
+                        style: const TextStyle(
+                          color: AppColors.primaryDark,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // 검색 결과
+            Expanded(
+              child: _results.isEmpty
+                  ? Center(
+                      child: Text(
+                        _controller.text.isEmpty
+                            ? '교회 이름을 입력하세요'
+                            : (_isSearching ? '검색 중...' : '결과가 없어요'),
+                        style: TextStyle(
+                            color: Colors.grey[500], fontSize: 13),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _results.length,
+                      itemBuilder: (context, index) {
+                        final church = _results[index];
+                        final isSelected = _selected?.id == church.id;
+                        return ListTile(
+                          dense: true,
+                          leading: Icon(
+                            Icons.church_outlined,
+                            color: isSelected
+                                ? AppColors.primaryDark
+                                : Colors.grey,
+                            size: 18,
+                          ),
+                          title: Text(
+                            church.name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isSelected
+                                  ? AppColors.primaryDark
+                                  : null,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                          subtitle: Text(
+                            church.roadAddress ?? church.address,
+                            style: const TextStyle(fontSize: 11),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: isSelected
+                              ? const Icon(Icons.check_circle,
+                                  color: AppColors.primaryDark, size: 18)
+                              : null,
+                          onTap: () {
+                            setState(() => _selected = church);
+                          },
+                        );
+                      },
+                    ),
+            ),
+
+            // 교회 안 다님
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(''),
+              child: Text(
+                '교회를 다니고 있지 않아요',
+                style: TextStyle(color: Colors.grey[600], fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: const Text('취소'),
+        ),
+        TextButton(
+          onPressed: () {
+            if (_selected != null) {
+              Navigator.of(context).pop(_selected!.name);
+            } else {
+              Navigator.of(context).pop(null);
+            }
+          },
+          child: const Text('저장'),
+        ),
+      ],
     );
   }
 }
