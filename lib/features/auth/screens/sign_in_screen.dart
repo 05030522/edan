@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/social_auth_service.dart';
+import '../../../core/services/supabase_service.dart';
+import '../../../core/constants/supabase_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
@@ -19,6 +21,41 @@ class SignInScreen extends ConsumerStatefulWidget {
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
   SocialProvider? _loadingProvider;
+
+  /// 로그인 성공 후 프로필 존재 여부에 따라 분기
+  Future<void> _navigateAfterLogin() async {
+    if (!mounted) return;
+    try {
+      final userId = SupabaseService.currentUserId;
+      if (userId == null) {
+        context.go('/welcome');
+        return;
+      }
+
+      final data = await SupabaseService.client
+          .from(SupabaseConstants.tableProfiles)
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (!mounted) return;
+
+      if (data != null &&
+          (data['display_name'] as String?)?.isNotEmpty == true) {
+        // 기존 사용자 → 홈
+        context.go('/home');
+      } else {
+        // 신규 사용자 → 온보딩(닉네임 입력)
+        context.go('/onboarding/name');
+      }
+    } catch (e) {
+      debugPrint('프로필 조회 에러: $e');
+      if (mounted) {
+        // 에러 시에도 온보딩으로 (안전하게)
+        context.go('/onboarding/name');
+      }
+    }
+  }
 
   Future<void> _handleSocialLogin(SocialProvider provider) async {
     // 미지원 프로바이더 안내
@@ -42,7 +79,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       setState(() => _loadingProvider = null);
       final authState = ref.read(authProvider);
       if (authState.status == AuthStatus.authenticated) {
-        context.go('/home');
+        await _navigateAfterLogin();
       }
     }
   }
