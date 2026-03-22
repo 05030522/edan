@@ -23,6 +23,11 @@ import '../../features/profile/screens/profile_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/settings/screens/privacy_policy_screen.dart';
 import '../../features/settings/screens/terms_screen.dart';
+import '../../features/prayer/screens/prayer_screen.dart';
+import '../../features/bible/screens/bible_reading_screen.dart';
+import '../../features/meditation/screens/meditation_screen.dart';
+import '../../features/store/screens/store_screen.dart';
+import '../../features/garden/screens/garden_screen.dart';
 import '../theme/app_colors.dart';
 
 /// 라우트 이름 상수
@@ -220,6 +225,84 @@ final routerProvider = Provider<GoRouter>((ref) {
             lessonId: lessonId,
           );
         },
+      ),
+
+      // ─── 기도하기 (풀스크린) ───
+      GoRoute(
+        path: '/prayer',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const PrayerScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            );
+          },
+        ),
+      ),
+
+      // ─── 말씀 읽기 (풀스크린) ───
+      GoRoute(
+        path: '/bible-reading',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const BibleReadingScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            );
+          },
+        ),
+      ),
+
+      // ─── 묵상하기 (풀스크린) ───
+      GoRoute(
+        path: '/meditation',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const MeditationScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            );
+          },
+        ),
+      ),
+
+      // ─── 상점 (풀스크린) ───
+      GoRoute(
+        path: '/store',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const StoreScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
+      ),
+
+      // ─── 루양의 정원 (풀스크린) ───
+      GoRoute(
+        path: '/garden',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const GardenScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        ),
       ),
     ],
   );

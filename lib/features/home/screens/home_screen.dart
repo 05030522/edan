@@ -181,19 +181,9 @@ class HomeScreen extends ConsumerWidget {
         ),
         const SizedBox(width: 8),
 
-        // FP pill - 스낵바 피드백 추가
+        // FP pill - 상점으로 이동
         GestureDetector(
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('상점 기능이 곧 추가됩니다!'),
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 2),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
-            );
-          },
+          onTap: () => context.go('/store'),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
@@ -224,17 +214,7 @@ class HomeScreen extends ConsumerWidget {
     required String levelName,
   }) {
     return GestureDetector(
-      onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('루양의 정원이 곧 열립니다!'),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 2),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
-          ),
-        );
-      },
+      onTap: () => context.go('/garden'),
       child: Container(
         width: double.infinity,
         height: 200,
@@ -293,7 +273,7 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     const Icon(Icons.touch_app, color: Colors.white, size: 14),
                     const SizedBox(width: 4),
-                    Text('준비 중',
+                    Text('들어가기',
                         style: AppTypography.label(Colors.white)
                             .copyWith(fontSize: 11)),
                   ],
@@ -329,13 +309,13 @@ class HomeScreen extends ConsumerWidget {
               if (task.isCompleted) return;
               switch (task.type) {
                 case DailyTaskType.meditation:
-                  context.go('/study/path-1/lesson-1/scripture');
+                  context.go('/meditation');
                   break;
                 case DailyTaskType.prayer:
-                  _handleTaskComplete(context, ref, task.type);
+                  context.go('/prayer');
                   break;
                 case DailyTaskType.bibleReading:
-                  _handleTaskComplete(context, ref, task.type);
+                  context.go('/bible-reading');
                   break;
               }
             },
