@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/supabase_constants.dart';
 
@@ -20,6 +21,13 @@ class SupabaseService {
     await Supabase.initialize(
       url: SupabaseConstants.supabaseUrl,
       anonKey: SupabaseConstants.supabaseAnonKey,
+      authOptions: FlutterAuthClientOptions(
+        // 웹: implicit flow (토큰이 URL fragment로 전달, verifier 불필요)
+        // 모바일: PKCE flow (딥링크 기반, 더 안전)
+        authFlowType: kIsWeb
+            ? AuthFlowType.implicit
+            : AuthFlowType.pkce,
+      ),
     );
   }
 }

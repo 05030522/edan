@@ -90,7 +90,7 @@ class EdenButton extends StatelessWidget {
               strokeWidth: 2,
               valueColor: AlwaysStoppedAnimation<Color>(
                 variant == _EdenButtonVariant.primary
-                    ? textPrimary
+                    ? Colors.white
                     : AppColors.primary,
               ),
             ),
@@ -102,9 +102,9 @@ class EdenButton extends StatelessWidget {
         return ElevatedButton(
           onPressed: _enabled ? onPressed : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.4),
-            foregroundColor: textPrimary,
+            backgroundColor: AppColors.primaryDark,
+            disabledBackgroundColor: AppColors.primaryDark.withValues(alpha: 0.4),
+            foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
             shape: RoundedRectangleBorder(
@@ -149,7 +149,7 @@ class EdenButton extends StatelessWidget {
     final Color labelColor;
     switch (variant) {
       case _EdenButtonVariant.primary:
-        labelColor = textPrimary;
+        labelColor = Colors.white;
         break;
       case _EdenButtonVariant.secondary:
       case _EdenButtonVariant.text:

@@ -6,6 +6,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
+import '../../../shared/widgets/point_toast.dart';
+import '../../home/providers/daily_tasks_provider.dart';
 
 /// 일일 퀘스트 화면
 class QuestsScreen extends ConsumerWidget {
@@ -19,27 +21,21 @@ class QuestsScreen extends ConsumerWidget {
     final subTextColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    // 플레이스홀더 퀘스트 데이터
-    final quests = [
-      _QuestData(
-        title: '오늘의 묵상 완료하기',
-        reward: '+${AppConstants.faithPointsPerLesson} FP',
-        isCompleted: false,
-        icon: Icons.menu_book,
-      ),
-      _QuestData(
-        title: '셀라 묵상 기록 남기기',
-        reward: '+${AppConstants.faithPointsPerSelah} FP',
-        isCompleted: false,
-        icon: Icons.edit_note,
-      ),
-      _QuestData(
-        title: '한 줄 기도 적기',
-        reward: '+${AppConstants.faithPointsPerSelah} FP',
-        isCompleted: false,
-        icon: Icons.favorite_outline,
-      ),
-    ];
+    // dailyTasksProvider에서 실제 완료 상태 읽기
+    final tasksState = ref.watch(dailyTasksProvider);
+    final completedCount = tasksState.completedCount;
+    final allCompleted = tasksState.allCompleted;
+
+    // 태스크 → 퀘스트 매핑
+    final quests = tasksState.tasks.map((task) {
+      return _QuestData(
+        title: _questTitleForType(task.type),
+        reward: '+${task.rewardFp} FP',
+        isCompleted: task.isCompleted,
+        icon: _questIconForType(task.type),
+        taskType: task.type,
+      );
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -59,13 +55,15 @@ class QuestsScreen extends ConsumerWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.gold.withValues(alpha: 0.2),
+                    color: allCompleted
+                        ? AppColors.success.withValues(alpha: 0.2)
+                        : AppColors.gold.withValues(alpha: 0.2),
                     borderRadius:
                         BorderRadius.circular(AppTheme.radiusMedium),
                   ),
-                  child: const Icon(
-                    Icons.stars,
-                    color: AppColors.gold,
+                  child: Icon(
+                    allCompleted ? Icons.check_circle : Icons.stars,
+                    color: allCompleted ? AppColors.success : AppColors.gold,
                     size: 28,
                   ),
                 ),
@@ -80,26 +78,31 @@ class QuestsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '모든 퀘스트를 완료하면 보너스 +${AppConstants.faithPointsPerfectDay} FP!',
+                        allCompleted
+                            ? '오늘의 모든 퀘스트를 완료했어요!'
+                            : '모든 퀘스트를 완료하면 보너스 +${AppConstants.faithPointsPerfectDay} FP!',
                         style: AppTypography.bodySmall(subTextColor),
                       ),
                     ],
                   ),
                 ),
-                // 완료 상태
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppTheme.spacingMD,
                     vertical: AppTheme.spacingXS,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.15),
+                    color: allCompleted
+                        ? AppColors.success.withValues(alpha: 0.15)
+                        : AppColors.primary.withValues(alpha: 0.15),
                     borderRadius:
                         BorderRadius.circular(AppTheme.radiusRound),
                   ),
                   child: Text(
-                    '0/3',
-                    style: AppTypography.label(AppColors.primaryDark),
+                    '$completedCount/${quests.length}',
+                    style: AppTypography.label(
+                      allCompleted ? AppColors.success : AppColors.primaryDark,
+                    ),
                   ),
                 ),
               ],
@@ -117,11 +120,71 @@ class QuestsScreen extends ConsumerWidget {
           // 퀘스트 목록
           ...quests.map((quest) => Padding(
                 padding: const EdgeInsets.only(bottom: AppTheme.spacingMD),
-                child: _QuestCard(quest: quest),
+                child: _QuestCard(
+                  quest: quest,
+                  onTap: quest.isCompleted
+                      ? null
+                      : () {
+                          final reward = ref
+                              .read(dailyTasksProvider.notifier)
+                              .completeTask(quest.taskType);
+                          if (reward > 0) {
+                            final size = MediaQuery.of(context).size;
+                            PointToast.show(
+                              context,
+                              points: reward,
+                              sourceOffset:
+                                  Offset(size.width / 2, size.height * 0.4),
+                            );
+                          }
+                        },
+                ),
               )),
+
+          // 스트릭 마일스톤 안내
+          const SizedBox(height: AppTheme.spacingXL),
+          Text(
+            '스트릭 보너스',
+            style: AppTypography.titleMedium(textColor),
+          ),
+          const SizedBox(height: AppTheme.spacingMD),
+          ...AppConstants.streakMilestoneRewards.entries
+              .take(4)
+              .map((entry) => Padding(
+                    padding:
+                        const EdgeInsets.only(bottom: AppTheme.spacingSM),
+                    child: _MilestoneRow(
+                      days: entry.key,
+                      reward: entry.value,
+                      textColor: textColor,
+                      subTextColor: subTextColor,
+                    ),
+                  )),
         ],
       ),
     );
+  }
+
+  String _questTitleForType(DailyTaskType type) {
+    switch (type) {
+      case DailyTaskType.meditation:
+        return '오늘의 묵상 완료하기';
+      case DailyTaskType.prayer:
+        return '한 줄 기도 적기';
+      case DailyTaskType.bibleReading:
+        return '말씀 읽기 완료하기';
+    }
+  }
+
+  IconData _questIconForType(DailyTaskType type) {
+    switch (type) {
+      case DailyTaskType.meditation:
+        return Icons.menu_book;
+      case DailyTaskType.prayer:
+        return Icons.favorite_outline;
+      case DailyTaskType.bibleReading:
+        return Icons.auto_stories;
+    }
   }
 }
 
@@ -131,20 +194,23 @@ class _QuestData {
   final String reward;
   final bool isCompleted;
   final IconData icon;
+  final DailyTaskType taskType;
 
   const _QuestData({
     required this.title,
     required this.reward,
     required this.isCompleted,
     required this.icon,
+    required this.taskType,
   });
 }
 
 /// 퀘스트 카드 위젯
 class _QuestCard extends StatelessWidget {
   final _QuestData quest;
+  final VoidCallback? onTap;
 
-  const _QuestCard({required this.quest});
+  const _QuestCard({required this.quest, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -154,71 +220,121 @@ class _QuestCard extends StatelessWidget {
     final subTextColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    return GlassCard(
-      padding: const EdgeInsets.all(AppTheme.spacingLG),
-      child: Row(
-        children: [
-          // 체크박스
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
+    return GestureDetector(
+      onTap: onTap,
+      child: GlassCard(
+        padding: const EdgeInsets.all(AppTheme.spacingLG),
+        child: Row(
+          children: [
+            // 체크박스
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: quest.isCompleted
+                      ? AppColors.success
+                      : AppColors.primary.withValues(alpha: 0.4),
+                  width: 2,
+                ),
                 color: quest.isCompleted
                     ? AppColors.success
-                    : AppColors.primary.withValues(alpha: 0.4),
-                width: 2,
+                    : Colors.transparent,
               ),
-              color: quest.isCompleted
-                  ? AppColors.success
-                  : Colors.transparent,
+              child: quest.isCompleted
+                  ? const Icon(Icons.check, size: 16, color: Colors.white)
+                  : null,
             ),
-            child: quest.isCompleted
-                ? const Icon(
-                    Icons.check,
-                    size: 16,
-                    color: Colors.white,
-                  )
-                : null,
-          ),
-          const SizedBox(width: AppTheme.spacingMD),
+            const SizedBox(width: AppTheme.spacingMD),
 
-          // 아이콘
-          Icon(
-            quest.icon,
-            color: quest.isCompleted ? AppColors.success : subTextColor,
-            size: 20,
-          ),
-          const SizedBox(width: AppTheme.spacingMD),
+            // 아이콘
+            Icon(
+              quest.icon,
+              color: quest.isCompleted ? AppColors.success : subTextColor,
+              size: 20,
+            ),
+            const SizedBox(width: AppTheme.spacingMD),
 
-          // 퀘스트 내용
-          Expanded(
-            child: Text(
-              quest.title,
-              style: AppTypography.bodyMedium(
-                quest.isCompleted ? subTextColor : textColor,
-              ).copyWith(
-                decoration:
-                    quest.isCompleted ? TextDecoration.lineThrough : null,
+            // 퀘스트 내용
+            Expanded(
+              child: Text(
+                quest.title,
+                style: AppTypography.bodyMedium(
+                  quest.isCompleted ? subTextColor : textColor,
+                ).copyWith(
+                  decoration:
+                      quest.isCompleted ? TextDecoration.lineThrough : null,
+                ),
               ),
             ),
-          ),
 
-          // 보상
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.spacingSM,
-              vertical: AppTheme.spacingXS,
+            // 보상
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingSM,
+                vertical: AppTheme.spacingXS,
+              ),
+              decoration: BoxDecoration(
+                color: quest.isCompleted
+                    ? AppColors.success.withValues(alpha: 0.15)
+                    : AppColors.gold.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+              ),
+              child: Text(
+                quest.isCompleted ? '완료' : quest.reward,
+                style: AppTypography.label(
+                  quest.isCompleted ? AppColors.success : AppColors.gold,
+                ),
+              ),
             ),
-            decoration: BoxDecoration(
-              color: AppColors.gold.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppTheme.radiusRound),
-            ),
-            child: Text(
-              quest.reward,
-              style: AppTypography.label(AppColors.gold),
-            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 스트릭 마일스톤 행
+class _MilestoneRow extends StatelessWidget {
+  final int days;
+  final int reward;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _MilestoneRow({
+    required this.days,
+    required this.reward,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingLG,
+        vertical: AppTheme.spacingMD,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.gold.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.local_fire_department,
+              color: AppColors.streakFlame, size: 18),
+          const SizedBox(width: AppTheme.spacingSM),
+          Text(
+            '$days일 연속',
+            style: AppTypography.bodyMedium(textColor),
+          ),
+          const Spacer(),
+          Text(
+            '+$reward FP',
+            style: AppTypography.label(AppColors.gold)
+                .copyWith(fontWeight: FontWeight.w700),
           ),
         ],
       ),

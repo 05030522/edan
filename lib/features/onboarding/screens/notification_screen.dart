@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../providers/onboarding_provider.dart';
 
 /// 온보딩 - 알림 시간 설정 화면
 class OnboardingNotificationScreen extends ConsumerStatefulWidget {
@@ -45,7 +46,7 @@ class _OnboardingNotificationScreenState
   }
 
   void _handleNext() {
-    // TODO: 알림 시간 저장
+    ref.read(onboardingProvider.notifier).setNotificationTime(_hour, _minute);
     context.go('/onboarding/complete');
   }
 
@@ -71,9 +72,22 @@ class _OnboardingNotificationScreenState
             children: [
               const SizedBox(height: AppTheme.spacing3XL),
 
-              // 진행 표시
-              _buildProgressIndicator(3, 4),
-              const SizedBox(height: AppTheme.spacing3XL),
+              // 진행 표시 (4/5)
+              _buildProgressIndicator(4, 5),
+              const SizedBox(height: AppTheme.spacingMD),
+
+              // 건너뛰기 버튼
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => context.go('/onboarding/complete'),
+                  child: Text(
+                    '건너뛰기',
+                    style: AppTypography.bodyMedium(subTextColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingLG),
 
               // 알림 아이콘
               const Icon(
@@ -162,7 +176,7 @@ class _OnboardingNotificationScreenState
                   onPressed: _handleNext,
                   child: Text(
                     '다음',
-                    style: AppTypography.button(AppColors.lightTextPrimary),
+                    style: AppTypography.button(Colors.white),
                   ),
                 ),
               ),

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +7,17 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
+import '../../../shared/widgets/point_toast.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../providers/daily_tasks_provider.dart';
+import '../widgets/weekly_calendar.dart';
+import '../widgets/daily_task_card.dart';
+
+/// 큰 숫자 포맷 (10000 → 10K+)
+String _formatNumber(int n) {
+  if (n >= 10000) return '${(n / 1000).floor()}K+';
+  return '$n';
+}
 
 /// 홈 화면 (에덴 정원)
 class HomeScreen extends ConsumerWidget {
@@ -17,211 +26,374 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? AppColors.darkBackground : AppColors.lightBackground;
     final textColor =
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    // 플레이스홀더 데이터
-    const String userName = '에덴 사용자';
-    const int streakCount = 0;
-    final String greeting = AppConstants.lambyGreetings[
-        Random().nextInt(AppConstants.lambyGreetings.length)];
+    final authState = ref.watch(authProvider);
+    final profile = authState.profile;
+    final streakCount = profile?.currentStreak ?? 0;
+    final faithPoints = profile?.faithPoints ?? 0;
+    final currentLevel = profile?.currentLevel ?? 1;
+
+    final tasksState = ref.watch(dailyTasksProvider);
+
+    // 주간 캘린더: 오늘 모든 태스크 완료 시 오늘 요일을 완료로 표시
+    final completedDays = <int>{};
+    if (tasksState.allCompleted) {
+      final todayIndex = (DateTime.now().weekday - 1) % 7;
+      completedDays.add(todayIndex);
+    }
+
+    final now = DateTime.now();
+    final weekdayNames = ['월', '화', '수', '목', '금', '토', '일'];
+    final todayLabel =
+        '${now.month}월 ${now.day}일 ${weekdayNames[(now.weekday - 1) % 7]}';
+
+    // 루양 인사 (날짜 기반으로 고정)
+    final greetingIndex = now.day % AppConstants.lambyGreetings.length;
+    final greeting = AppConstants.lambyGreetings[greetingIndex];
+
+    final levelIndex =
+        (currentLevel - 1).clamp(0, AppConstants.levelNames.length - 1);
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppTheme.spacingXL),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppTheme.spacingXL,
+            vertical: AppTheme.spacingLG,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 상단: 인사말 + 스트릭
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '안녕, $userName!',
-                          style: AppTypography.headlineMedium(textColor),
-                        ),
-                        const SizedBox(height: AppTheme.spacingXS),
-                        Text(
-                          '오늘도 에덴을 가꿔볼까요?',
-                          style: AppTypography.bodyMedium(subTextColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // 스트릭 표시
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingMD,
-                      vertical: AppTheme.spacingSM,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.streakFlame.withValues(alpha: 0.15),
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusRound),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.local_fire_department,
-                          color: AppColors.streakFlame,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$streakCount',
-                          style: AppTypography.streakNumber(
-                            AppColors.streakFlame,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              _buildHeader(
+                context,
+                streakCount: streakCount,
+                faithPoints: faithPoints,
+                textColor: textColor,
               ),
               const SizedBox(height: AppTheme.spacingXL),
 
-              // 정원 영역
+              WeeklyCalendar(completedDays: completedDays),
+              const SizedBox(height: AppTheme.spacingXL),
+
+              // 날짜 표시
               Container(
                 width: double.infinity,
-                height: 220,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingLG,
+                  vertical: AppTheme.spacingMD,
+                ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      AppColors.gardenSprout,
-                      AppColors.primaryDark,
-                    ],
-                  ),
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : AppColors.primary.withValues(alpha: 0.08),
                   borderRadius:
-                      BorderRadius.circular(AppTheme.radiusXLarge),
+                      BorderRadius.circular(AppTheme.radiusMedium),
                 ),
-                child: Stack(
-                  children: [
-                    // 정원 레벨 텍스트
-                    Positioned(
-                      bottom: AppTheme.spacingLG,
-                      left: AppTheme.spacingLG,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppTheme.spacingMD,
-                          vertical: AppTheme.spacingSM,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(
-                            AppTheme.radiusRound,
-                          ),
-                        ),
-                        child: Text(
-                          'Lv.1 ${AppConstants.levelNames[0]}',
-                          style: AppTypography.label(Colors.white),
-                        ),
-                      ),
-                    ),
-
-                    // 플레이스홀더 정원 아이콘
-                    Center(
-                      child: Icon(
-                        Icons.eco,
-                        size: 64,
-                        color: Colors.white.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacingXL),
-
-              // 오늘의 묵상 카드
-              GlassCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.menu_book,
-                          color: AppColors.primary,
-                          size: 20,
-                        ),
-                        const SizedBox(width: AppTheme.spacingSM),
-                        Text(
-                          '오늘의 묵상',
-                          style: AppTypography.titleMedium(textColor),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppTheme.spacingMD),
-
-                    Text(
-                      '신앙의 첫걸음 - Day 1',
-                      style: AppTypography.titleLarge(textColor),
-                    ),
-                    const SizedBox(height: AppTheme.spacingXS),
-                    Text(
-                      '요한복음 3:16',
-                      style: AppTypography.bodySmall(subTextColor),
-                    ),
-                    const SizedBox(height: AppTheme.spacingLG),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          context.go('/study/path-1/lesson-1/scripture');
-                        },
-                        child: Text(
-                          '묵상 시작하기',
-                          style: AppTypography.button(
-                            AppColors.lightTextPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacingXL),
-
-              // 램비 인사 메시지
-              GlassCard(
                 child: Row(
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.pets,
-                        color: AppColors.primaryDark,
-                        size: 20,
-                      ),
+                    Icon(
+                      Icons.calendar_today,
+                      size: 18,
+                      color: AppColors.primaryDark,
                     ),
-                    const SizedBox(width: AppTheme.spacingMD),
-                    Expanded(
-                      child: Text(
-                        greeting,
-                        style: AppTypography.bodyMedium(textColor),
-                      ),
+                    const SizedBox(width: AppTheme.spacingSM),
+                    Text(
+                      todayLabel,
+                      style: AppTypography.titleMedium(textColor),
                     ),
                   ],
                 ),
+              ),
+              const SizedBox(height: AppTheme.spacingXL),
+
+              _buildGardenPreview(
+                context,
+                currentLevel: currentLevel,
+                levelName: AppConstants.levelNames[levelIndex],
+              ),
+              const SizedBox(height: AppTheme.spacingXL),
+
+              _buildDailyTasks(context, ref,
+                  tasksState: tasksState, textColor: textColor),
+              const SizedBox(height: AppTheme.spacingXL),
+
+              _buildLambyCard(context,
+                  greeting: greeting, textColor: textColor),
+              const SizedBox(height: AppTheme.spacingLG),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context, {
+    required int streakCount,
+    required int faithPoints,
+    required Color textColor,
+  }) {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () => context.go('/profile/settings'),
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.primary.withValues(alpha: 0.1),
+            ),
+            child: Icon(
+              Icons.settings_outlined,
+              color: textColor.withValues(alpha: 0.6),
+              size: 22,
+            ),
+          ),
+        ),
+        const Spacer(),
+
+        // 스트릭 pill
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.streakFlame.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.local_fire_department,
+                  color: AppColors.streakFlame, size: 18),
+              const SizedBox(width: 4),
+              Text(
+                '연속 ${_formatNumber(streakCount)}일',
+                style: AppTypography.label(AppColors.streakFlame)
+                    .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
               ),
             ],
           ),
         ),
+        const SizedBox(width: 8),
+
+        // FP pill - 스낵바 피드백 추가
+        GestureDetector(
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('상점 기능이 곧 추가됩니다!'),
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 2),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.star_rounded, color: AppColors.gold, size: 18),
+                const SizedBox(width: 4),
+                Text(
+                  _formatNumber(faithPoints),
+                  style: AppTypography.label(AppColors.goldDark)
+                      .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGardenPreview(
+    BuildContext context, {
+    required int currentLevel,
+    required String levelName,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('루양의 정원이 곧 열립니다!'),
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        height: 200,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [AppColors.gardenSprout, AppColors.primaryDark],
+          ),
+          borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              bottom: AppTheme.spacingLG,
+              left: AppTheme.spacingLG,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppTheme.spacingMD,
+                    vertical: AppTheme.spacingSM),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                ),
+                child: Text(
+                  'Lv.$currentLevel $levelName',
+                  style: AppTypography.label(Colors.white),
+                ),
+              ),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.pets, size: 56,
+                      color: Colors.white.withValues(alpha: 0.7)),
+                  const SizedBox(height: 8),
+                  Text('루양의 정원',
+                      style: AppTypography.label(
+                          Colors.white.withValues(alpha: 0.8))),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: AppTheme.spacingLG,
+              right: AppTheme.spacingLG,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.touch_app, color: Colors.white, size: 14),
+                    const SizedBox(width: 4),
+                    Text('준비 중',
+                        style: AppTypography.label(Colors.white)
+                            .copyWith(fontSize: 11)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDailyTasks(
+    BuildContext context,
+    WidgetRef ref, {
+    required DailyTasksState tasksState,
+    required Color textColor,
+  }) {
+    return Column(
+      children: tasksState.tasks.asMap().entries.map((entry) {
+        final index = entry.key;
+        final task = entry.value;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: index < tasksState.tasks.length - 1
+                ? AppTheme.spacingMD
+                : 0,
+          ),
+          child: DailyTaskCard(
+            task: task,
+            onStart: () {
+              if (task.isCompleted) return;
+              switch (task.type) {
+                case DailyTaskType.meditation:
+                  context.go('/study/path-1/lesson-1/scripture');
+                  break;
+                case DailyTaskType.prayer:
+                  _handleTaskComplete(context, ref, task.type);
+                  break;
+                case DailyTaskType.bibleReading:
+                  _handleTaskComplete(context, ref, task.type);
+                  break;
+              }
+            },
+            onComplete: () {
+              _handleTaskComplete(context, ref, task.type);
+            },
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _handleTaskComplete(
+      BuildContext context, WidgetRef ref, DailyTaskType type) {
+    final reward =
+        ref.read(dailyTasksProvider.notifier).completeTask(type);
+    if (reward > 0) {
+      final size = MediaQuery.of(context).size;
+      PointToast.show(
+        context,
+        points: reward,
+        sourceOffset: Offset(size.width / 2, size.height * 0.3),
+      );
+    }
+  }
+
+  Widget _buildLambyCard(
+    BuildContext context, {
+    required String greeting,
+    required Color textColor,
+  }) {
+    return GlassCard(
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.pets, color: AppColors.primaryDark, size: 22),
+          ),
+          const SizedBox(width: AppTheme.spacingMD),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('루양',
+                    style: AppTypography.label(AppColors.primaryDark)
+                        .copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
+                Text(greeting,
+                    style: AppTypography.bodyMedium(textColor)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

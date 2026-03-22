@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../providers/onboarding_provider.dart';
 
 /// 온보딩 - 교회 선택 화면
 class OnboardingChurchScreen extends ConsumerStatefulWidget {
@@ -47,7 +48,7 @@ class _OnboardingChurchScreenState
   }
 
   void _handleNext() {
-    // TODO: 교회 정보 저장
+    ref.read(onboardingProvider.notifier).setChurch(_selectedChurch);
     context.go('/onboarding/notification');
   }
 
@@ -74,9 +75,22 @@ class _OnboardingChurchScreenState
             children: [
               const SizedBox(height: AppTheme.spacing3XL),
 
-              // 진행 표시
-              _buildProgressIndicator(2, 4),
-              const SizedBox(height: AppTheme.spacing3XL),
+              // 진행 표시 (3/5)
+              _buildProgressIndicator(3, 5),
+              const SizedBox(height: AppTheme.spacingMD),
+
+              // 건너뛰기 버튼
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => context.go('/onboarding/notification'),
+                  child: Text(
+                    '건너뛰기',
+                    style: AppTypography.bodyMedium(subTextColor),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingLG),
 
               // 타이틀
               Text(
@@ -191,7 +205,7 @@ class _OnboardingChurchScreenState
                   onPressed: _handleNext,
                   child: Text(
                     '다음',
-                    style: AppTypography.button(AppColors.lightTextPrimary),
+                    style: AppTypography.button(Colors.white),
                   ),
                 ),
               ),

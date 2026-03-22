@@ -57,7 +57,7 @@ class AppConstants {
     365: 1000,
   };
 
-  // ─── 램비 인사말 ───
+  // ─── 루양 인사말 ───
   static const List<String> lambyGreetings = [
     '좋은 아침이에요! 오늘도 말씀과 함께해요~',
     '반가워! 오늘은 어떤 말씀을 만날까?',
@@ -66,7 +66,7 @@ class AppConstants {
     '에덴에 온 걸 환영해! 오늘도 파이팅!',
   ];
 
-  // ─── 램비 격려말 ───
+  // ─── 루양 격려말 ───
   static const List<String> lambyEncouragements = [
     '잘하고 있어! 계속 함께해~',
     '말씀이 마음에 심겨지고 있어!',

@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/constants/supabase_constants.dart';
+import '../../../core/services/supabase_service.dart';
 import '../providers/auth_provider.dart';
 
 /// 스플래시 화면
@@ -40,13 +42,47 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     // 2초 후 라우팅
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
-      final authState = ref.read(authProvider);
-      if (authState.status == AuthStatus.authenticated) {
+      _navigateBasedOnAuth();
+    });
+  }
+
+  /// 인증 상태 + 프로필 완성 여부에 따라 분기
+  Future<void> _navigateBasedOnAuth() async {
+    if (!mounted) return;
+    final authState = ref.read(authProvider);
+
+    if (authState.status != AuthStatus.authenticated) {
+      context.go('/welcome');
+      return;
+    }
+
+    // 로그인 되어있으면 프로필 존재 여부 확인
+    try {
+      final userId = SupabaseService.currentUserId;
+      if (userId == null) {
+        context.go('/welcome');
+        return;
+      }
+
+      final data = await SupabaseService.client
+          .from(SupabaseConstants.tableProfiles)
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
+
+      if (!mounted) return;
+
+      if (data != null &&
+          (data['display_name'] as String?)?.isNotEmpty == true) {
         context.go('/home');
       } else {
-        context.go('/welcome');
+        // 프로필 미완성 → 온보딩
+        context.go('/onboarding/name');
       }
-    });
+    } catch (e) {
+      debugPrint('프로필 조회 에러: $e');
+      if (mounted) context.go('/home');
+    }
   }
 
   @override

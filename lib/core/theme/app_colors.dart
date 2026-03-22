@@ -38,6 +38,12 @@ class AppColors {
   static const Color streakFlameBright = Color(0xFFFFAB40);
   static const Color streakRainbow = Color(0xFFE040FB);
 
+  // ─── 퀴즈 ───
+  static const Color quizCorrect = Color(0xFF4CAF50);
+  static const Color quizCorrectDark = Color(0xFF2E7D32);
+  static const Color quizIncorrectDark = Color(0xFFC62828);
+  static const Color goldDark = Color(0xFFB8960A);
+
   // ─── 정원 레벨 ───
   static const Color gardenSoil = Color(0xFF8D6E63);
   static const Color gardenSprout = Color(0xFFA5D6A7);

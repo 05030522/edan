@@ -58,6 +58,7 @@ class UserProfile {
       'id': id,
       'display_name': displayName,
       'church_id': churchId,
+      'church_name': churchName,
       'faith_points': faithPoints,
       'current_level': currentLevel,
       'current_streak': currentStreak,

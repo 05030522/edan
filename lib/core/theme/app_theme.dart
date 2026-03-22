@@ -60,14 +60,14 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.lightTextPrimary,
+          backgroundColor: AppColors.primaryDark,
+          foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusLarge),
           ),
-          textStyle: AppTypography.button(AppColors.lightTextPrimary),
+          textStyle: AppTypography.button(Colors.white),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -156,13 +156,14 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.lightTextPrimary,
+          backgroundColor: AppColors.primaryDark,
+          foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusLarge),
           ),
+          textStyle: AppTypography.button(Colors.white),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(

@@ -5,6 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/services/supabase_service.dart';
+import '../../../shared/models/user_profile.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../providers/onboarding_provider.dart';
 
 /// 온보딩 완료 화면
 class OnboardingCompleteScreen extends ConsumerWidget {
@@ -20,8 +24,8 @@ class OnboardingCompleteScreen extends ConsumerWidget {
     final subTextColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    // TODO: 실제 사용자 이름으로 교체
-    const String userName = '사용자';
+    final onboardingData = ref.watch(onboardingProvider);
+    final userName = onboardingData.name.isNotEmpty ? onboardingData.name : '사용자';
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -34,8 +38,8 @@ class OnboardingCompleteScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: AppTheme.spacing3XL),
 
-              // 진행 표시 (완료)
-              _buildProgressIndicator(4, 4),
+              // 진행 표시 (완료 5/5)
+              _buildProgressIndicator(5, 5),
 
               const Spacer(),
 
@@ -104,10 +108,46 @@ class OnboardingCompleteScreen extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.go('/home'),
+                  onPressed: () async {
+                    // 온보딩 데이터 로컬 저장
+                    await ref.read(onboardingProvider.notifier).saveToLocal();
+
+                    // Auth 프로필 업데이트 (새 프로필 생성 또는 기존 프로필 업데이트)
+                    final userId = SupabaseService.currentUserId;
+                    if (userId != null) {
+                      final currentProfile = ref.read(authProvider).profile;
+                      final now = DateTime.now();
+
+                      final updatedProfile = currentProfile != null
+                          ? currentProfile.copyWith(
+                              displayName: onboardingData.name,
+                              churchName: onboardingData.churchName,
+                              notificationTime:
+                                  onboardingData.notificationTimeFormatted,
+                            )
+                          : UserProfile(
+                              id: userId,
+                              displayName: onboardingData.name,
+                              churchName: onboardingData.churchName,
+                              notificationTime:
+                                  onboardingData.notificationTimeFormatted,
+                              faithPoints: 10, // 온보딩 완료 보너스
+                              createdAt: now,
+                              updatedAt: now,
+                            );
+
+                      await ref
+                          .read(authProvider.notifier)
+                          .updateProfile(updatedProfile);
+                    }
+
+                    if (context.mounted) {
+                      context.go('/home');
+                    }
+                  },
                   child: Text(
                     '에덴 시작하기',
-                    style: AppTypography.button(AppColors.lightTextPrimary),
+                    style: AppTypography.button(Colors.white),
                   ),
                 ),
               ),

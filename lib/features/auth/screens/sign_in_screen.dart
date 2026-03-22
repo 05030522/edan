@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/social_auth_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/widgets/social_login_button.dart';
 import '../providers/auth_provider.dart';
 
-/// 로그인 화면
+/// 로그인 화면 - 소셜 로그인 전용
 class SignInScreen extends ConsumerStatefulWidget {
   const SignInScreen({super.key});
 
@@ -16,31 +18,32 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  SocialProvider? _loadingProvider;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleSignIn() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    await ref.read(authProvider.notifier).signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
+  Future<void> _handleSocialLogin(SocialProvider provider) async {
+    // 미지원 프로바이더 안내
+    if (!SocialAuthService.isProviderSupported(provider)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${SocialAuthService.getProviderDisplayName(provider)} 로그인은 준비 중입니다.',
+            ),
+            duration: const Duration(seconds: 2),
+          ),
         );
+      }
+      return;
+    }
 
-    if (!mounted) return;
-
-    final authState = ref.read(authProvider);
-    if (authState.status == AuthStatus.authenticated) {
-      context.go('/home');
+    setState(() => _loadingProvider = provider);
+    await ref.read(authProvider.notifier).signInWithSocial(provider);
+    if (mounted) {
+      setState(() => _loadingProvider = null);
+      final authState = ref.read(authProvider);
+      if (authState.status == AuthStatus.authenticated) {
+        context.go('/home');
+      }
     }
   }
 
@@ -55,7 +58,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
     final authState = ref.watch(authProvider);
-    final isLoading = authState.status == AuthStatus.loading;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -72,131 +74,74 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           padding: const EdgeInsets.symmetric(
             horizontal: AppTheme.spacingXL,
           ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppTheme.spacingXXL),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppTheme.spacingXXL),
 
-                // 타이틀
-                Text(
-                  '다시 만나서 반가워요!',
-                  style: AppTypography.headlineLarge(textColor),
-                ),
-                const SizedBox(height: AppTheme.spacingSM),
-                Text(
-                  '에덴에 로그인하세요',
-                  style: AppTypography.bodyMedium(subTextColor),
-                ),
-                const SizedBox(height: AppTheme.spacing3XL),
+              // 타이틀
+              Text(
+                '다시 만나서 반가워요!',
+                style: AppTypography.headlineLarge(textColor),
+              ),
+              const SizedBox(height: AppTheme.spacingSM),
+              Text(
+                '간편하게 로그인하세요',
+                style: AppTypography.bodyMedium(subTextColor),
+              ),
+              const SizedBox(height: AppTheme.spacing3XL),
 
-                // 이메일 입력
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    hintText: '이메일',
-                    prefixIcon: Icon(Icons.email_outlined),
+              // 에러 메시지
+              if (authState.error != null)
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: AppTheme.spacingLG,
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return '이메일을 입력해주세요';
-                    }
-                    if (!value.contains('@')) {
-                      return '올바른 이메일 형식을 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppTheme.spacingLG),
-
-                // 비밀번호 입력
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    hintText: '비밀번호',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppTheme.spacingMD),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.radiusMedium),
                     ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '비밀번호를 입력해주세요';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppTheme.spacingLG),
-
-                // 에러 메시지
-                if (authState.error != null)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: AppTheme.spacingLG,
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppTheme.spacingMD),
-                      decoration: BoxDecoration(
-                        color: AppColors.error.withValues(alpha: 0.1),
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusMedium),
-                      ),
-                      child: Text(
-                        authState.error!,
-                        style: AppTypography.bodySmall(AppColors.error),
-                      ),
-                    ),
-                  ),
-
-                // 로그인 버튼
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: isLoading ? null : _handleSignIn,
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.lightTextPrimary,
-                            ),
-                          )
-                        : Text(
-                            '로그인',
-                            style: AppTypography.button(
-                              AppColors.lightTextPrimary,
-                            ),
-                          ),
-                  ),
-                ),
-                const SizedBox(height: AppTheme.spacingXL),
-
-                // 회원가입 링크
-                Center(
-                  child: TextButton(
-                    onPressed: () => context.go('/auth/signup'),
                     child: Text(
-                      '계정이 없으신가요? 회원가입',
-                      style: AppTypography.bodyMedium(subTextColor),
+                      authState.error!,
+                      style: AppTypography.bodySmall(AppColors.error),
                     ),
                   ),
                 ),
-              ],
-            ),
+
+              // 소셜 로그인 버튼
+              SocialLoginButton(
+                provider: SocialProvider.kakao,
+                onPressed: () => _handleSocialLogin(SocialProvider.kakao),
+                isLoading: _loadingProvider == SocialProvider.kakao,
+              ),
+              const SizedBox(height: 12),
+              SocialLoginButton(
+                provider: SocialProvider.google,
+                onPressed: () => _handleSocialLogin(SocialProvider.google),
+                isLoading: _loadingProvider == SocialProvider.google,
+              ),
+              const SizedBox(height: 12),
+              SocialLoginButton(
+                provider: SocialProvider.naver,
+                onPressed: () => _handleSocialLogin(SocialProvider.naver),
+                isLoading: _loadingProvider == SocialProvider.naver,
+              ),
+
+              const SizedBox(height: AppTheme.spacing3XL),
+
+              // 안내 문구
+              Center(
+                child: Text(
+                  '소셜 계정으로 간편하게\n로그인하고 시작하세요',
+                  style: AppTypography.bodySmall(subTextColor),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
       ),
