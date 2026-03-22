@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/services/supabase_service.dart';
+import '../../../core/constants/supabase_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
@@ -49,35 +52,101 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  /// 닉네임 유효성 검사 (한글, 영어, 숫자만 허용)
+  static final _validNameRegex = RegExp(r'^[가-힣a-zA-Z0-9]+$');
+  static const int _minNameLength = 2;
+  static const int _maxNameLength = 12;
+
+  /// Supabase에서 닉네임 중복 검사 (대소문자 무시, 본인 제외)
+  Future<bool> _isNameTaken(String name, String currentUserId) async {
+    try {
+      final result = await SupabaseService.client
+          .from(SupabaseConstants.tableProfiles)
+          .select('id')
+          .ilike('display_name', name)
+          .neq('id', currentUserId)
+          .limit(1);
+      return (result as List).isNotEmpty;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// 이름 변경 다이얼로그
   Future<void> _showNameChangeDialog() async {
     final authState = ref.read(authProvider);
     final currentName = authState.profile?.displayName ?? '';
+    final currentUserId = authState.profile?.id ?? '';
     final controller = TextEditingController(text: currentName);
 
     final newName = await showDialog<String>(
       context: context,
       builder: (context) {
         String? errorText;
+        bool isChecking = false;
         return StatefulBuilder(
           builder: (context, setDialogState) {
+            Future<void> handleSave() async {
+              final name = controller.text.trim();
+              if (name.isEmpty || name.length < _minNameLength) {
+                setDialogState(
+                    () => errorText = '이름은 $_minNameLength자 이상이어야 해요');
+                return;
+              }
+              if (!_validNameRegex.hasMatch(name)) {
+                setDialogState(
+                    () => errorText = '한글, 영어, 숫자만 사용할 수 있어요');
+                return;
+              }
+
+              setDialogState(() {
+                isChecking = true;
+                errorText = null;
+              });
+
+              final taken = await _isNameTaken(name, currentUserId);
+
+              if (taken) {
+                setDialogState(() {
+                  isChecking = false;
+                  errorText = '이미 사용 중인 이름이에요';
+                });
+                return;
+              }
+
+              setDialogState(() => isChecking = false);
+              if (context.mounted) Navigator.of(context).pop(name);
+            }
+
             return AlertDialog(
               title: const Text('이름 변경'),
               content: TextField(
                 controller: controller,
                 autofocus: true,
+                maxLength: _maxNameLength,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'[가-힣a-zA-Z0-9]'),
+                  ),
+                ],
                 decoration: InputDecoration(
                   hintText: '새 이름을 입력하세요',
                   errorText: errorText,
+                  suffixIcon: isChecking
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Padding(
+                            padding: EdgeInsets.all(12),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        )
+                      : null,
                 ),
-                onSubmitted: (value) {
-                  final name = value.trim();
-                  if (name.isEmpty) {
-                    setDialogState(() => errorText = '이름을 입력해주세요');
-                    return;
-                  }
-                  Navigator.of(context).pop(name);
-                },
+                onSubmitted: (_) => handleSave(),
               ),
               actions: [
                 TextButton(
@@ -85,14 +154,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   child: const Text('취소'),
                 ),
                 TextButton(
-                  onPressed: () {
-                    final name = controller.text.trim();
-                    if (name.isEmpty) {
-                      setDialogState(() => errorText = '이름을 입력해주세요');
-                      return;
-                    }
-                    Navigator.of(context).pop(name);
-                  },
+                  onPressed: isChecking ? null : handleSave,
                   child: const Text('저장'),
                 ),
               ],

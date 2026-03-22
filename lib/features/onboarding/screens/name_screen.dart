@@ -35,13 +35,16 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
     super.dispose();
   }
 
-  /// Supabase에서 닉네임 중복 검사
+  /// 닉네임 유효성 검사 (한글, 영어, 숫자만 허용)
+  static final _validNameRegex = RegExp(r'^[가-힣a-zA-Z0-9]+$');
+
+  /// Supabase에서 닉네임 중복 검사 (대소문자 무시)
   Future<bool> _isNameTaken(String name) async {
     try {
       final result = await SupabaseService.client
           .from(SupabaseConstants.tableProfiles)
           .select('id')
-          .eq('display_name', name)
+          .ilike('display_name', name)
           .limit(1);
       return (result as List).isNotEmpty;
     } catch (e) {
@@ -57,6 +60,14 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
     if (name.length < _minNameLength) {
       setState(() {
         _errorText = '이름은 $_minNameLength자 이상이어야 해요';
+      });
+      return;
+    }
+
+    // 허용 문자 검사 (한글, 영어, 숫자만)
+    if (!_validNameRegex.hasMatch(name)) {
+      setState(() {
+        _errorText = '한글, 영어, 숫자만 사용할 수 있어요';
       });
       return;
     }
@@ -162,8 +173,8 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 onChanged: (_) => setState(() {}),
                 inputFormatters: [
-                  FilteringTextInputFormatter.deny(
-                    RegExp(r'\s{2,}'), // 연속 공백 방지
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'[가-힣a-zA-Z0-9]'), // 한글, 영어, 숫자만 허용
                   ),
                 ],
               ),

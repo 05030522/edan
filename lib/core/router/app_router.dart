@@ -18,6 +18,7 @@ import '../../features/study/screens/quiz_screen.dart';
 import '../../features/study/screens/quiz_result_screen.dart';
 import '../../features/study/screens/share_card_screen.dart';
 import '../../features/quests/screens/quests_screen.dart';
+import '../../features/community/screens/community_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/settings/screens/privacy_policy_screen.dart';
@@ -39,6 +40,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String study = '/study';
   static const String quests = '/quests';
+  static const String community = '/community';
   static const String profile = '/profile';
   static const String settings = '/profile/settings';
   static const String lessonScripture = '/study/:pathId/:lessonId/scripture';
@@ -47,7 +49,7 @@ class AppRoutes {
   static const String shareCard = '/study/:pathId/:lessonId/share';
 }
 
-/// 하단 내비게이션 쉘 (4탭)
+/// 하단 내비게이션 쉘 (5탭)
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 /// GoRouter 프로바이더
 final routerProvider = Provider<GoRouter>((ref) {
@@ -128,7 +130,16 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // 탭 4: 나 (프로필)
+          // 탭 4: 커뮤니티
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.community,
+                builder: (context, state) => const CommunityScreen(),
+              ),
+            ],
+          ),
+          // 탭 5: 나 (프로필)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -266,6 +277,11 @@ class _MainScaffold extends StatelessWidget {
               icon: Icon(Icons.star_outline),
               selectedIcon: Icon(Icons.star, color: AppColors.primaryDark),
               label: '도전',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.people_outline),
+              selectedIcon: Icon(Icons.people, color: AppColors.primaryDark),
+              label: '커뮤니티',
             ),
             NavigationDestination(
               icon: Icon(Icons.person_outline),
