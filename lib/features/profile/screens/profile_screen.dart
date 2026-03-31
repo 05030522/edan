@@ -313,31 +313,172 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-/// 캘린더 히트맵 위젯
-class _CalendarHeatmap extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+/// 캘린더 히트맵 위젯 (GitHub 스타일)
+class _CalendarHeatmap extends ConsumerWidget {
+  // 히트맵 색상 단계 (라이트)
+  static const _lightEmpty = Color(0xFFEBEDF0);
+  static const _lightLevel1 = Color(0xFFD4EDDA);
+  static const _lightLevel2 = Color(0xFFA5D6A7);
+  static const _lightLevel3 = Color(0xFF7BA884);
+  static const _lightLevel4 = Color(0xFF4A7C59);
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
-      ),
-      itemCount: 35,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.darkCard
-                : AppColors.primary.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        );
-      },
+  // 히트맵 색상 단계 (다크)
+  static const _darkEmpty = Color(0xFF2D2D2D);
+  static const _darkLevel1 = Color(0xFF0E4429);
+  static const _darkLevel2 = Color(0xFF006D32);
+  static const _darkLevel3 = Color(0xFF26A641);
+  static const _darkLevel4 = Color(0xFF39D353);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subTextColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+
+    final authState = ref.watch(authProvider);
+    final profile = authState.profile;
+    final streak = profile?.currentStreak ?? 0;
+    final lastStudy = profile?.lastStudyDate;
+
+    // 최근 35일 기준으로 완료 날짜 세트 생성
+    final completedDays = <DateTime>{};
+    if (lastStudy != null && streak > 0) {
+      final lastDay = DateTime(lastStudy.year, lastStudy.month, lastStudy.day);
+      for (int i = 0; i < streak; i++) {
+        completedDays.add(lastDay.subtract(Duration(days: i)));
+      }
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // 35일 전부터 오늘까지 (5주)
+    final startDate = today.subtract(const Duration(days: 34));
+
+    // 요일 라벨
+    const dayLabels = ['월', '', '수', '', '금', '', ''];
+
+    return Column(
+      children: [
+        // 요일 헤더 + 그리드
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 요일 라벨 열
+            Column(
+              children: List.generate(7, (i) {
+                return SizedBox(
+                  height: 18,
+                  child: dayLabels[i].isNotEmpty
+                      ? Text(
+                          dayLabels[i],
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: subTextColor,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                );
+              }),
+            ),
+            const SizedBox(width: 6),
+
+            // 히트맵 그리드
+            Expanded(
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 5, // 5주
+                  crossAxisSpacing: 3,
+                  mainAxisSpacing: 3,
+                ),
+                itemCount: 35,
+                itemBuilder: (context, index) {
+                  // index를 주(column) 우선으로 재배열: 위→아래, 왼→오른
+                  final week = index % 5;
+                  final dayOfWeek = index ~/ 5;
+                  final dayOffset = week * 7 + dayOfWeek;
+                  final date = startDate.add(Duration(days: dayOffset));
+                  final dateNorm =
+                      DateTime(date.year, date.month, date.day);
+
+                  final isCompleted = completedDays.contains(dateNorm);
+                  final isFuture = dateNorm.isAfter(today);
+                  final isToday = dateNorm == today;
+
+                  Color cellColor;
+                  if (isFuture) {
+                    cellColor = isDark ? _darkEmpty : _lightEmpty;
+                  } else if (isCompleted) {
+                    // 스트릭 연속 일수에 따라 색 농도 결정
+                    final daysAgo = today.difference(dateNorm).inDays;
+                    if (daysAgo == 0) {
+                      cellColor = isDark ? _darkLevel4 : _lightLevel4;
+                    } else if (daysAgo <= 3) {
+                      cellColor = isDark ? _darkLevel3 : _lightLevel3;
+                    } else if (daysAgo <= 10) {
+                      cellColor = isDark ? _darkLevel2 : _lightLevel2;
+                    } else {
+                      cellColor = isDark ? _darkLevel1 : _lightLevel1;
+                    }
+                  } else {
+                    cellColor = isDark ? _darkEmpty : _lightEmpty;
+                  }
+
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: cellColor,
+                      borderRadius: BorderRadius.circular(3),
+                      border: isToday
+                          ? Border.all(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.4)
+                                  : AppColors.primaryDark.withValues(alpha: 0.5),
+                              width: 1.5,
+                            )
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // 범례
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              '적음',
+              style: TextStyle(fontSize: 10, color: subTextColor),
+            ),
+            const SizedBox(width: 4),
+            ...[
+              isDark ? _darkEmpty : _lightEmpty,
+              isDark ? _darkLevel1 : _lightLevel1,
+              isDark ? _darkLevel2 : _lightLevel2,
+              isDark ? _darkLevel3 : _lightLevel3,
+              isDark ? _darkLevel4 : _lightLevel4,
+            ].map((c) => Container(
+                  width: 12,
+                  height: 12,
+                  margin: const EdgeInsets.only(left: 2),
+                  decoration: BoxDecoration(
+                    color: c,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                )),
+            const SizedBox(width: 4),
+            Text(
+              '많음',
+              style: TextStyle(fontSize: 10, color: subTextColor),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
