@@ -71,7 +71,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     }
 
     // 완료 후 자동으로 돌아가기
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) Navigator.of(context).pop();
     });
   }

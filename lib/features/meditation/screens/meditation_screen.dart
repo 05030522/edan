@@ -100,7 +100,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
       );
     }
 
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
       if (mounted) Navigator.of(context).pop();
     });
   }

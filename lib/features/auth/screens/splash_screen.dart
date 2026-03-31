@@ -46,7 +46,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _initAndNavigate() async {
     // 최소 스플래시 표시 시간과 인증 체크를 동시에 실행
     final results = await Future.wait([
-      Future.delayed(const Duration(milliseconds: 1500)),
+      Future.delayed(const Duration(milliseconds: 600)),
       _checkAuth(),
     ]);
 

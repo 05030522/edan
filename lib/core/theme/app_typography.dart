@@ -8,7 +8,9 @@ class AppTypography {
   AppTypography._();
 
   /// UI 텍스트 스타일 (Noto Sans KR - Pretendard 대체)
-  static TextStyle get _baseUI => GoogleFonts.notoSansKr();
+  static TextStyle get _baseUI => GoogleFonts.notoSansKr().copyWith(
+        fontFamilyFallback: const ['Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', 'sans-serif'],
+      );
 
   /// 성경 구절 전용 스타일 (Noto Serif KR + 한글 fallback)
   static TextStyle get _baseScripture => GoogleFonts.notoSerifKr().copyWith(

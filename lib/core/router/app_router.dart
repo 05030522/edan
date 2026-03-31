@@ -445,7 +445,7 @@ class _AuthCallbackScreenState extends State<_AuthCallbackScreen> {
     try {
       // Supabase SDK가 implicit flow에서 URL fragment의 토큰을
       // 자동으로 처리할 때까지 대기
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 800));
 
       // 이미 인증되었는지 확인
       if (mounted) {
@@ -458,7 +458,6 @@ class _AuthCallbackScreenState extends State<_AuthCallbackScreen> {
           if (code != null) {
             debugPrint('PKCE 코드 교환 시도: $code');
             await SupabaseService.auth.exchangeCodeForSession(code);
-            await Future.delayed(const Duration(milliseconds: 500));
           }
 
           if (mounted) {
