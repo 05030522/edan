@@ -135,15 +135,27 @@ class _PointToastState extends State<PointToast>
           ),
         );
       },
-      child: Text(
-        '+${widget.points} ${widget.label}',
-        style: AppTypography.pointDisplay(AppColors.gold).copyWith(
-          fontSize: 22,
-          shadows: const [
-            Shadow(
-              color: Color(0x40000000),
-              blurRadius: 4,
-              offset: Offset(0, 2),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.gold,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x30000000),
+              blurRadius: 8,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.star_rounded, color: Colors.white, size: 18),
+            const SizedBox(width: 4),
+            Text(
+              '+${widget.points} ${widget.label}',
+              style: AppTypography.titleLarge(Colors.white),
             ),
           ],
         ),
