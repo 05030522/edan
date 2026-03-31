@@ -32,8 +32,7 @@ class HomeScreen extends ConsumerWidget {
     final textColor =
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
 
-    final authState = ref.watch(authProvider);
-    final profile = authState.profile;
+    final profile = ref.watch(authProvider.select((s) => s.profile));
     final streakCount = profile?.currentStreak ?? 0;
     final currentLevel = profile?.currentLevel ?? 1;
 

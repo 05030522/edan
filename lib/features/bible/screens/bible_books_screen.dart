@@ -8,6 +8,10 @@ import '../../../core/theme/app_typography.dart';
 import '../models/bible_book.dart';
 import '../providers/bible_provider.dart';
 
+// 매 빌드마다 필터링하지 않도록 캐시
+final _oldTestament = bibleBooks.where((b) => b.testament == 'old').toList();
+final _newTestament = bibleBooks.where((b) => b.testament == 'new').toList();
+
 /// 성경 전문 보기 - 책 목록 화면
 class BibleBooksScreen extends ConsumerStatefulWidget {
   const BibleBooksScreen({super.key});
@@ -42,10 +46,8 @@ class _BibleBooksScreenState extends ConsumerState<BibleBooksScreen>
     final subTextColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    final oldTestament =
-        bibleBooks.where((b) => b.testament == 'old').toList();
-    final newTestament =
-        bibleBooks.where((b) => b.testament == 'new').toList();
+    final oldTestament = _oldTestament;
+    final newTestament = _newTestament;
 
     return Scaffold(
       backgroundColor: backgroundColor,

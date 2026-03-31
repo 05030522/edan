@@ -35,9 +35,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final subTextColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
 
-    // Auth 프로바이더에서 실제 데이터 읽기
-    final authState = ref.watch(authProvider);
-    final profile = authState.profile;
+    // Auth 프로바이더에서 프로필만 선택적으로 watch
+    final profile = ref.watch(authProvider.select((s) => s.profile));
     final displayName = profile?.displayName.isNotEmpty == true
         ? profile!.displayName
         : '에덴 사용자';

@@ -24,7 +24,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(communityProvider.notifier).refresh();
+      // 이미 데이터가 있으면 불필요한 재로드 방지
+      final state = ref.read(communityProvider);
+      if (state.members.isEmpty && !state.isLoading) {
+        ref.read(communityProvider.notifier).refresh();
+      }
     });
   }
 
@@ -231,6 +235,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           ),
           child: Column(
             children: community.pendingReceived.map((friendship) {
+              // Key for efficient list updates
               // 요청 보낸 사람의 프로필을 멤버 목록에서 찾기
               final requester = community.members.firstWhere(
                 (m) => m.id == friendship.requesterId,
@@ -378,6 +383,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             child: Column(
               children: community.friends.map((friend) {
                 return MemberCard(
+                  key: ValueKey(friend.id),
                   member: friend,
                   friendshipStatus: FriendshipStatus.accepted,
                 );
@@ -435,6 +441,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                     : FriendshipStatus.none;
 
                 return MemberCard(
+                  key: ValueKey(member.id),
                   member: member,
                   isCurrentUser: isMe,
                   friendshipStatus: friendStatus,
