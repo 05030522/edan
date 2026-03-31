@@ -166,20 +166,16 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
           .map((json) => ChurchMember.fromJson(json as Map<String, dynamic>))
           .toList();
 
-      if (mounted) {
-        state = state.copyWith(
-          isLoading: false,
-          members: members,
-        );
-      }
+      state = state.copyWith(
+        isLoading: false,
+        members: members,
+      );
     } catch (e) {
       debugPrint('교회 멤버 로드 실패: $e');
-      if (mounted) {
-        state = state.copyWith(
-          isLoading: false,
-          error: '멤버 목록을 불러오지 못했어요',
-        );
-      }
+      state = state.copyWith(
+        isLoading: false,
+        error: '멤버 목록을 불러오지 못했어요',
+      );
     }
   }
 
@@ -231,19 +227,15 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
             .toList();
       }
 
-      if (mounted) {
-        state = state.copyWith(
-          isFriendsLoading: false,
-          friends: friends,
-          friendships: allFriendships,
-          pendingReceived: pendingReceived,
-        );
-      }
+      state = state.copyWith(
+        isFriendsLoading: false,
+        friends: friends,
+        friendships: allFriendships,
+        pendingReceived: pendingReceived,
+      );
     } catch (e) {
       debugPrint('친구 목록 로드 실패: $e');
-      if (mounted) {
-        state = state.copyWith(isFriendsLoading: false);
-      }
+      state = state.copyWith(isFriendsLoading: false);
     }
   }
 

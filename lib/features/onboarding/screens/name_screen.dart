@@ -139,7 +139,7 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
               ),
               const SizedBox(height: AppTheme.spacingSM),
               Text(
-                '최소 ${_minNameLength}자 · 최대 ${_maxNameLength}자',
+                '최소 $_minNameLength자 · 최대 $_maxNameLength자',
                 style: AppTypography.bodyMedium(subTextColor),
               ),
               const SizedBox(height: AppTheme.spacingXXL),

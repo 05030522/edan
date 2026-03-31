@@ -1,5 +1,4 @@
 /// Supabase 설정 상수
-/// TODO: 실제 Supabase 프로젝트 생성 후 값을 업데이트하세요
 class SupabaseConstants {
   SupabaseConstants._();
 
