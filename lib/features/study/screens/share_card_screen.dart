@@ -187,7 +187,17 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
 
       final bytes = byteData.buffer.asUint8List();
 
-      // share_plus로 공유
+      // 레슨 정보로 공유 텍스트 구성
+      final lesson =
+          LessonDataStore.getLesson(widget.pathId, widget.lessonId) ??
+          LessonDataStore.defaultLesson;
+
+      final shareText = '오늘의 묵상: ${lesson.title} 🌿\n'
+          '${lesson.scriptureReference}\n\n'
+          '나도 에덴에서 매일 묵상하기 👇\n'
+          'https://github.com/05030522/edan';
+
+      // share_plus로 이미지 + 텍스트 + 링크 공유
       await Share.shareXFiles(
         [
           XFile.fromData(
@@ -196,7 +206,8 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
             mimeType: 'image/png',
           ),
         ],
-        text: '오늘도 에덴에서 묵상했어요! 🌿\n매일 5분, 에덴에서 만나요.',
+        text: shareText,
+        subject: '에덴 묵상 - ${lesson.title}',
       );
     } catch (e) {
       if (mounted) {

@@ -147,10 +147,12 @@ class ShareCard extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Icon(
-                  Icons.favorite,
-                  color: AppColors.pink.withValues(alpha: 0.5),
-                  size: 14,
+                child: Text(
+                  '🕊️',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white.withValues(alpha: 0.5),
+                  ),
                 ),
               ),
               Expanded(
@@ -161,15 +163,45 @@ class ShareCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppTheme.spacingMD),
+          const SizedBox(height: AppTheme.spacingLG),
 
-          // 앱 슬로건
-          Center(
-            child: Text(
-              '매일 5분, 에덴에서 만나요',
-              style: AppTypography.label(
-                Colors.white.withValues(alpha: 0.5),
-              ),
+          // 앱 CTA 영역
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              vertical: AppTheme.spacingSM,
+              horizontal: AppTheme.spacingMD,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.eco, color: AppColors.primary, size: 14),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '에덴에서 나도 묵상하기',
+                  style: AppTypography.label(
+                    Colors.white.withValues(alpha: 0.7),
+                  ).copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(width: 6),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 10,
+                  color: Colors.white.withValues(alpha: 0.4),
+                ),
+              ],
             ),
           ),
         ],
