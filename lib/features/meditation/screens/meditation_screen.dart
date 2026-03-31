@@ -315,27 +315,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('묵상 완료', style: AppTypography.button(Colors.white)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusRound),
-                        ),
-                        child: Text(
-                          '+10 FP',
-                          style: AppTypography.label(Colors.white)
-                              .copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: Text('묵상 완료', style: AppTypography.button(Colors.white)),
                 ),
               );
             },

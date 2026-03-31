@@ -182,24 +182,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.favorite, size: 20),
+                      const Text('🙏', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 8),
                       Text('아멘', style: AppTypography.button(Colors.white)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.25),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusRound),
-                        ),
-                        child: Text(
-                          '+5 FP',
-                          style: AppTypography.label(Colors.white)
-                              .copyWith(fontWeight: FontWeight.w700),
-                        ),
-                      ),
                     ],
                   ),
                 ),

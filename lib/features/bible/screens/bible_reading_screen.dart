@@ -256,21 +256,6 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
                   const SizedBox(width: 8),
                   Text('읽기 완료',
                       style: AppTypography.button(Colors.white)),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25),
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusRound),
-                    ),
-                    child: Text(
-                      '+5 FP',
-                      style: AppTypography.label(Colors.white)
-                          .copyWith(fontWeight: FontWeight.w700),
-                    ),
-                  ),
                 ],
               ),
             ),
