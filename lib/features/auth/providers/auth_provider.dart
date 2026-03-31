@@ -7,6 +7,7 @@ import '../../../core/services/supabase_service.dart';
 import '../../../core/services/social_auth_service.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../core/constants/supabase_constants.dart';
+import '../../../core/constants/app_constants.dart';
 
 /// 인증 상태
 enum AuthStatus {
@@ -167,6 +168,123 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       state = state.copyWith(error: e.toString());
     }
+  }
+
+  /// FP에 따른 레벨 계산
+  int _calculateLevel(int fp) {
+    final thresholds = AppConstants.levelThresholds;
+    int level = 1;
+    for (int i = thresholds.length - 1; i >= 0; i--) {
+      if (fp >= thresholds[i]) {
+        level = i + 1;
+        break;
+      }
+    }
+    return level;
+  }
+
+  /// FP 추가 (로컬 즉시 반영 + 자동 레벨업 + 서버 비동기 저장)
+  Future<void> addFaithPoints(int points) async {
+    final profile = state.profile;
+    if (profile == null || points <= 0) return;
+
+    final newFp = profile.faithPoints + points;
+    final newLevel = _calculateLevel(newFp);
+
+    final updated = profile.copyWith(
+      faithPoints: newFp,
+      currentLevel: newLevel,
+    );
+    // 로컬 즉시 반영
+    state = state.copyWith(profile: updated);
+
+    // 서버 비동기 저장 (dev 모드면 스킵)
+    if (!state.isDevMode) {
+      try {
+        final updateData = <String, dynamic>{
+          'faith_points': newFp,
+        };
+        if (newLevel != profile.currentLevel) {
+          updateData['current_level'] = newLevel;
+        }
+        await SupabaseService.client
+            .from(SupabaseConstants.tableProfiles)
+            .update(updateData)
+            .eq('id', profile.id);
+      } catch (e) {
+        debugPrint('FP 저장 실패: $e');
+      }
+    }
+  }
+
+  /// 스트릭 업데이트 (오늘 모든 태스크 완료 시 호출)
+  /// 반환값: 새 스트릭 수 (마일스톤 체크용), 이미 오늘 기록했으면 0
+  Future<int> updateStreak() async {
+    final profile = state.profile;
+    if (profile == null) return 0;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // 오늘 이미 스트릭을 기록했으면 무시
+    if (profile.lastStudyDate != null) {
+      final lastDate = DateTime(
+        profile.lastStudyDate!.year,
+        profile.lastStudyDate!.month,
+        profile.lastStudyDate!.day,
+      );
+      if (lastDate == today) return 0;
+    }
+
+    // 스트릭 계산
+    int newStreak;
+    if (profile.lastStudyDate != null) {
+      final lastDate = DateTime(
+        profile.lastStudyDate!.year,
+        profile.lastStudyDate!.month,
+        profile.lastStudyDate!.day,
+      );
+      final diff = today.difference(lastDate).inDays;
+      if (diff == 1) {
+        // 어제 연속 → 스트릭 +1
+        newStreak = profile.currentStreak + 1;
+      } else {
+        // 하루 이상 빠짐 → 1부터 다시
+        newStreak = 1;
+      }
+    } else {
+      // 첫 공부
+      newStreak = 1;
+    }
+
+    final newLongest =
+        newStreak > profile.longestStreak ? newStreak : profile.longestStreak;
+
+    final updated = profile.copyWith(
+      currentStreak: newStreak,
+      longestStreak: newLongest,
+      lastStudyDate: now,
+    );
+
+    // 로컬 즉시 반영
+    state = state.copyWith(profile: updated);
+
+    // 서버 비동기 저장
+    if (!state.isDevMode) {
+      try {
+        await SupabaseService.client
+            .from(SupabaseConstants.tableProfiles)
+            .update({
+          'current_streak': newStreak,
+          'longest_streak': newLongest,
+          'last_study_date': now.toIso8601String(),
+        }).eq('id', profile.id);
+      } catch (e) {
+        debugPrint('스트릭 저장 실패: $e');
+      }
+    }
+
+    return newStreak;
   }
 
   /// 프로필 새로고침

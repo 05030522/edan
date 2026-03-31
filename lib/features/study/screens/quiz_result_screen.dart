@@ -10,7 +10,9 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/sound_service.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../providers/quiz_provider.dart';
+import '../providers/study_progress_provider.dart';
 
 /// 퀴즈 결과 화면
 class QuizResultScreen extends ConsumerStatefulWidget {
@@ -41,6 +43,19 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     // 완료 효과음
     SoundService.instance.playComplete();
     HapticFeedback.heavyImpact();
+
+    // 퀴즈 FP를 프로필에 반영 + 레슨 진척도 저장
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final quizState = ref.read(quizProvider(widget.lessonId));
+      final fp = quizState.totalFpEarned;
+      if (fp > 0) {
+        ref.read(authProvider.notifier).addFaithPoints(fp);
+      }
+      // 레슨 완료 기록
+      ref
+          .read(studyProgressProvider.notifier)
+          .completeLesson(widget.pathId, widget.lessonId);
+    });
 
     _scoreController = AnimationController(
       duration: const Duration(milliseconds: 1200),

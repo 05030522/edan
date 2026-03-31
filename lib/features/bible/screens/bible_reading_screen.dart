@@ -5,6 +5,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/point_toast.dart';
+import '../../../shared/utils/streak_helper.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/daily_tasks_provider.dart';
 
 /// 오늘의 말씀 읽기 데이터 (창세기부터 순서대로)
@@ -105,6 +107,14 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
         .read(dailyTasksProvider.notifier)
         .completeTask(DailyTaskType.bibleReading);
 
+    // 프로필 FP 즉시 반영
+    if (reward > 0) {
+      ref.read(authProvider.notifier).addFaithPoints(reward);
+    }
+
+    // 스트릭 체크
+    StreakHelper.checkAndUpdate(context, ref);
+
     setState(() => _hasRead = true);
 
     if (reward > 0) {
@@ -116,7 +126,7 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
       );
     }
 
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) Navigator.of(context).pop();
     });
   }

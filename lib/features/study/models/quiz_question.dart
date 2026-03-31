@@ -1,3 +1,5 @@
+import '../data/matthew_quiz_data.dart';
+
 /// 퀴즈 문제 모델
 class QuizQuestion {
   final String id;
@@ -199,6 +201,18 @@ class DummyQuizData {
 
   /// lessonId로 퀴즈 세트 찾기 (없으면 기본 퀴즈)
   static QuizSet getQuizForLesson(String lessonId) {
+    // 마태복음 퀴즈 확인
+    if (lessonId.startsWith('matthew-lesson-')) {
+      final match = RegExp(r'matthew-lesson-(\d+)').firstMatch(lessonId);
+      if (match != null) {
+        final unit = int.tryParse(match.group(1)!);
+        if (unit != null) {
+          final mqSet = MatthewQuizData.getQuizForUnit(unit);
+          if (mqSet != null) return mqSet;
+        }
+      }
+    }
+
     return quizSets.firstWhere(
       (q) => q.lessonId == lessonId,
       orElse: () => quizSets.last,

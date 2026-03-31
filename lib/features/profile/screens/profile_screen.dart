@@ -58,7 +58,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings_outlined, color: textColor),
-            onPressed: () => context.go('/profile/settings'),
+            onPressed: () => context.push('/profile/settings'),
           ),
         ],
       ),
@@ -218,7 +218,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () => context.go('/profile/settings'),
+                  onPressed: () => context.push('/profile/settings'),
                   icon: Icon(Icons.settings_outlined, color: subTextColor),
                   label: Text(
                     '설정',

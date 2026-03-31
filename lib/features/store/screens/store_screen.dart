@@ -158,6 +158,30 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
     super.dispose();
   }
 
+  /// 구매 실행 — FP 차감 + 서버 저장
+  Future<void> _executePurchase(StoreItem item) async {
+    final profile = ref.read(authProvider).profile;
+    if (profile == null) return;
+
+    final newFp = profile.faithPoints - item.price;
+    if (newFp < 0) return;
+
+    // 프로필 FP 차감 (로컬 즉시)
+    final updated = profile.copyWith(faithPoints: newFp);
+    await ref.read(authProvider.notifier).updateProfile(updated);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('${item.name}을(를) 구매했어요! (-${item.price} FP)'),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+    }
+  }
+
   void _purchaseItem(StoreItem item) {
     final profile = ref.read(authProvider).profile;
     final currentFp = profile?.faithPoints ?? 0;
@@ -188,14 +212,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${item.name}을(를) 구매했어요! 🎉'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              );
+              // FP 차감
+              _executePurchase(item);
             },
             child: const Text('구매'),
           ),

@@ -7,6 +7,8 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/point_toast.dart';
+import '../../../shared/utils/streak_helper.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/daily_tasks_provider.dart';
 
 /// 일일 퀘스트 화면
@@ -129,6 +131,9 @@ class QuestsScreen extends ConsumerWidget {
                               .read(dailyTasksProvider.notifier)
                               .completeTask(quest.taskType);
                           if (reward > 0) {
+                            // 프로필 FP 즉시 반영
+                            ref.read(authProvider.notifier).addFaithPoints(reward);
+
                             final size = MediaQuery.of(context).size;
                             PointToast.show(
                               context,
@@ -137,6 +142,8 @@ class QuestsScreen extends ConsumerWidget {
                                   Offset(size.width / 2, size.height * 0.4),
                             );
                           }
+                          // 스트릭 체크
+                          StreakHelper.checkAndUpdate(context, ref);
                         },
                 ),
               )),

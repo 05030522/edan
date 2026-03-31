@@ -5,7 +5,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/point_toast.dart';
+import '../../../shared/utils/streak_helper.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/daily_tasks_provider.dart';
+import '../../study/data/matthew_meditation_data.dart';
 
 /// 묵상하기 화면 - 말씀을 읽고 느낀 점 작성 후 완료
 class MeditationScreen extends ConsumerStatefulWidget {
@@ -40,7 +43,23 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
     final dayOfYear = DateTime.now()
         .difference(DateTime(DateTime.now().year, 1, 1))
         .inDays;
-    _todayContent = _meditationContents[dayOfYear % _meditationContents.length];
+
+    // 마태복음 묵상 데이터가 있으면 확장된 풀에서 선택
+    final matthewContents = MatthewMeditationData.meditationContents;
+    if (matthewContents.isNotEmpty) {
+      final allContents = [
+        ..._meditationContents,
+        ...matthewContents.map((m) => _MeditationContent(
+              theme: m.theme,
+              verse: m.topic,
+              reference: '마태복음 ${m.chapter}장',
+              guide: m.guide,
+            )),
+      ];
+      _todayContent = allContents[dayOfYear % allContents.length];
+    } else {
+      _todayContent = _meditationContents[dayOfYear % _meditationContents.length];
+    }
   }
 
   @override
@@ -61,6 +80,14 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
         .read(dailyTasksProvider.notifier)
         .completeTask(DailyTaskType.meditation);
 
+    // 프로필 FP 즉시 반영
+    if (reward > 0) {
+      ref.read(authProvider.notifier).addFaithPoints(reward);
+    }
+
+    // 스트릭 체크
+    StreakHelper.checkAndUpdate(context, ref);
+
     setState(() => _step = 2);
     _animController.forward();
 
@@ -73,7 +100,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
       );
     }
 
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) Navigator.of(context).pop();
     });
   }
@@ -272,42 +299,46 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
               ),
               contentPadding: const EdgeInsets.all(AppTheme.spacingLG),
             ),
-            onChanged: (_) => setState(() {}),
           ),
 
           const Spacer(),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _reflectionController.text.trim().isNotEmpty
-                  ? _submitReflection
-                  : null,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('묵상 완료', style: AppTypography.button(Colors.white)),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.25),
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusRound),
-                    ),
-                    child: Text(
-                      '+10 FP',
-                      style: AppTypography.label(Colors.white)
-                          .copyWith(fontWeight: FontWeight.w700),
-                    ),
+          // 버튼만 텍스트 변경 시 rebuild
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _reflectionController,
+            builder: (context, value, _) {
+              final hasText = value.text.trim().isNotEmpty;
+              return SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: hasText ? _submitReflection : null,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                ],
-              ),
-            ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('묵상 완료', style: AppTypography.button(Colors.white)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.25),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusRound),
+                        ),
+                        child: Text(
+                          '+10 FP',
+                          style: AppTypography.label(Colors.white)
+                              .copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: AppTheme.spacingXL),
         ],

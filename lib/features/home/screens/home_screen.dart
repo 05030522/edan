@@ -8,6 +8,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/point_toast.dart';
+import '../../../shared/utils/streak_helper.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/daily_tasks_provider.dart';
 import '../widgets/weekly_calendar.dart';
@@ -34,13 +35,22 @@ class HomeScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
     final profile = authState.profile;
     final streakCount = profile?.currentStreak ?? 0;
-    final faithPoints = profile?.faithPoints ?? 0;
     final currentLevel = profile?.currentLevel ?? 1;
 
     final tasksState = ref.watch(dailyTasksProvider);
+    final faithPoints = profile?.faithPoints ?? 0;
 
-    // 주간 캘린더: 오늘 모든 태스크 완료 시 오늘 요일을 완료로 표시
+    // 주간 캘린더: 스트릭 기반으로 이번 주 완료일 계산
     final completedDays = <int>{};
+    if (profile?.lastStudyDate != null && streakCount > 0) {
+      final now = DateTime.now();
+      final todayWeekday = (now.weekday - 1) % 7; // 0=월 ~ 6=일
+      // 스트릭 연속일수만큼 거꾸로 이번 주 내의 완료일 추가
+      for (int i = 0; i < streakCount && i <= todayWeekday; i++) {
+        completedDays.add(todayWeekday - i);
+      }
+    }
+    // 오늘 전체 완료했으면 오늘도 추가
     if (tasksState.allCompleted) {
       final todayIndex = (DateTime.now().weekday - 1) % 7;
       completedDays.add(todayIndex);
@@ -122,6 +132,9 @@ class HomeScreen extends ConsumerWidget {
                   tasksState: tasksState, textColor: textColor),
               const SizedBox(height: AppTheme.spacingXL),
 
+              _buildBibleFullButton(context, textColor: textColor),
+              const SizedBox(height: AppTheme.spacingXL),
+
               _buildLambyCard(context,
                   greeting: greeting, textColor: textColor),
               const SizedBox(height: AppTheme.spacingLG),
@@ -141,7 +154,7 @@ class HomeScreen extends ConsumerWidget {
     return Row(
       children: [
         GestureDetector(
-          onTap: () => context.go('/profile/settings'),
+          onTap: () => context.push('/profile/settings'),
           child: Container(
             width: 40,
             height: 40,
@@ -183,7 +196,7 @@ class HomeScreen extends ConsumerWidget {
 
         // FP pill - 상점으로 이동
         GestureDetector(
-          onTap: () => context.go('/store'),
+          onTap: () => context.push('/store'),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
@@ -214,7 +227,7 @@ class HomeScreen extends ConsumerWidget {
     required String levelName,
   }) {
     return GestureDetector(
-      onTap: () => context.go('/garden'),
+      onTap: () => context.push('/garden'),
       child: Container(
         width: double.infinity,
         height: 200,
@@ -286,6 +299,69 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  /// 성경 전문 보기 버튼
+  Widget _buildBibleFullButton(
+    BuildContext context, {
+    required Color textColor,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final subTextColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+
+    return Material(
+      color: isDark
+          ? Colors.white.withValues(alpha: 0.05)
+          : Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+        onTap: () => context.push('/bible-full'),
+        child: Padding(
+          padding: const EdgeInsets.all(AppTheme.spacingLG),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.gold.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                ),
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  color: AppColors.gold,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: AppTheme.spacingMD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '성경 전문 읽기',
+                      style: AppTypography.titleMedium(textColor),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '구약 · 신약 66권',
+                      style: AppTypography.bodySmall(subTextColor),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: subTextColor.withValues(alpha: 0.5),
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDailyTasks(
     BuildContext context,
     WidgetRef ref, {
@@ -309,13 +385,13 @@ class HomeScreen extends ConsumerWidget {
               if (task.isCompleted) return;
               switch (task.type) {
                 case DailyTaskType.meditation:
-                  context.go('/meditation');
+                  context.push('/meditation');
                   break;
                 case DailyTaskType.prayer:
-                  context.go('/prayer');
+                  context.push('/prayer');
                   break;
                 case DailyTaskType.bibleReading:
-                  context.go('/bible-reading');
+                  context.push('/bible-reading');
                   break;
               }
             },
@@ -333,6 +409,9 @@ class HomeScreen extends ConsumerWidget {
     final reward =
         ref.read(dailyTasksProvider.notifier).completeTask(type);
     if (reward > 0) {
+      // 프로필 FP 즉시 반영
+      ref.read(authProvider.notifier).addFaithPoints(reward);
+
       final size = MediaQuery.of(context).size;
       PointToast.show(
         context,
@@ -340,6 +419,9 @@ class HomeScreen extends ConsumerWidget {
         sourceOffset: Offset(size.width / 2, size.height * 0.3),
       );
     }
+
+    // 모든 태스크 완료 시 → 스트릭 업데이트 + 축하
+    StreakHelper.checkAndUpdate(context, ref);
   }
 
   Widget _buildLambyCard(

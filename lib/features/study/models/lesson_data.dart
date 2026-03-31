@@ -1,3 +1,5 @@
+import '../data/matthew_meditation_data.dart';
+
 /// 레슨 콘텐츠 데이터 모델
 class LessonContent {
   final String lessonId;
@@ -92,6 +94,17 @@ class LessonDataStore {
 
   /// pathId와 lessonId로 레슨 콘텐츠 찾기
   static LessonContent? getLesson(String pathId, String lessonId) {
+    // 마태복음 경로는 별도 데이터에서 조회
+    if (pathId == 'path-matthew') {
+      try {
+        return MatthewMeditationData.lessons.firstWhere(
+          (l) => l.lessonId == lessonId,
+        );
+      } catch (_) {
+        return null;
+      }
+    }
+
     try {
       return lessons.firstWhere(
         (l) => l.pathId == pathId && l.lessonId == lessonId,
@@ -103,6 +116,9 @@ class LessonDataStore {
 
   /// pathId로 해당 경로의 모든 레슨 가져오기
   static List<LessonContent> getLessonsForPath(String pathId) {
+    if (pathId == 'path-matthew') {
+      return MatthewMeditationData.lessons;
+    }
     return lessons.where((l) => l.pathId == pathId).toList();
   }
 

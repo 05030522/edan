@@ -10,8 +10,10 @@ class AppTypography {
   /// UI 텍스트 스타일 (Noto Sans KR - Pretendard 대체)
   static TextStyle get _baseUI => GoogleFonts.notoSansKr();
 
-  /// 성경 구절 전용 스타일 (Noto Serif KR)
-  static TextStyle get _baseScripture => GoogleFonts.notoSerifKr();
+  /// 성경 구절 전용 스타일 (Noto Serif KR + 한글 fallback)
+  static TextStyle get _baseScripture => GoogleFonts.notoSerifKr().copyWith(
+        fontFamilyFallback: const ['Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
+      );
 
   // ─── 디스플레이 ───
   static TextStyle displayLarge(Color color) => _baseUI.copyWith(

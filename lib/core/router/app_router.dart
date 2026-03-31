@@ -25,6 +25,8 @@ import '../../features/settings/screens/privacy_policy_screen.dart';
 import '../../features/settings/screens/terms_screen.dart';
 import '../../features/prayer/screens/prayer_screen.dart';
 import '../../features/bible/screens/bible_reading_screen.dart';
+import '../../features/bible/screens/bible_books_screen.dart';
+import '../../features/bible/screens/bible_chapter_screen.dart';
 import '../../features/meditation/screens/meditation_screen.dart';
 import '../../features/store/screens/store_screen.dart';
 import '../../features/garden/screens/garden_screen.dart';
@@ -263,6 +265,45 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
+      // ─── 성경 전문 보기 ───
+      GoRoute(
+        path: '/bible-full',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const BibleBooksScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1, 0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            );
+          },
+        ),
+      ),
+
+      // ─── 성경 책 장/절 보기 ───
+      GoRoute(
+        path: '/bible-full/:bookName',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final bookName = Uri.decodeComponent(state.pathParameters['bookName']!);
+          return CustomTransitionPage(
+            child: BibleChapterScreen(bookName: bookName),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+                child: child,
+              );
+            },
+          );
+        },
+      ),
+
       // ─── 묵상하기 (풀스크린) ───
       GoRoute(
         path: '/meditation',
@@ -288,7 +329,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => CustomTransitionPage(
           child: const StoreScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1, 0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              child: child,
+            );
           },
         ),
       ),

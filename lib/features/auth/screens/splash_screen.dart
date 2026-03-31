@@ -39,30 +39,34 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _controller.forward();
 
-    // 2초 후 라우팅
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      _navigateBasedOnAuth();
-    });
+    // 최소 표시 시간(1.5초)과 인증 확인을 병렬 실행
+    _initAndNavigate();
   }
 
-  /// 인증 상태 + 프로필 완성 여부에 따라 분기
-  Future<void> _navigateBasedOnAuth() async {
+  Future<void> _initAndNavigate() async {
+    // 최소 스플래시 표시 시간과 인증 체크를 동시에 실행
+    final results = await Future.wait([
+      Future.delayed(const Duration(milliseconds: 1500)),
+      _checkAuth(),
+    ]);
+
     if (!mounted) return;
+
+    final route = results[1] as String;
+    context.go(route);
+  }
+
+  /// 인증 상태 + 프로필 완성 여부 확인 → 이동할 라우트 반환
+  Future<String> _checkAuth() async {
     final authState = ref.read(authProvider);
 
     if (authState.status != AuthStatus.authenticated) {
-      context.go('/welcome');
-      return;
+      return '/welcome';
     }
 
-    // 로그인 되어있으면 프로필 존재 여부 확인
     try {
       final userId = SupabaseService.currentUserId;
-      if (userId == null) {
-        context.go('/welcome');
-        return;
-      }
+      if (userId == null) return '/welcome';
 
       final data = await SupabaseService.client
           .from(SupabaseConstants.tableProfiles)
@@ -70,18 +74,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           .eq('id', userId)
           .maybeSingle();
 
-      if (!mounted) return;
-
       if (data != null &&
           (data['display_name'] as String?)?.isNotEmpty == true) {
-        context.go('/home');
+        return '/home';
       } else {
-        // 프로필 미완성 → 온보딩
-        context.go('/onboarding/name');
+        return '/onboarding/name';
       }
     } catch (e) {
       debugPrint('프로필 조회 에러: $e');
-      if (mounted) context.go('/home');
+      return '/home';
     }
   }
 

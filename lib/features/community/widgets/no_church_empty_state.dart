@@ -44,7 +44,7 @@ class NoChurchEmptyState extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => context.go('/profile/settings'),
+              onPressed: () => context.push('/profile/settings'),
               child: const Text('교회 등록하기'),
             ),
           ),
