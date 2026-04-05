@@ -118,12 +118,8 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
     final hasChurchName = profile?.churchName != null && profile!.churchName!.isNotEmpty;
 
     if (!hasChurchId && !hasChurchName) {
-      state = state.copyWith(
-        isLoading: false,
-        members: [],
-        churchName: null,
-        churchId: null,
-      );
+      // 교회 없음 → 완전 초기화 (copyWith는 null을 유지하므로 새 객체 생성)
+      state = const CommunityState();
       return;
     }
 
