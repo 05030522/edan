@@ -13,6 +13,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../community/providers/community_provider.dart';
 import '../../onboarding/providers/onboarding_provider.dart';
 
 /// 설정 화면
@@ -240,6 +241,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
 
       ref.invalidate(localChurchNameProvider);
+      // 커뮤니티 프로바이더도 갱신
+      ref.invalidate(communityProvider);
       // UI 강제 갱신
       if (mounted) setState(() {});
     } catch (e) {
