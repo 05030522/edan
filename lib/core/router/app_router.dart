@@ -82,6 +82,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.authCallback,
         builder: (context, state) => const _AuthCallbackScreen(),
       ),
+      // Supabase가 /welcome/auth/callback 으로 리다이렉트하는 경우 대비
+      GoRoute(
+        path: '/welcome/auth/callback',
+        builder: (context, state) => const _AuthCallbackScreen(),
+      ),
       // ─── 온보딩 플로우 (내비게이션 바 없음) ───
       GoRoute(
         path: AppRoutes.onboardingName,
