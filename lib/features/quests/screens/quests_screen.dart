@@ -50,7 +50,7 @@ class QuestsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(AppTheme.spacingXL),
         children: [
-          // 완벽한 하루 보너스
+          // 오늘의 경건 완료 보너스
           GlassCard(
             child: Row(
               children: [
@@ -76,14 +76,14 @@ class QuestsScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '완벽한 하루',
+                        '오늘의 경건 완료',
                         style: AppTypography.titleMedium(textColor),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         allCompleted
-                            ? '오늘의 모든 퀘스트를 완료했어요!'
-                            : '모든 퀘스트를 완료하면 보너스 +${AppConstants.faithPointsPerfectDay} FP!',
+                            ? '오늘의 모든 경건을 완료했어요!'
+                            : '모든 경건을 완료하면 보너스 +${AppConstants.faithPointsPerfectDay} FP!',
                         style: AppTypography.bodySmall(subTextColor),
                       ),
                     ],
@@ -115,7 +115,7 @@ class QuestsScreen extends ConsumerWidget {
 
           // 오늘의 퀘스트 섹션 타이틀
           Text(
-            '오늘의 퀘스트',
+            '오늘의 묵상',
             style: AppTypography.titleMedium(textColor),
           ),
           const SizedBox(height: AppTheme.spacingMD),
