@@ -154,35 +154,72 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
-  /// 프로필 업데이트
+  /// 프로필 업데이트 (전체)
   Future<void> updateProfile(UserProfile profile) async {
     if (state.isDevMode) {
       state = state.copyWith(profile: profile);
       return;
     }
-    try {
-      final json = profile.toJson();
-      // update 시 id 제외 (where 절에서 사용)
-      json.remove('id');
+    // 변경된 필드만 추출하여 업데이트
+    final oldProfile = state.profile;
+    final changes = <String, dynamic>{};
 
+    if (oldProfile == null) return;
+
+    if (profile.displayName != oldProfile.displayName) {
+      changes['display_name'] = profile.displayName;
+    }
+    if (profile.churchName != oldProfile.churchName) {
+      changes['church_name'] = profile.churchName;
+    }
+    if (profile.churchId != oldProfile.churchId) {
+      changes['church_id'] = profile.churchId;
+    }
+    if (profile.darkMode != oldProfile.darkMode) {
+      changes['dark_mode'] = profile.darkMode;
+    }
+    if (profile.faithPoints != oldProfile.faithPoints) {
+      changes['faith_points'] = profile.faithPoints;
+    }
+    if (profile.currentLevel != oldProfile.currentLevel) {
+      changes['current_level'] = profile.currentLevel;
+    }
+    if (profile.currentStreak != oldProfile.currentStreak) {
+      changes['current_streak'] = profile.currentStreak;
+    }
+    if (profile.longestStreak != oldProfile.longestStreak) {
+      changes['longest_streak'] = profile.longestStreak;
+    }
+
+    if (changes.isEmpty) {
+      state = state.copyWith(profile: profile);
+      return;
+    }
+
+    try {
       await SupabaseService.client
           .from(SupabaseConstants.tableProfiles)
-          .update(json)
+          .update(changes)
           .eq('id', profile.id);
       state = state.copyWith(profile: profile);
-      debugPrint('프로필 업데이트 성공: church_name=${profile.churchName}');
+      debugPrint('프로필 업데이트 성공: $changes');
     } catch (e) {
       debugPrint('프로필 업데이트 실패: $e');
-      // upsert 폴백 시도 (신규 프로필인 경우)
-      try {
-        await SupabaseService.client
-            .from(SupabaseConstants.tableProfiles)
-            .upsert(profile.toJson());
-        state = state.copyWith(profile: profile);
-      } catch (e2) {
-        debugPrint('프로필 upsert도 실패: $e2');
-        state = state.copyWith(error: e2.toString());
-      }
+      state = state.copyWith(error: e.toString());
+    }
+  }
+
+  /// 특정 필드만 업데이트
+  Future<void> updateProfileField(Map<String, dynamic> fields) async {
+    if (state.isDevMode || state.profile == null) return;
+    try {
+      await SupabaseService.client
+          .from(SupabaseConstants.tableProfiles)
+          .update(fields)
+          .eq('id', state.profile!.id);
+      debugPrint('필드 업데이트 성공: $fields');
+    } catch (e) {
+      debugPrint('필드 업데이트 실패: $e');
     }
   }
 
