@@ -4,8 +4,8 @@ class SupabaseConstants {
 
   // ─── Supabase 연결 정보 ───
   // Supabase 대시보드 → Settings → API 에서 확인
-  static const String supabaseUrl = 'https://akoeoaocgzrkehftkqiv.supabase.co';
-  static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrb2VvYW9jZ3pya2VoZnRrcWl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3ODUzMTMsImV4cCI6MjA4ODM2MTMxM30.C64tQ9lR5AGsC3aalShQQ7aNdkotFJs1P-lZrwQK7nE';
+  static const String supabaseUrl = 'https://seawgpunbrnvmxjaseoy.supabase.co';
+  static const String supabaseAnonKey = 'sb_publishable_47I6VxItjnjUO0iUor-Uzg_IMdFOwSs';
 
   // ─── 테이블 이름 ───
   static const String tableChurches = 'churches';
