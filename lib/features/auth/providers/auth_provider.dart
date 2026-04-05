@@ -161,12 +161,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return;
     }
     try {
+      final json = profile.toJson();
+      // update 시 id 제외 (where 절에서 사용)
+      json.remove('id');
+
       await SupabaseService.client
           .from(SupabaseConstants.tableProfiles)
-          .upsert(profile.toJson());
+          .update(json)
+          .eq('id', profile.id);
       state = state.copyWith(profile: profile);
+      debugPrint('프로필 업데이트 성공: church_name=${profile.churchName}');
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      debugPrint('프로필 업데이트 실패: $e');
+      // upsert 폴백 시도 (신규 프로필인 경우)
+      try {
+        await SupabaseService.client
+            .from(SupabaseConstants.tableProfiles)
+            .upsert(profile.toJson());
+        state = state.copyWith(profile: profile);
+      } catch (e2) {
+        debugPrint('프로필 upsert도 실패: $e2');
+        state = state.copyWith(error: e2.toString());
+      }
     }
   }
 

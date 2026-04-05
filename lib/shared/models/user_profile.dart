@@ -67,7 +67,7 @@ class UserProfile {
       'dark_mode': darkMode,
       'notification_enabled': notificationEnabled,
       'notification_time': notificationTime,
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
+      // updated_at, created_at은 DB 트리거가 자동 관리
     };
   }
 

@@ -234,10 +234,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ? profile.copyWith(churchName: newChurch)
             : profile.copyWith(clearChurchName: true);
         await ref.read(authProvider.notifier).updateProfile(updatedProfile);
+        debugPrint('교회 변경 완료: $newChurch');
+      } else {
+        debugPrint('프로필이 null - DB 저장 건너뜀');
       }
 
       ref.invalidate(localChurchNameProvider);
-      setState(() {});
+      // UI 강제 갱신
+      if (mounted) setState(() {});
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
