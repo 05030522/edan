@@ -34,13 +34,11 @@
 </head>
 <body>
   <script>
-    // OAuth 콜백 처리: auth/callback 경로면 토큰을 보존하면서 앱 루트로 리다이렉트
     (function() {
       var path = window.location.pathname;
       var hash = window.location.hash;
       if (path.indexOf('auth/callback') !== -1 || hash.indexOf('access_token') !== -1) {
-        // access_token이 hash에 있으면 앱 루트로 리다이렉트 (토큰 보존)
-        window.location.replace('/edan/' + hash);
+        window.location.replace('/edan/auth/callback' + hash);
         return;
       }
     })();

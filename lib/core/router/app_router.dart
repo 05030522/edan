@@ -64,6 +64,11 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     routes: [
+      // ─── 루트 경로 → 스플래시로 리다이렉트 ───
+      GoRoute(
+        path: '/',
+        redirect: (context, state) => AppRoutes.splash,
+      ),
       // ─── 인증 플로우 (내비게이션 바 없음) ───
       GoRoute(
         path: AppRoutes.splash,
