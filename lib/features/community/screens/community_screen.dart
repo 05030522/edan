@@ -564,7 +564,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     Color subTextColor,
   ) {
     final chips = [
-      (RankingSortType.streak, '스트릭', Icons.local_fire_department),
+      (RankingSortType.streak, '연속 묵상', Icons.local_fire_department),
       (RankingSortType.faithPoints, '포인트', Icons.stars),
       (RankingSortType.level, '레벨', Icons.eco),
     ];

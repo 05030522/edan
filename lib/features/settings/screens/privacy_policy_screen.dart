@@ -51,7 +51,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   '- 이메일 주소 (소셜 로그인 시)\n'
                   '- 교회 정보 (선택)\n'
                   '- 알림 설정 시간\n'
-                  '- 앱 사용 기록 (학습 진행도, 스트릭 등)',
+                  '- 앱 사용 기록 (학습 진행도, 연속 묵상 등)',
               textColor: textColor,
               subTextColor: subTextColor,
             ),
@@ -61,7 +61,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               content:
                   '수집된 개인정보는 다음의 목적을 위해 이용됩니다.\n\n'
                   '- 서비스 제공 및 개인화\n'
-                  '- 학습 진도 및 스트릭 관리\n'
+                  '- 학습 진도 및 연속 묵상 관리\n'
                   '- 푸시 알림 전송\n'
                   '- 서비스 개선 및 통계 분석',
               textColor: textColor,

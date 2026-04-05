@@ -116,7 +116,7 @@ class _StreakCelebrationDialog extends StatelessWidget {
 
               // 타이틀
               Text(
-                isMilestone ? '마일스톤 달성!' : '스트릭 달성!',
+                isMilestone ? '마일스톤 달성!' : '연속 묵상 달성!',
                 style: AppTypography.titleLarge(
                   isDark
                       ? AppColors.darkTextPrimary
@@ -176,7 +176,7 @@ class _StreakCelebrationDialog extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                   ),
                   child: Text(
-                    '스트릭 보너스 +$milestoneBonus FP',
+                    '연속 묵상 보너스 +$milestoneBonus FP',
                     style: AppTypography.label(AppColors.streakFlame)
                         .copyWith(fontWeight: FontWeight.w700),
                   ),

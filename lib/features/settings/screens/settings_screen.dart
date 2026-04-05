@@ -395,8 +395,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onTap: _showNotificationTimePicker,
           ),
           _buildSwitchTile(
-            title: '스트릭 알림',
-            subtitle: '스트릭이 끊기기 전에 알려줘요',
+            title: '연속 묵상 알림',
+            subtitle: '연속 묵상이 끊기기 전에 알려줘요',
             icon: Icons.local_fire_department_outlined,
             value: streakNotification,
             textColor: textColor,

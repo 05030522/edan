@@ -58,7 +58,7 @@ class TermsScreen extends StatelessWidget {
                   '서비스는 다음의 기능을 제공합니다.\n\n'
                   '- 성경 말씀 묵상 및 학습\n'
                   '- 퀴즈를 통한 복습\n'
-                  '- 일일 스트릭 및 포인트 시스템\n'
+                  '- 일일 연속 묵상 및 포인트 시스템\n'
                   '- 커뮤니티 기능 (교회 연결)\n'
                   '- 정원 꾸미기 및 캐릭터 성장',
               textColor: textColor,

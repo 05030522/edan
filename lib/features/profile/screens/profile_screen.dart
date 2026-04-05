@@ -137,7 +137,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       icon: Icons.local_fire_department,
                       iconColor: AppColors.streakFlame,
                       value: '$streakCount',
-                      label: '스트릭',
+                      label: '연속 묵상',
                     ),
                   ),
                   const SizedBox(width: AppTheme.spacingMD),

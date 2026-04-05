@@ -184,7 +184,7 @@ class HomeScreen extends ConsumerWidget {
                   color: AppColors.streakFlame, size: 18),
               const SizedBox(width: 4),
               Text(
-                '연속 ${_formatNumber(streakCount)}일',
+                '연속 묵상 ${_formatNumber(streakCount)}일',
                 style: AppTypography.label(AppColors.streakFlame)
                     .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
               ),

@@ -319,7 +319,7 @@ class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '연속 스트릭 목표',
+          '연속 묵상 목표',
           style: AppTypography.titleMedium(widget.textColor),
         ),
         const SizedBox(height: AppTheme.spacingMD),
