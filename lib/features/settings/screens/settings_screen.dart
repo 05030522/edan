@@ -362,10 +362,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             icon: Icons.email_outlined,
             textColor: textColor,
             subTextColor: subTextColor,
-            trailing: Text(
-              '읽기 전용',
-              style: AppTypography.label(subTextColor),
-            ),
           ),
           Divider(color: dividerColor),
 

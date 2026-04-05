@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
@@ -119,57 +120,38 @@ class QuestsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppTheme.spacingMD),
 
-          // 퀘스트 목록
+          // 퀘스트 목록 - 탭 시 해당 활동 페이지로 이동
           ...quests.map((quest) => Padding(
                 padding: const EdgeInsets.only(bottom: AppTheme.spacingMD),
                 child: _QuestCard(
                   quest: quest,
                   onTap: quest.isCompleted
                       ? null
-                      : () {
-                          final reward = ref
-                              .read(dailyTasksProvider.notifier)
-                              .completeTask(quest.taskType);
-                          if (reward > 0) {
-                            // 프로필 FP 즉시 반영
-                            ref.read(authProvider.notifier).addFaithPoints(reward);
-
-                            final size = MediaQuery.of(context).size;
-                            PointToast.show(
-                              context,
-                              points: reward,
-                              sourceOffset:
-                                  Offset(size.width / 2, size.height * 0.4),
-                            );
-                          }
-                          // 스트릭 체크
-                          StreakHelper.checkAndUpdate(context, ref);
-                        },
+                      : () => _navigateToActivity(context, quest.taskType),
                 ),
               )),
 
-          // 스트릭 마일스톤 안내
+          // 스트릭 목표 시스템
           const SizedBox(height: AppTheme.spacingXL),
-          Text(
-            '스트릭 보너스',
-            style: AppTypography.titleMedium(textColor),
-          ),
-          const SizedBox(height: AppTheme.spacingMD),
-          ...AppConstants.streakMilestoneRewards.entries
-              .take(4)
-              .map((entry) => Padding(
-                    padding:
-                        const EdgeInsets.only(bottom: AppTheme.spacingSM),
-                    child: _MilestoneRow(
-                      days: entry.key,
-                      reward: entry.value,
-                      textColor: textColor,
-                      subTextColor: subTextColor,
-                    ),
-                  )),
+          _StreakGoalSection(textColor: textColor, subTextColor: subTextColor),
         ],
       ),
     );
+  }
+
+  /// 퀘스트 타입에 따라 실제 활동 페이지로 이동
+  void _navigateToActivity(BuildContext context, DailyTaskType type) {
+    switch (type) {
+      case DailyTaskType.meditation:
+        context.push('/study'); // 묵상 페이지
+        break;
+      case DailyTaskType.prayer:
+        context.push('/study'); // 기도 페이지 (묵상 내 기도 섹션)
+        break;
+      case DailyTaskType.bibleReading:
+        context.push('/study'); // 말씀 읽기 페이지
+        break;
+    }
   }
 
   String _questTitleForType(DailyTaskType type) {
@@ -303,48 +285,157 @@ class _QuestCard extends StatelessWidget {
   }
 }
 
-/// 스트릭 마일스톤 행
-class _MilestoneRow extends StatelessWidget {
-  final int days;
-  final int reward;
+/// 스트릭 목표 선택 섹션
+class _StreakGoalSection extends ConsumerStatefulWidget {
   final Color textColor;
   final Color subTextColor;
 
-  const _MilestoneRow({
-    required this.days,
-    required this.reward,
+  const _StreakGoalSection({
     required this.textColor,
     required this.subTextColor,
   });
 
   @override
+  ConsumerState<_StreakGoalSection> createState() => _StreakGoalSectionState();
+}
+
+class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
+  static const _goalOptions = [7, 14, 30, 100, 365];
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppTheme.spacingLG,
-        vertical: AppTheme.spacingMD,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.gold.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.local_fire_department,
-              color: AppColors.streakFlame, size: 18),
-          const SizedBox(width: AppTheme.spacingSM),
-          Text(
-            '$days일 연속',
-            style: AppTypography.bodyMedium(textColor),
+    final profile = ref.watch(authProvider).profile;
+    final currentStreak = profile?.currentStreak ?? 0;
+
+    // 현재 목표: 현재 스트릭보다 큰 가장 가까운 목표
+    final currentGoal = _goalOptions.firstWhere(
+      (g) => g > currentStreak,
+      orElse: () => 365,
+    );
+
+    final progress = currentStreak / currentGoal;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '연속 스트릭 목표',
+          style: AppTypography.titleMedium(widget.textColor),
+        ),
+        const SizedBox(height: AppTheme.spacingMD),
+
+        // 현재 진행 상황
+        GlassCard(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.local_fire_department,
+                      color: AppColors.streakFlame, size: 32),
+                  const SizedBox(width: AppTheme.spacingMD),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$currentGoal일 연속 목표',
+                          style: AppTypography.titleMedium(widget.textColor),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '현재 $currentStreak일째 진행 중',
+                          style: AppTypography.bodySmall(widget.subTextColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '$currentStreak/$currentGoal',
+                    style: AppTypography.label(AppColors.streakFlame)
+                        .copyWith(fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacingMD),
+              // 프로그레스 바
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress.clamp(0.0, 1.0),
+                  backgroundColor: AppColors.streakFlame.withValues(alpha: 0.15),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.streakFlame),
+                  minHeight: 8,
+                ),
+              ),
+            ],
           ),
-          const Spacer(),
-          Text(
-            '+$reward FP',
-            style: AppTypography.label(AppColors.gold)
-                .copyWith(fontWeight: FontWeight.w700),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: AppTheme.spacingMD),
+
+        // 마일스톤 목록
+        ...AppConstants.streakMilestoneRewards.entries.map((entry) {
+          final isAchieved = currentStreak >= entry.key;
+          final isCurrent = entry.key == currentGoal;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppTheme.spacingSM),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingLG,
+                vertical: AppTheme.spacingMD,
+              ),
+              decoration: BoxDecoration(
+                color: isCurrent
+                    ? AppColors.streakFlame.withValues(alpha: 0.1)
+                    : isAchieved
+                        ? AppColors.success.withValues(alpha: 0.08)
+                        : AppColors.gold.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                border: isCurrent
+                    ? Border.all(color: AppColors.streakFlame.withValues(alpha: 0.3))
+                    : null,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    isAchieved ? Icons.check_circle : Icons.local_fire_department,
+                    color: isAchieved ? AppColors.success : AppColors.streakFlame,
+                    size: 18,
+                  ),
+                  const SizedBox(width: AppTheme.spacingSM),
+                  Text(
+                    '${entry.key}일 연속',
+                    style: AppTypography.bodyMedium(
+                      isAchieved ? AppColors.success : widget.textColor,
+                    ).copyWith(
+                      fontWeight: isCurrent ? FontWeight.w700 : null,
+                    ),
+                  ),
+                  if (isCurrent) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.streakFlame,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text('현재 목표',
+                          style: TextStyle(color: Colors.white, fontSize: 10)),
+                    ),
+                  ],
+                  const Spacer(),
+                  Text(
+                    isAchieved ? '달성!' : '+${entry.value} FP',
+                    style: AppTypography.label(
+                      isAchieved ? AppColors.success : AppColors.gold,
+                    ).copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 }
