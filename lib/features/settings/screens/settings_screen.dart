@@ -243,8 +243,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ref.invalidate(localChurchNameProvider);
       // 커뮤니티 프로바이더 즉시 새로고침
       ref.read(communityProvider.notifier).refresh();
-      // UI 강제 갱신
-      if (mounted) setState(() {});
+      // 설정 화면 닫고 커뮤니티 탭으로 이동
+      if (mounted) {
+        context.go('/community');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
