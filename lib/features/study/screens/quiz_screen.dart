@@ -481,7 +481,14 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     }
 
     // 피드백 애니메이션 시작
-    _feedbackController.forward(from: 0);
+    if (result == QuizAnswerResult.correct) {
+      _feedbackController.forward(from: 0);
+    } else {
+      // 오답: 잠시 후 피드백 표시 (틀린 선택을 인지할 시간)
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _feedbackController.forward(from: 0);
+      });
+    }
   }
 
   /// 다음 문제

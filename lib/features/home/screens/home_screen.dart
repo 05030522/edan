@@ -121,6 +121,10 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppTheme.spacingXL),
 
+              _buildLambyCard(context,
+                  greeting: greeting, textColor: textColor),
+              const SizedBox(height: AppTheme.spacingXL),
+
               _buildGardenPreview(
                 context,
                 currentLevel: currentLevel,
@@ -133,10 +137,6 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: AppTheme.spacingXL),
 
               _buildBibleFullButton(context, textColor: textColor),
-              const SizedBox(height: AppTheme.spacingXL),
-
-              _buildLambyCard(context,
-                  greeting: greeting, textColor: textColor),
               const SizedBox(height: AppTheme.spacingLG),
             ],
           ),
