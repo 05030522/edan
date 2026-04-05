@@ -6,6 +6,15 @@ class ChurchMember {
   final int currentStreak;
   final int faithPoints;
 
+  /// 고유 태그 번호 (id 해시 기반, 0000~9999)
+  String get tag {
+    final hash = id.hashCode.abs() % 10000;
+    return '#${hash.toString().padLeft(4, '0')}';
+  }
+
+  /// 이름 + 태그
+  String get displayNameWithTag => '$displayName $tag';
+
   const ChurchMember({
     required this.id,
     required this.displayName,

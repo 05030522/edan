@@ -81,11 +81,21 @@ class MemberCard extends StatelessWidget {
                 Row(
                   children: [
                     Flexible(
-                      child: Text(
-                        member.displayName.isNotEmpty
-                            ? member.displayName
-                            : '에덴 사용자',
-                        style: AppTypography.titleMedium(textColor),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: member.displayName.isNotEmpty
+                                  ? member.displayName
+                                  : '에덴 사용자',
+                              style: AppTypography.titleMedium(textColor),
+                            ),
+                            TextSpan(
+                              text: ' ${member.tag}',
+                              style: AppTypography.label(subTextColor).copyWith(fontSize: 11),
+                            ),
+                          ],
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

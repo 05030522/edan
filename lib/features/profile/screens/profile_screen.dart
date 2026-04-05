@@ -88,10 +88,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     ),
                     const SizedBox(height: AppTheme.spacingMD),
 
-                    // 이름
-                    Text(
-                      displayName,
-                      style: AppTypography.headlineMedium(textColor),
+                    // 이름 + 태그
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: displayName,
+                            style: AppTypography.headlineMedium(textColor),
+                          ),
+                          if (profile != null)
+                            TextSpan(
+                              text: ' ${profile.tag}',
+                              style: AppTypography.label(subTextColor),
+                            ),
+                        ],
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

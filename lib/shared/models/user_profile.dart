@@ -2,6 +2,15 @@
 class UserProfile {
   final String id;
   final String displayName;
+
+  /// 고유 태그 번호 (id 해시 기반, 4자리)
+  String get tag {
+    final hash = id.hashCode.abs() % 10000;
+    return '#${hash.toString().padLeft(4, '0')}';
+  }
+
+  /// 이름 + 태그 (예: "ㄱ진혁 #1234")
+  String get displayNameWithTag => '$displayName $tag';
   final String? churchId;
   final String? churchName;
   final int faithPoints;
