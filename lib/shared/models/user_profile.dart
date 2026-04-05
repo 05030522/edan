@@ -67,13 +67,16 @@ class UserProfile {
       'dark_mode': darkMode,
       'notification_enabled': notificationEnabled,
       'notification_time': notificationTime,
+      'updated_at': DateTime.now().toUtc().toIso8601String(),
     };
   }
 
+  /// clearChurchName: true면 교회를 null로 초기화
   UserProfile copyWith({
     String? displayName,
     String? churchId,
     String? churchName,
+    bool clearChurchName = false,
     int? faithPoints,
     int? currentLevel,
     int? currentStreak,
@@ -87,7 +90,7 @@ class UserProfile {
       id: id,
       displayName: displayName ?? this.displayName,
       churchId: churchId ?? this.churchId,
-      churchName: churchName ?? this.churchName,
+      churchName: clearChurchName ? null : (churchName ?? this.churchName),
       faithPoints: faithPoints ?? this.faithPoints,
       currentLevel: currentLevel ?? this.currentLevel,
       currentStreak: currentStreak ?? this.currentStreak,

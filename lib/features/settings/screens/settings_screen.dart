@@ -230,9 +230,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       // Auth 프로필 업데이트
       final profile = ref.read(authProvider).profile;
       if (profile != null) {
-        await ref
-            .read(authProvider.notifier)
-            .updateProfile(profile.copyWith(churchName: newChurch));
+        final updatedProfile = newChurch != null
+            ? profile.copyWith(churchName: newChurch)
+            : profile.copyWith(clearChurchName: true);
+        await ref.read(authProvider.notifier).updateProfile(updatedProfile);
       }
 
       ref.invalidate(localChurchNameProvider);
