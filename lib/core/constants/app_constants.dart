@@ -58,7 +58,51 @@ class AppConstants {
     365: 1000,
   };
 
-  // ─── 루양 인사말 ───
+  // ─── 루양 인사말 (시간대별) ───
+  // 한국 시간(KST, UTC+9) 기준
+  static const Map<String, List<String>> lambyGreetingsByTime = {
+    'morning': [  // 06:00 ~ 11:59
+      '좋은 아침이에요! 오늘도 말씀과 함께해요~',
+      '상쾌한 아침이야! 말씀으로 하루를 시작하자~',
+      '굿모닝! 오늘 하루도 주님과 동행해요!',
+    ],
+    'afternoon': [  // 12:00 ~ 17:59
+      '점심 잘 먹었어? 잠깐 말씀 한 구절 어때?',
+      '오후에도 힘내! 말씀이 힘이 되어줄 거야~',
+      '반가워! 오늘은 어떤 말씀을 만날까?',
+    ],
+    'evening': [  // 18:00 ~ 21:59
+      '오늘 하루 수고했어! 말씀으로 마무리하자~',
+      '저녁이야~ 하루를 돌아보며 묵상해볼까?',
+      '돌아왔구나! 함께 묵상하자~',
+    ],
+    'night': [  // 22:00 ~ 05:59
+      '이 밤, 말씀과 함께 평안한 시간 보내요~',
+      '조용한 밤이야. 주님과 대화해볼까?',
+      '늦은 시간에도 찾아와줬구나! 고마워~',
+    ],
+  };
+
+  /// 한국 시간 기준 시간대 인사말 반환
+  static String getGreetingByTime() {
+    // UTC+9 (한국 시간)
+    final kstHour = DateTime.now().toUtc().add(const Duration(hours: 9)).hour;
+    final String timeKey;
+    if (kstHour >= 6 && kstHour < 12) {
+      timeKey = 'morning';
+    } else if (kstHour >= 12 && kstHour < 18) {
+      timeKey = 'afternoon';
+    } else if (kstHour >= 18 && kstHour < 22) {
+      timeKey = 'evening';
+    } else {
+      timeKey = 'night';
+    }
+    final greetings = lambyGreetingsByTime[timeKey]!;
+    final index = DateTime.now().day % greetings.length;
+    return greetings[index];
+  }
+
+  // 하위 호환용
   static const List<String> lambyGreetings = [
     '좋은 아침이에요! 오늘도 말씀과 함께해요~',
     '반가워! 오늘은 어떤 말씀을 만날까?',

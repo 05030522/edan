@@ -61,9 +61,8 @@ class HomeScreen extends ConsumerWidget {
     final todayLabel =
         '${now.month}월 ${now.day}일 ${weekdayNames[(now.weekday - 1) % 7]}';
 
-    // 루양 인사 (날짜 기반으로 고정)
-    final greetingIndex = now.day % AppConstants.lambyGreetings.length;
-    final greeting = AppConstants.lambyGreetings[greetingIndex];
+    // 루양 인사 (한국 시간대별)
+    final greeting = AppConstants.getGreetingByTime();
 
     final levelIndex =
         (currentLevel - 1).clamp(0, AppConstants.levelNames.length - 1);
