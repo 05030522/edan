@@ -1,11 +1,11 @@
 {
-    "name": "eden_app",
-    "short_name": "eden_app",
+    "name": "에덴 - 매일 5분 성경 묵상",
+    "short_name": "에덴",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "매일 5분, 에덴에서 만나요. 기독교 성경 묵상 앱",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

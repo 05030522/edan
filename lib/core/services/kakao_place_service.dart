@@ -6,7 +6,10 @@ import 'package:http/http.dart' as http;
 class KakaoPlaceService {
   KakaoPlaceService._();
 
-  static const String _restApiKey = 'e16ec4d92b108cba0871ed527a2e4bf0';
+  static const String _restApiKey = String.fromEnvironment(
+    'KAKAO_REST_API_KEY',
+    defaultValue: '',
+  );
   static const String _baseUrl =
       'https://dapi.kakao.com/v2/local/search/keyword.json';
 

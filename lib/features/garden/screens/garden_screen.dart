@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../shared/widgets/luyang_image.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// 루양의 정원 화면 - 레벨에 따라 정원이 성장하는 시각적 표현
@@ -274,18 +275,10 @@ class _GardenView extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.pets,
-                  size: 44,
-                  color: Colors.white.withValues(alpha: 0.9),
-                ),
+              const LuyangImage(
+                size: 80,
+                backgroundColor: Color(0x33FFFFFF),
+                shadow: false,
               ),
               const SizedBox(height: 8),
               Text(

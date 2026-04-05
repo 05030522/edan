@@ -10,6 +10,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/sound_service.dart';
+import '../../../shared/widgets/luyang_image.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/quiz_provider.dart';
 import '../providers/study_progress_provider.dart';
@@ -240,21 +241,8 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                         ),
                         child: Row(
                           children: [
-                            // 루양 아이콘
-                            Container(
-                              width: 48,
-                              height: 48,
-                              decoration: BoxDecoration(
-                                color:
-                                    AppColors.primary.withValues(alpha: 0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.pets,
-                                color: AppColors.primaryDark,
-                                size: 24,
-                              ),
-                            ),
+                            // 루양 캐릭터
+                            const LuyangImage(size: 48, shadow: false),
                             const SizedBox(width: AppTheme.spacingMD),
 
                             // 메시지

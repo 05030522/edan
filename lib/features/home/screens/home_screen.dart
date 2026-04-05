@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
+import '../../../shared/widgets/luyang_image.dart';
 import '../../../shared/widgets/point_toast.dart';
 import '../../../shared/utils/streak_helper.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -261,8 +262,11 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.pets, size: 56,
-                      color: Colors.white.withValues(alpha: 0.7)),
+                  const LuyangImage(
+                    size: 56,
+                    backgroundColor: Color(0x33FFFFFF),
+                    shadow: false,
+                  ),
                   const SizedBox(height: 8),
                   Text('루양의 정원',
                       style: AppTypography.label(
@@ -431,15 +435,7 @@ class HomeScreen extends ConsumerWidget {
     return GlassCard(
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.pets, color: AppColors.primaryDark, size: 22),
-          ),
+          const LuyangImage(size: 44, shadow: false),
           const SizedBox(width: AppTheme.spacingMD),
           Expanded(
             child: Column(
