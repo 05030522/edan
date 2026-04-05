@@ -8934,7 +8934,7 @@ _.c=c
 _.d=d},
 bdK(){var s=A.JM(),r=s.gzK(s)
 s=A.JM()
-return r+(B.c.n(s.gck(s),"/edan/")?"/edan":"")+"/auth/callback"},
+return r+(B.c.n(s.gck(s),"/edan/")?"/edan/":"/")},
 bdJ(a){switch(a.a){case 0:return B.a1o
 case 1:return B.a1n
 case 2:return null}},
