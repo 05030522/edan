@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 import '../constants/supabase_constants.dart';
 import '../../features/auth/screens/splash_screen.dart';
@@ -453,37 +456,48 @@ class _AuthCallbackScreenState extends State<_AuthCallbackScreen> {
 
   Future<void> _handleCallback() async {
     try {
-      // Supabase SDK가 implicit flow에서 URL fragment의 토큰을
-      // 자동으로 처리할 때까지 대기
-      await Future.delayed(const Duration(milliseconds: 800));
+      // 이미 인증된 경우 바로 이동
+      if (SupabaseService.isAuthenticated) {
+        await _navigateAfterLogin();
+        return;
+      }
 
-      // 이미 인증되었는지 확인
+      // PKCE 코드가 있으면 교환 시도 (모바일)
+      final uri = Uri.base;
+      final code = uri.queryParameters['code'];
+      if (code != null) {
+        debugPrint('PKCE 코드 교환 시도');
+        await SupabaseService.auth.exchangeCodeForSession(code);
+        if (mounted && SupabaseService.isAuthenticated) {
+          await _navigateAfterLogin();
+          return;
+        }
+      }
+
+      // Implicit flow: SDK가 URL fragment 토큰을 처리할 때까지 대기
+      // onAuthStateChange 스트림으로 감지 (최대 5초 타임아웃)
+      await SupabaseService.auth.onAuthStateChange
+          .where((data) => data.event == AuthChangeEvent.signedIn)
+          .first
+          .timeout(const Duration(seconds: 5), onTimeout: () {
+        throw TimeoutException('인증 타임아웃');
+      });
+
+      if (mounted && SupabaseService.isAuthenticated) {
+        await _navigateAfterLogin();
+      } else if (mounted) {
+        debugPrint('로그인 실패 - welcome으로 이동');
+        context.go(AppRoutes.welcome);
+      }
+    } catch (e) {
+      debugPrint('OAuth 콜백 처리: $e');
       if (mounted) {
+        // 타임아웃이어도 이미 인증됐을 수 있음
         if (SupabaseService.isAuthenticated) {
           await _navigateAfterLogin();
         } else {
-          // 아직 미인증이면 PKCE 코드 교환 시도 (모바일 폴백)
-          final uri = Uri.base;
-          final code = uri.queryParameters['code'];
-          if (code != null) {
-            debugPrint('PKCE 코드 교환 시도: $code');
-            await SupabaseService.auth.exchangeCodeForSession(code);
-          }
-
-          if (mounted) {
-            if (SupabaseService.isAuthenticated) {
-              await _navigateAfterLogin();
-            } else {
-              debugPrint('로그인 실패 - welcome으로 이동');
-              context.go(AppRoutes.welcome);
-            }
-          }
+          context.go(AppRoutes.welcome);
         }
-      }
-    } catch (e) {
-      debugPrint('OAuth 콜백 처리 에러: $e');
-      if (mounted) {
-        context.go(AppRoutes.welcome);
       }
     }
   }

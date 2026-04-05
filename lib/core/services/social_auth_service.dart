@@ -20,14 +20,14 @@ class SocialAuthService {
   /// 딥링크 콜백 URL (Android/iOS)
   static const String _redirectUrl = 'com.eden.app://login-callback';
 
-  /// 웹 리다이렉트 URL을 동적으로 생성
+  /// GitHub Pages 배포 기준 콜백 URL
+  /// 주의: Supabase가 실제로 /welcome/auth/callback 으로 리다이렉트하는 경우가 있어
+  /// docs/welcome/auth/callback/index.html 물리 파일로 대응 중
   static String get _webRedirectUrl {
     if (kIsWeb) {
-      // 앱 루트 URL로 리다이렉트 - Supabase SDK가 URL fragment의
-      // access_token을 자동 감지하고 onAuthStateChange로 처리
       final origin = Uri.base.origin;
-      final basePath = Uri.base.path.contains('/edan/') ? '/edan/' : '/';
-      return '$origin$basePath';
+      final basePath = Uri.base.path.contains('/edan/') ? '/edan' : '';
+      return '$origin$basePath/auth/callback';
     }
     return _redirectUrl;
   }
