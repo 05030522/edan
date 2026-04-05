@@ -95,6 +95,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+
+                    // 교회 이름
+                    if (profile?.churchName != null && profile!.churchName!.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        profile.churchName!,
+                        style: AppTypography.bodySmall(subTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                     const SizedBox(height: AppTheme.spacingSM),
 
                     // 레벨 배지
