@@ -23,10 +23,11 @@ class SocialAuthService {
   /// 웹 리다이렉트 URL을 동적으로 생성
   static String get _webRedirectUrl {
     if (kIsWeb) {
-      // 웹에서는 현재 origin 기반으로 콜백 URL 생성
-      // Uri.base는 현재 페이지의 URL을 반환
-      final origin = Uri.base.origin;
-      return '$origin/auth/callback';
+      // Uri.base는 현재 페이지의 전체 URL을 반환 (base href 포함)
+      // 예: https://05030522.github.io/edan/ → /edan/ 경로 포함
+      final base = Uri.base;
+      final basePath = base.path.endsWith('/') ? base.path : '${base.path}/';
+      return '${base.origin}${basePath}auth/callback';
     }
     return _redirectUrl;
   }
