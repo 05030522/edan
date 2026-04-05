@@ -241,8 +241,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
 
       ref.invalidate(localChurchNameProvider);
-      // 커뮤니티 프로바이더도 갱신
-      ref.invalidate(communityProvider);
+      // 커뮤니티 프로바이더 즉시 새로고침
+      ref.read(communityProvider.notifier).refresh();
       // UI 강제 갱신
       if (mounted) setState(() {});
     } catch (e) {
