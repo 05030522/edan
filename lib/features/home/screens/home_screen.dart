@@ -422,8 +422,15 @@ class HomeScreen extends ConsumerWidget {
       );
     }
 
-    // 모든 태스크 완료 시 → 스트릭 업데이트 + 축하
-    StreakHelper.checkAndUpdate(context, ref);
+    // 모든 태스크 완료 시 → PointToast 애니메이션(1초) 후 스트릭 축하 표시
+    final tasksState = ref.read(dailyTasksProvider);
+    if (tasksState.allCompleted) {
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        if (context.mounted) {
+          StreakHelper.checkAndUpdate(context, ref);
+        }
+      });
+    }
   }
 
   Widget _buildLambyCard(

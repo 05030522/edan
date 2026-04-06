@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_typography.dart';
@@ -42,9 +43,9 @@ class StreakCelebration {
       },
     );
 
-    // 3초 후 자동 닫기
+    // 5초 후 자동 닫기 (공유 버튼 누를 시간 확보)
     final navigator = Navigator.of(context, rootNavigator: true);
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (navigator.canPop()) {
         navigator.pop();
       }
@@ -193,6 +194,36 @@ class _StreakCelebrationDialog extends StatelessWidget {
                   isDark
                       ? AppColors.darkTextSecondary
                       : AppColors.lightTextSecondary,
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingLG),
+
+              // 공유하기 버튼
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    final text = '에덴에서 연속 $streakCount일 묵상 달성! 🔥\n'
+                        '${_getMessage(streakCount).replaceAll('\n', ' ')}\n\n'
+                        '나도 에덴에서 매일 묵상하기 👇\n'
+                        'https://05030522.github.io/edan/';
+                    Share.share(text, subject: '에덴 묵상 - 연속 $streakCount일 달성!');
+                  },
+                  icon: const Icon(Icons.share, size: 18),
+                  label: Text(
+                    '공유하기',
+                    style: AppTypography.button(Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryDark,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                    ),
+                  ),
                 ),
               ),
             ],
