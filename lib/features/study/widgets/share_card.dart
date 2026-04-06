@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/widgets/luyang_image.dart';
 
 /// 묵상 완료 공유카드 위젯
 /// RepaintBoundary 키로 이미지 캡처 가능
@@ -52,21 +53,13 @@ class ShareCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // 에덴 로고
+              // 에덴 로고 + 루양
               Row(
                 children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.eco,
-                      color: AppColors.primary,
-                      size: 16,
-                    ),
+                  const LuyangImage(
+                    size: 32,
+                    backgroundColor: Color(0x40FFFFFF),
+                    shadow: false,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -169,7 +162,7 @@ class ShareCard extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(
-              vertical: AppTheme.spacingSM,
+              vertical: AppTheme.spacingMD,
               horizontal: AppTheme.spacingMD,
             ),
             decoration: BoxDecoration(
@@ -179,14 +172,10 @@ class ShareCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.4),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.eco, color: AppColors.primary, size: 14),
+                const LuyangImage(
+                  size: 28,
+                  backgroundColor: Color(0x40FFFFFF),
+                  shadow: false,
                 ),
                 const SizedBox(width: 8),
                 Text(
