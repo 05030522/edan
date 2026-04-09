@@ -21,7 +21,7 @@ class AppConstants {
   static const int streakDangerHour = 21; // 오후 9시 알림
 
   // ─── 레벨 시스템 ───
-  // 일평균 ~35 FP 기준, 총 에덴 도달까지 약 16개월
+  // 일평균 ~35 달란트 기준, 총 에덴 도달까지 약 16개월
   static const List<String> levelNames = [
     '갈아엎은 땅',   // Lv1  - 시작
     '씨앗 심기',     // Lv2  - 관심

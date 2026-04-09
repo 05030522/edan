@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/glass_card.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../models/church_member.dart';
 import '../providers/community_provider.dart';
@@ -563,9 +564,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
     Color textColor,
     Color subTextColor,
   ) {
-    final chips = [
+    final chips = <(RankingSortType, String, IconData?)>[
       (RankingSortType.streak, '연속 묵상', Icons.local_fire_department),
-      (RankingSortType.faithPoints, '포인트', Icons.stars),
+      (RankingSortType.faithPoints, '달란트', null), // null이면 TalentIcon 사용
       (RankingSortType.level, '레벨', Icons.eco),
     ];
 
@@ -580,11 +581,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             label: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  size: 14,
-                  color: isSelected ? AppColors.primaryDark : subTextColor,
-                ),
+                icon != null
+                    ? Icon(
+                        icon,
+                        size: 14,
+                        color:
+                            isSelected ? AppColors.primaryDark : subTextColor,
+                      )
+                    : const TalentIcon(size: 14),
                 const SizedBox(width: 4),
                 Text(label),
               ],

@@ -64,11 +64,14 @@ class QuestsScreen extends ConsumerWidget {
                     borderRadius:
                         BorderRadius.circular(AppTheme.radiusMedium),
                   ),
-                  child: Icon(
-                    allCompleted ? Icons.check_circle : Icons.stars,
-                    color: allCompleted ? AppColors.success : AppColors.gold,
-                    size: 28,
-                  ),
+                  alignment: Alignment.center,
+                  child: allCompleted
+                      ? const Icon(
+                          Icons.check_circle,
+                          color: AppColors.success,
+                          size: 28,
+                        )
+                      : const TalentIcon(size: 30),
                 ),
                 const SizedBox(width: AppTheme.spacingMD),
                 Expanded(

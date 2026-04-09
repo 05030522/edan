@@ -46,7 +46,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     SoundService.instance.playComplete();
     HapticFeedback.heavyImpact();
 
-    // 퀴즈 FP를 프로필에 반영 + 레슨 진척도 저장
+    // 퀴즈 달란트를 프로필에 반영 + 레슨 진척도 저장
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final quizState = ref.read(quizProvider(widget.lessonId));
       final fp = quizState.totalFpEarned;

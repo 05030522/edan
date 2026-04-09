@@ -236,7 +236,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     return level;
   }
 
-  /// FP 추가 (로컬 즉시 반영 + 자동 레벨업 + 서버 비동기 저장)
+  /// 달란트 추가 (로컬 즉시 반영 + 자동 레벨업 + 서버 비동기 저장)
   Future<void> addFaithPoints(int points) async {
     final profile = state.profile;
     if (profile == null || points <= 0) return;
@@ -265,7 +265,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             .update(updateData)
             .eq('id', profile.id);
       } catch (e) {
-        debugPrint('FP 저장 실패: $e');
+        debugPrint('달란트 저장 실패: $e');
       }
     }
   }

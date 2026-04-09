@@ -122,7 +122,7 @@ class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
     _checkAndResetIfNewDay();
   }
 
-  /// 태스크 완료 처리 → 보상 FP 반환
+  /// 태스크 완료 처리 → 보상 달란트 반환
   int completeTask(DailyTaskType type) {
     _checkAndResetIfNewDay(); // 혹시 날짜가 바뀌었으면 리셋
 

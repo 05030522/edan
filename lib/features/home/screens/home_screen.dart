@@ -451,7 +451,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final reward =
         ref.read(dailyTasksProvider.notifier).completeTask(type);
     if (reward > 0) {
-      // 프로필 FP 즉시 반영
+      // 프로필 달란트 즉시 반영
       ref.read(authProvider.notifier).addFaithPoints(reward);
 
       final size = MediaQuery.of(context).size;

@@ -107,7 +107,7 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
         .read(dailyTasksProvider.notifier)
         .completeTask(DailyTaskType.bibleReading);
 
-    // 프로필 FP 즉시 반영
+    // 프로필 달란트 즉시 반영
     if (reward > 0) {
       ref.read(authProvider.notifier).addFaithPoints(reward);
     }

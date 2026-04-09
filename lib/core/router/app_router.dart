@@ -417,8 +417,8 @@ class _MainScaffold extends StatelessWidget {
               label: '묵상',
             ),
             NavigationDestination(
-              icon: Icon(Icons.star_outline),
-              selectedIcon: Icon(Icons.star, color: AppColors.primaryDark),
+              icon: Icon(Icons.flag_outlined),
+              selectedIcon: Icon(Icons.flag, color: AppColors.primaryDark),
               label: '도전',
             ),
             NavigationDestination(

@@ -466,7 +466,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     // 효과음 재생
     if (result == QuizAnswerResult.correct) {
       SoundService.instance.playCorrect();
-      // FP 토스트 표시
+      // 달란트 토스트 표시
       final size = MediaQuery.of(context).size;
       PointToast.show(
         context,
