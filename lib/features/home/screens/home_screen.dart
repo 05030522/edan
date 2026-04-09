@@ -446,8 +446,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _handleTaskComplete(
-      BuildContext context, WidgetRef ref, DailyTaskType type) {
+  Future<void> _handleTaskComplete(
+      BuildContext context, WidgetRef ref, DailyTaskType type) async {
     final reward =
         ref.read(dailyTasksProvider.notifier).completeTask(type);
     if (reward > 0) {
@@ -464,13 +464,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // 모든 태스크 완료 시 → PointToast 애니메이션(1초) 후 스트릭 축하 표시
     final tasksState = ref.read(dailyTasksProvider);
-    if (tasksState.allCompleted) {
-      Future.delayed(const Duration(milliseconds: 1200), () {
-        if (context.mounted) {
-          StreakHelper.checkAndUpdate(context, ref);
-        }
-      });
-    }
+    if (!tasksState.allCompleted) return;
+
+    await Future.delayed(const Duration(milliseconds: 1200));
+    if (!context.mounted) return;
+    // await하면 사용자가 '확인했어요'를 누를 때까지 블록됨
+    await StreakHelper.checkAndUpdate(context, ref);
   }
 
   Widget _buildLambyCard(

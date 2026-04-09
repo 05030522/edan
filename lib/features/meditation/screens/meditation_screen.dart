@@ -73,7 +73,7 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
     setState(() => _step = 1);
   }
 
-  void _submitReflection() {
+  Future<void> _submitReflection() async {
     if (_reflectionController.text.trim().isEmpty) return;
 
     final reward = ref
@@ -84,9 +84,6 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
     if (reward > 0) {
       ref.read(authProvider.notifier).addFaithPoints(reward);
     }
-
-    // 스트릭 체크
-    StreakHelper.checkAndUpdate(context, ref);
 
     setState(() => _step = 2);
     _animController.forward();
@@ -100,9 +97,16 @@ class _MeditationScreenState extends ConsumerState<MeditationScreen>
       );
     }
 
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) Navigator.of(context).pop();
-    });
+    // 토스트가 뜰 시간 확보
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (!mounted) return;
+
+    // 스트릭 체크 — 축하 다이얼로그가 뜨면 사용자가 '확인했어요'를 누를 때까지 대기
+    await StreakHelper.checkAndUpdate(context, ref);
+    if (!mounted) return;
+
+    // 사용자가 축하 다이얼로그를 닫은 후에야 홈으로 복귀
+    Navigator.of(context).pop();
   }
 
   @override

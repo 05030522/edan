@@ -44,7 +44,7 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     super.dispose();
   }
 
-  void _submitPrayer() {
+  Future<void> _submitPrayer() async {
     if (_prayerController.text.trim().isEmpty) return;
 
     final reward =
@@ -54,9 +54,6 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
     if (reward > 0) {
       ref.read(authProvider.notifier).addFaithPoints(reward);
     }
-
-    // 스트릭 체크
-    StreakHelper.checkAndUpdate(context, ref);
 
     setState(() => _isCompleted = true);
     _animController.forward();
@@ -70,10 +67,16 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
       );
     }
 
-    // 완료 후 자동으로 돌아가기
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) Navigator.of(context).pop();
-    });
+    // 토스트가 뜰 시간 확보
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (!mounted) return;
+
+    // 스트릭 체크 — 축하 다이얼로그가 뜨면 사용자가 닫을 때까지 대기
+    await StreakHelper.checkAndUpdate(context, ref);
+    if (!mounted) return;
+
+    // 사용자가 축하 다이얼로그를 닫은 후에야 홈으로 복귀
+    Navigator.of(context).pop();
   }
 
   @override

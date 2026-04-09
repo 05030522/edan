@@ -102,7 +102,7 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
     _today = _chapters[dayOfYear % _chapters.length];
   }
 
-  void _completeReading() {
+  Future<void> _completeReading() async {
     final reward = ref
         .read(dailyTasksProvider.notifier)
         .completeTask(DailyTaskType.bibleReading);
@@ -111,9 +111,6 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
     if (reward > 0) {
       ref.read(authProvider.notifier).addFaithPoints(reward);
     }
-
-    // 스트릭 체크
-    StreakHelper.checkAndUpdate(context, ref);
 
     setState(() => _hasRead = true);
 
@@ -126,9 +123,16 @@ class _BibleReadingScreenState extends ConsumerState<BibleReadingScreen> {
       );
     }
 
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) Navigator.of(context).pop();
-    });
+    // 토스트가 뜰 시간 확보
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (!mounted) return;
+
+    // 스트릭 체크 — 축하 다이얼로그가 뜨면 사용자가 닫을 때까지 대기
+    await StreakHelper.checkAndUpdate(context, ref);
+    if (!mounted) return;
+
+    // 사용자가 축하 다이얼로그를 닫은 후에야 홈으로 복귀
+    Navigator.of(context).pop();
   }
 
   @override

@@ -9,8 +9,11 @@ import 'talent_icon.dart';
 
 /// 스트릭 달성 축하 다이얼로그
 class StreakCelebration {
-  /// 스트릭 달성 시 축하 표시
-  static void show(
+  /// 스트릭 달성 시 축하 표시.
+  ///
+  /// 사용자가 '확인했어요' 버튼을 눌러 다이얼로그를 닫을 때까지 Future가 resolve되지 않습니다.
+  /// 자동 닫기 없음 — 사용자가 명시적으로 닫아야 함.
+  static Future<void> show(
     BuildContext context, {
     required int streakCount,
     int? bonusFp,
@@ -22,9 +25,11 @@ class StreakCelebration {
     final milestoneBonus =
         isMilestone ? AppConstants.streakMilestoneRewards[streakCount] : null;
 
-    showGeneralDialog(
+    // 사용자가 직접 닫기 버튼을 눌러야 닫히도록 자동 닫기 제거
+    // 배경 탭으로도 실수로 닫히지 않도록 barrierDismissible: false
+    return showGeneralDialog<void>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierLabel: '닫기',
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 400),
@@ -43,14 +48,6 @@ class StreakCelebration {
         );
       },
     );
-
-    // 5초 후 자동 닫기 (공유 버튼 누를 시간 확보)
-    final navigator = Navigator.of(context, rootNavigator: true);
-    Future.delayed(const Duration(seconds: 5), () {
-      if (navigator.canPop()) {
-        navigator.pop();
-      }
-    });
   }
 }
 
@@ -211,33 +208,68 @@ class _StreakCelebrationDialog extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacingLG),
 
-              // 공유하기 버튼
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    final text = '에덴에서 연속 $streakCount일 묵상 달성! 🔥\n'
-                        '${_getMessage(streakCount).replaceAll('\n', ' ')}\n\n'
-                        '나도 에덴에서 매일 묵상하기 👇\n'
-                        'https://05030522.github.io/edan/';
-                    Share.share(text, subject: '에덴 묵상 - 연속 $streakCount일 달성!');
-                  },
-                  icon: const Icon(Icons.share, size: 18),
-                  label: Text(
-                    '공유하기',
-                    style: AppTypography.button(Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryDark,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+              // 버튼 영역: 공유하기 + 확인
+              Row(
+                children: [
+                  // 공유하기 버튼 (보조)
+                  Expanded(
+                    child: SizedBox(
+                      height: 46,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          final text =
+                              '에덴에서 연속 $streakCount일 묵상 달성! 🔥\n'
+                              '${_getMessage(streakCount).replaceAll('\n', ' ')}\n\n'
+                              '나도 에덴에서 매일 묵상하기 👇\n'
+                              'https://05030522.github.io/edan/';
+                          Share.share(text,
+                              subject: '에덴 묵상 - 연속 $streakCount일 달성!');
+                        },
+                        icon: const Icon(Icons.share, size: 18),
+                        label: Text(
+                          '공유',
+                          style: AppTypography.button(AppColors.primaryDark),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primaryDark,
+                          side: BorderSide(
+                            color: AppColors.primaryDark.withValues(alpha: 0.4),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusRound),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: AppTheme.spacingSM),
+                  // 확인 버튼 (주요)
+                  Expanded(
+                    flex: 2,
+                    child: SizedBox(
+                      height: 46,
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            Navigator.of(context, rootNavigator: true).pop(),
+                        icon: const Icon(Icons.check_circle_outline, size: 18),
+                        label: Text(
+                          '확인했어요',
+                          style: AppTypography.button(Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryDark,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.radiusRound),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

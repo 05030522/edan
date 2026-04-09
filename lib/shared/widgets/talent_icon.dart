@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
-/// 달란트 아이콘 (금화 모양 + "달" 글자)
+/// 달란트 아이콘 (금화/동전 모양)
 ///
 /// 성경의 '달란트'를 본딴 금화 아이콘. 앱 전역에서 달란트(신앙 포인트) 표시에 사용됩니다.
-/// - 라디얼 그라데이션 금빛 원형
-/// - 중앙에 "달" 글자 (크기가 작으면 자동으로 점으로 대체)
+/// - 라디얼 그라데이션으로 금속 광택
+/// - 바깥 테두리(rim) + 안쪽 원(각인선)으로 "동전 얼굴" 느낌
+/// - 글자/기호 없이 모든 크기에서 일관된 금화 형태
 class TalentIcon extends StatelessWidget {
   const TalentIcon({
     super.key,
@@ -24,54 +25,57 @@ class TalentIcon extends StatelessWidget {
     final base = color ?? AppColors.gold;
     // 어두운 톤: 기본 goldDark, 커스텀 컬러일 경우 15% 어둡게
     final rim = color != null
-        ? HSLColor.fromColor(color!).withLightness(
-            (HSLColor.fromColor(color!).lightness - 0.15).clamp(0.0, 1.0),
-          ).toColor()
+        ? HSLColor.fromColor(color!)
+            .withLightness(
+              (HSLColor.fromColor(color!).lightness - 0.18).clamp(0.0, 1.0),
+            )
+            .toColor()
         : AppColors.goldDark;
+    final highlight = Color.lerp(base, Colors.white, 0.55)!;
 
-    // 크기에 따라 글자/점 결정 (작은 사이즈에서는 글자가 뭉개지므로 점 사용)
-    final showGlyph = size >= 14;
+    // 바깥 테두리 두께 (크기에 비례)
+    final rimWidth = (size * 0.09).clamp(0.8, 2.2);
+    // 안쪽 각인 원 크기
+    final innerSize = size * 0.58;
+    // 안쪽 각인 테두리 두께
+    final innerBorder = (size * 0.045).clamp(0.5, 1.2);
 
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
+        // 금속 광택: 좌상단에서 빛이 들어오는 라디얼 그라데이션
         gradient: RadialGradient(
-          center: const Alignment(-0.25, -0.3),
-          radius: 0.9,
+          center: const Alignment(-0.35, -0.4),
+          radius: 1.0,
           colors: [
-            Color.lerp(base, Colors.white, 0.4)!,
+            highlight,
             base,
             rim,
           ],
           stops: const [0.0, 0.55, 1.0],
         ),
+        // 바깥 테두리 (코인 림)
         border: Border.all(
           color: rim,
-          width: size * 0.06,
+          width: rimWidth,
         ),
       ),
-      alignment: Alignment.center,
-      child: showGlyph
-          ? Text(
-              '달',
-              style: TextStyle(
-                fontSize: size * 0.58,
-                fontWeight: FontWeight.w900,
-                color: Colors.white.withValues(alpha: 0.95),
-                height: 1.0,
-                letterSpacing: -0.3,
-              ),
-            )
-          : Container(
-              width: size * 0.32,
-              height: size * 0.32,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
-                shape: BoxShape.circle,
-              ),
+      child: Center(
+        // 안쪽 각인 원 (동전 얼굴의 테두리 느낌)
+        child: Container(
+          width: innerSize,
+          height: innerSize,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: rim.withValues(alpha: 0.55),
+              width: innerBorder,
             ),
+          ),
+        ),
+      ),
     );
   }
 }
