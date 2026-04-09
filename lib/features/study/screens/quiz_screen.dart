@@ -8,6 +8,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/services/sound_service.dart';
 import '../../../shared/widgets/point_toast.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../providers/quiz_provider.dart';
 
 /// 퀴즈 화면 (듀오링고 스타일)
@@ -398,14 +399,10 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        color: AppColors.gold,
-                        size: 16,
-                      ),
+                      const TalentIcon(size: 16),
                       const SizedBox(width: 2),
                       Text(
-                        '+${quizState.currentQuestion.rewardFp} FP',
+                        '+${quizState.currentQuestion.rewardFp}',
                         style: AppTypography.label(
                           AppColors.goldDark,
                         ).copyWith(fontWeight: FontWeight.w700),

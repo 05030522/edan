@@ -11,6 +11,7 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/sound_service.dart';
 import '../../../shared/widgets/luyang_image.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/quiz_provider.dart';
 import '../providers/study_progress_provider.dart';
@@ -210,12 +211,12 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                           ),
                           const SizedBox(width: AppTheme.spacingMD),
 
-                          // 획득 FP
+                          // 획득 달란트
                           Expanded(
                             child: _buildStatCard(
-                              icon: Icons.star_rounded,
+                              iconWidget: const TalentIcon(size: 28),
                               iconColor: AppColors.gold,
-                              label: '획득 FP',
+                              label: '획득 달란트',
                               value: '+$totalFp',
                               isDark: isDark,
                               textColor: textColor,
@@ -367,13 +368,15 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
 
   /// 통계 카드 위젯
   Widget _buildStatCard({
-    required IconData icon,
+    IconData? icon,
+    Widget? iconWidget,
     required Color iconColor,
     required String label,
     required String value,
     required bool isDark,
     required Color textColor,
   }) {
+    assert(icon != null || iconWidget != null);
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppTheme.spacingMD,
@@ -396,7 +399,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
       ),
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 28),
+          iconWidget ?? Icon(icon, color: iconColor, size: 28),
           const SizedBox(height: AppTheme.spacingSM),
           Text(
             value,

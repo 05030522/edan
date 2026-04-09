@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/luyang_image.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// 루양의 정원 화면 - 레벨에 따라 정원이 성장하는 시각적 표현
@@ -112,18 +113,42 @@ class GardenScreen extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('$faithPoints FP',
-                          style: AppTypography.bodySmall(subTextColor)),
-                      Text('$nextThreshold FP',
-                          style: AppTypography.bodySmall(subTextColor)),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const TalentIcon(size: 12),
+                          const SizedBox(width: 3),
+                          Text('$faithPoints',
+                              style: AppTypography.bodySmall(subTextColor)),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const TalentIcon(size: 12),
+                          const SizedBox(width: 3),
+                          Text('$nextThreshold',
+                              style: AppTypography.bodySmall(subTextColor)),
+                        ],
+                      ),
                     ],
                   ),
 
                   if (currentLevel < 10) ...[
                     const SizedBox(height: 8),
-                    Text(
-                      '다음 레벨까지 ${nextThreshold - faithPoints} FP 남았어요',
-                      style: AppTypography.bodySmall(AppColors.primaryDark),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '다음 레벨까지 ${nextThreshold - faithPoints} ',
+                          style: AppTypography.bodySmall(AppColors.primaryDark),
+                        ),
+                        const TalentIcon(size: 12),
+                        Text(
+                          ' 남았어요',
+                          style: AppTypography.bodySmall(AppColors.primaryDark),
+                        ),
+                      ],
                     ),
                   ],
                 ],
@@ -189,9 +214,16 @@ class GardenScreen extends ConsumerWidget {
                               isUnlocked ? textColor : subTextColor,
                             ),
                           ),
-                          Text(
-                            '$threshold FP',
-                            style: AppTypography.bodySmall(subTextColor),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const TalentIcon(size: 11),
+                              const SizedBox(width: 3),
+                              Text(
+                                '$threshold',
+                                style: AppTypography.bodySmall(subTextColor),
+                              ),
+                            ],
                           ),
                         ],
                       ),

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import 'talent_icon.dart';
 
-/// Animated "+N FP" toast that floats upward and fades out.
+/// 달란트 획득 토스트 ("+N 달란트"가 위로 떠오르며 사라지는 애니메이션)
 ///
 /// Use [PointToast.show] to display the toast as an overlay anchored to a
 /// source position, or embed the widget directly in a Stack.
@@ -11,15 +12,15 @@ class PointToast extends StatefulWidget {
   const PointToast({
     super.key,
     required this.points,
-    this.label = 'FP',
+    this.label = kTalentLabel,
     this.duration = const Duration(milliseconds: 1000),
     this.onComplete,
   });
 
-  /// Number of points to show (e.g. 10 renders "+10 FP").
+  /// Number of points to show (e.g. 10 renders "+10 달란트").
   final int points;
 
-  /// Suffix label after the number. Defaults to "FP" (Faith Points).
+  /// Suffix label after the number. Defaults to "달란트".
   final String label;
 
   /// Total animation duration (float up + fade out).
@@ -37,14 +38,14 @@ class PointToast extends StatefulWidget {
     BuildContext context, {
     required int points,
     required Offset sourceOffset,
-    String label = 'FP',
+    String label = kTalentLabel,
   }) {
     final OverlayState overlay = Overlay.of(context);
     late final OverlayEntry entry;
 
     entry = OverlayEntry(
       builder: (context) => Positioned(
-        left: sourceOffset.dx - 30,
+        left: sourceOffset.dx - 40,
         top: sourceOffset.dy - 20,
         child: PointToast(
           points: points,
@@ -135,14 +136,32 @@ class _PointToastState extends State<PointToast>
           ),
         );
       },
-      child: Text(
-        '+${widget.points} ${widget.label}',
-        style: AppTypography.headlineMedium(AppColors.gold).copyWith(
-          decoration: TextDecoration.none,
-          decorationStyle: null,
-          decorationColor: Colors.transparent,
-          decorationThickness: 0,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '+${widget.points}',
+            style: AppTypography.headlineMedium(AppColors.gold).copyWith(
+              decoration: TextDecoration.none,
+              decorationStyle: null,
+              decorationColor: Colors.transparent,
+              decorationThickness: 0,
+            ),
+          ),
+          const SizedBox(width: 4),
+          const TalentIcon(size: 22),
+          const SizedBox(width: 2),
+          Text(
+            widget.label,
+            style: AppTypography.headlineMedium(AppColors.gold).copyWith(
+              fontSize: 16,
+              decoration: TextDecoration.none,
+              decorationStyle: null,
+              decorationColor: Colors.transparent,
+              decorationThickness: 0,
+            ),
+          ),
+        ],
       ),
     );
   }

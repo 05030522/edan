@@ -7,10 +7,10 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
-import '../../../shared/widgets/point_toast.dart';
-import '../../../shared/utils/streak_helper.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/daily_tasks_provider.dart';
+import '../../streak/providers/streak_goal_provider.dart';
 
 /// 일일 퀘스트 화면
 class QuestsScreen extends ConsumerWidget {
@@ -33,7 +33,7 @@ class QuestsScreen extends ConsumerWidget {
     final quests = tasksState.tasks.map((task) {
       return _QuestData(
         title: _questTitleForType(task.type),
-        reward: '+${task.rewardFp} FP',
+        rewardAmount: task.rewardFp,
         isCompleted: task.isCompleted,
         icon: _questIconForType(task.type),
         taskType: task.type,
@@ -80,12 +80,29 @@ class QuestsScreen extends ConsumerWidget {
                         style: AppTypography.titleMedium(textColor),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        allCompleted
-                            ? '오늘의 모든 경건을 완료했어요!'
-                            : '모든 경건을 완료하면 보너스 +${AppConstants.faithPointsPerfectDay} FP!',
-                        style: AppTypography.bodySmall(subTextColor),
-                      ),
+                      allCompleted
+                          ? Text(
+                              '오늘의 모든 경건을 완료했어요!',
+                              style: AppTypography.bodySmall(subTextColor),
+                            )
+                          : Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    '모든 경건을 완료하면 보너스 +${AppConstants.faithPointsPerfectDay} ',
+                                    style:
+                                        AppTypography.bodySmall(subTextColor),
+                                  ),
+                                ),
+                                const TalentIcon(size: 12),
+                                Text(
+                                  '!',
+                                  style:
+                                      AppTypography.bodySmall(subTextColor),
+                                ),
+                              ],
+                            ),
                     ],
                   ),
                 ),
@@ -180,14 +197,14 @@ class QuestsScreen extends ConsumerWidget {
 /// 퀘스트 데이터 모델
 class _QuestData {
   final String title;
-  final String reward;
+  final int rewardAmount;
   final bool isCompleted;
   final IconData icon;
   final DailyTaskType taskType;
 
   const _QuestData({
     required this.title,
-    required this.reward,
+    required this.rewardAmount,
     required this.isCompleted,
     required this.icon,
     required this.taskType,
@@ -271,12 +288,21 @@ class _QuestCard extends StatelessWidget {
                     : AppColors.gold.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppTheme.radiusRound),
               ),
-              child: Text(
-                quest.isCompleted ? '완료' : quest.reward,
-                style: AppTypography.label(
-                  quest.isCompleted ? AppColors.success : AppColors.gold,
-                ),
-              ),
+              child: quest.isCompleted
+                  ? Text(
+                      '완료',
+                      style: AppTypography.label(AppColors.success),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '+${quest.rewardAmount} ',
+                          style: AppTypography.label(AppColors.gold),
+                        ),
+                        const TalentIcon(size: 13),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -300,27 +326,45 @@ class _StreakGoalSection extends ConsumerStatefulWidget {
 }
 
 class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
-  static const _goalOptions = [7, 14, 30, 100, 365];
-
   @override
   Widget build(BuildContext context) {
     final profile = ref.watch(authProvider).profile;
     final currentStreak = profile?.currentStreak ?? 0;
 
-    // 현재 목표: 현재 스트릭보다 큰 가장 가까운 목표
-    final currentGoal = _goalOptions.firstWhere(
-      (g) => g > currentStreak,
-      orElse: () => 365,
-    );
+    // 현재 목표: 사용자가 직접 설정한 값이 있으면 그 값, 없으면 자동 계산
+    final goalNotifier = ref.watch(streakGoalProvider.notifier);
+    final goalState = ref.watch(streakGoalProvider);
+    final currentGoal = goalNotifier.resolveGoal(currentStreak);
+    final isCustomGoal = goalState.customGoal != null;
 
     final progress = currentStreak / currentGoal;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '연속 묵상 목표',
-          style: AppTypography.titleMedium(widget.textColor),
+        Row(
+          children: [
+            Text(
+              '연속 묵상 목표',
+              style: AppTypography.titleMedium(widget.textColor),
+            ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: () => _openGoalPicker(currentGoal),
+              icon: const Icon(Icons.edit_outlined, size: 16),
+              label: Text(
+                '목표 변경',
+                style: AppTypography.label(AppColors.primaryDark),
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                foregroundColor: AppColors.primaryDark,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: AppTheme.spacingMD),
 
@@ -337,9 +381,37 @@ class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '$currentGoal일 연속 목표',
-                          style: AppTypography.titleMedium(widget.textColor),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                '$currentGoal일 연속 목표',
+                                style: AppTypography.titleMedium(
+                                    widget.textColor),
+                              ),
+                            ),
+                            if (isCustomGoal) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary
+                                      .withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '직접 설정',
+                                  style: TextStyle(
+                                    color: AppColors.primaryDark,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -362,8 +434,10 @@ class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
                   value: progress.clamp(0.0, 1.0),
-                  backgroundColor: AppColors.streakFlame.withValues(alpha: 0.15),
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.streakFlame),
+                  backgroundColor:
+                      AppColors.streakFlame.withValues(alpha: 0.15),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.streakFlame),
                   minHeight: 8,
                 ),
               ),
@@ -379,63 +453,219 @@ class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
 
           return Padding(
             padding: const EdgeInsets.only(bottom: AppTheme.spacingSM),
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppTheme.spacingLG,
-                vertical: AppTheme.spacingMD,
-              ),
-              decoration: BoxDecoration(
-                color: isCurrent
-                    ? AppColors.streakFlame.withValues(alpha: 0.1)
-                    : isAchieved
-                        ? AppColors.success.withValues(alpha: 0.08)
-                        : AppColors.gold.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                border: isCurrent
-                    ? Border.all(color: AppColors.streakFlame.withValues(alpha: 0.3))
-                    : null,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    isAchieved ? Icons.check_circle : Icons.local_fire_department,
-                    color: isAchieved ? AppColors.success : AppColors.streakFlame,
-                    size: 18,
-                  ),
-                  const SizedBox(width: AppTheme.spacingSM),
-                  Text(
-                    '${entry.key}일 연속',
-                    style: AppTypography.bodyMedium(
-                      isAchieved ? AppColors.success : widget.textColor,
-                    ).copyWith(
-                      fontWeight: isCurrent ? FontWeight.w700 : null,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+              onTap: () => _selectGoal(entry.key),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppTheme.spacingLG,
+                  vertical: AppTheme.spacingMD,
+                ),
+                decoration: BoxDecoration(
+                  color: isCurrent
+                      ? AppColors.streakFlame.withValues(alpha: 0.1)
+                      : isAchieved
+                          ? AppColors.success.withValues(alpha: 0.08)
+                          : AppColors.gold.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                  border: isCurrent
+                      ? Border.all(
+                          color:
+                              AppColors.streakFlame.withValues(alpha: 0.3))
+                      : null,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isAchieved
+                          ? Icons.check_circle
+                          : Icons.local_fire_department,
+                      color: isAchieved
+                          ? AppColors.success
+                          : AppColors.streakFlame,
+                      size: 18,
                     ),
-                  ),
-                  if (isCurrent) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.streakFlame,
-                        borderRadius: BorderRadius.circular(8),
+                    const SizedBox(width: AppTheme.spacingSM),
+                    Text(
+                      '${entry.key}일 연속',
+                      style: AppTypography.bodyMedium(
+                        isAchieved ? AppColors.success : widget.textColor,
+                      ).copyWith(
+                        fontWeight: isCurrent ? FontWeight.w700 : null,
                       ),
-                      child: const Text('현재 목표',
-                          style: TextStyle(color: Colors.white, fontSize: 10)),
                     ),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.streakFlame,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text('현재 목표',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: 10)),
+                      ),
+                    ],
+                    const Spacer(),
+                    if (isAchieved)
+                      Text(
+                        '달성!',
+                        style: AppTypography.label(AppColors.success)
+                            .copyWith(fontWeight: FontWeight.w700),
+                      )
+                    else
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '+${entry.value} ',
+                            style: AppTypography.label(AppColors.gold)
+                                .copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const TalentIcon(size: 14),
+                        ],
+                      ),
                   ],
-                  const Spacer(),
-                  Text(
-                    isAchieved ? '달성!' : '+${entry.value} FP',
-                    style: AppTypography.label(
-                      isAchieved ? AppColors.success : AppColors.gold,
-                    ).copyWith(fontWeight: FontWeight.w700),
-                  ),
-                ],
+                ),
               ),
             ),
           );
         }),
+
+        // 자동 목표로 되돌리기 (직접 설정된 경우에만)
+        if (isCustomGoal) ...[
+          const SizedBox(height: AppTheme.spacingSM),
+          Center(
+            child: TextButton.icon(
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                await ref.read(streakGoalProvider.notifier).clearGoal();
+                if (!mounted) return;
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('목표를 자동 설정으로 되돌렸어요'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              icon: const Icon(Icons.refresh, size: 16),
+              label: Text(
+                '자동 목표로 되돌리기',
+                style: AppTypography.label(widget.subTextColor),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: widget.subTextColor,
+              ),
+            ),
+          ),
+        ],
       ],
+    );
+  }
+
+  /// 목표 선택 모달
+  void _openGoalPicker(int currentGoal) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkBackgroundSecondary : Colors.white,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(24),
+            ),
+          ),
+          padding: const EdgeInsets.all(AppTheme.spacingXL),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '연속 묵상 목표 선택',
+                style: AppTypography.titleLarge(widget.textColor),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '원하는 목표 일수를 선택해주세요',
+                style: AppTypography.bodySmall(widget.subTextColor),
+              ),
+              const SizedBox(height: AppTheme.spacingLG),
+              ...kStreakGoalOptions.map((days) {
+                final isSelected = days == currentGoal;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppTheme.spacingSM),
+                  child: InkWell(
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.radiusMedium),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _selectGoal(days);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppTheme.spacingLG,
+                          vertical: AppTheme.spacingMD),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.streakFlame.withValues(alpha: 0.12)
+                            : (isDark
+                                ? Colors.white.withValues(alpha: 0.04)
+                                : Colors.grey.shade100),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.radiusMedium),
+                        border: isSelected
+                            ? Border.all(
+                                color: AppColors.streakFlame
+                                    .withValues(alpha: 0.4))
+                            : null,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.local_fire_department,
+                              color: AppColors.streakFlame, size: 20),
+                          const SizedBox(width: 10),
+                          Text(
+                            '$days일 연속',
+                            style: AppTypography.titleMedium(widget.textColor)
+                                .copyWith(
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (isSelected)
+                            const Icon(Icons.check_circle,
+                                color: AppColors.streakFlame, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: AppTheme.spacingSM),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _selectGoal(int days) async {
+    await ref.read(streakGoalProvider.notifier).setGoal(days);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('연속 묵상 목표를 $days일로 설정했어요'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
     );
   }
 }

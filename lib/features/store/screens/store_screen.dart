@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// 상점 아이템 모델
@@ -158,22 +159,22 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
     super.dispose();
   }
 
-  /// 구매 실행 — FP 차감 + 서버 저장
+  /// 구매 실행 — 달란트 차감 + 서버 저장
   Future<void> _executePurchase(StoreItem item) async {
     final profile = ref.read(authProvider).profile;
     if (profile == null) return;
 
-    final newFp = profile.faithPoints - item.price;
-    if (newFp < 0) return;
+    final newTalents = profile.faithPoints - item.price;
+    if (newTalents < 0) return;
 
-    // 프로필 FP 차감 (로컬 즉시)
-    final updated = profile.copyWith(faithPoints: newFp);
+    // 프로필 달란트 차감 (로컬 즉시)
+    final updated = profile.copyWith(faithPoints: newTalents);
     await ref.read(authProvider.notifier).updateProfile(updated);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${item.name}을(를) 구매했어요! (-${item.price} FP)'),
+          content: Text('${item.name}을(를) 구매했어요! (-${item.price} 달란트)'),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12)),
@@ -184,12 +185,13 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
 
   void _purchaseItem(StoreItem item) {
     final profile = ref.read(authProvider).profile;
-    final currentFp = profile?.faithPoints ?? 0;
+    final currentTalents = profile?.faithPoints ?? 0;
 
-    if (currentFp < item.price) {
+    if (currentTalents < item.price) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('FP가 부족해요! (보유: $currentFp / 필요: ${item.price})'),
+          content: Text(
+              '달란트가 부족해요! (보유: $currentTalents / 필요: ${item.price})'),
           behavior: SnackBarBehavior.floating,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -203,7 +205,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
       builder: (context) => AlertDialog(
         title: Text('${item.name} 구매'),
         content: Text(
-            '${item.price} FP를 사용하여\n${item.name}을(를) 구매할까요?'),
+            '${item.price} 달란트를 사용하여\n${item.name}을(를) 구매할까요?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -212,7 +214,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // FP 차감
+              // 달란트 차감
               _executePurchase(item);
             },
             child: const Text('구매'),
@@ -231,7 +233,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
         isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
 
     final profile = ref.watch(authProvider).profile;
-    final faithPoints = profile?.faithPoints ?? 0;
+    final talents = profile?.faithPoints ?? 0;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -245,7 +247,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
         title: Text('상점', style: AppTypography.titleLarge(textColor)),
         centerTitle: true,
         actions: [
-          // FP 잔액 표시
+          // 달란트 잔액 표시
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
@@ -259,11 +261,10 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.star_rounded,
-                        color: AppColors.gold, size: 16),
+                    const TalentIcon(size: 16),
                     const SizedBox(width: 4),
                     Text(
-                      '$faithPoints FP',
+                      '$talents 달란트',
                       style: AppTypography.label(AppColors.goldDark)
                           .copyWith(fontWeight: FontWeight.w700),
                     ),
@@ -397,8 +398,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star_rounded,
-                          color: AppColors.gold, size: 14),
+                      const TalentIcon(size: 14),
                       const SizedBox(width: 2),
                       Text(
                         '${item.price}',

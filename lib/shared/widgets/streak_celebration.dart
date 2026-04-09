@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_constants.dart';
+import 'talent_icon.dart';
 
 /// 스트릭 달성 축하 다이얼로그
 class StreakCelebration {
@@ -146,7 +147,7 @@ class _StreakCelebrationDialog extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.spacingMD),
 
-              // 보너스 FP
+              // 보너스 달란트
               if (bonusFp != null && bonusFp! > 0) ...[
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -157,10 +158,16 @@ class _StreakCelebrationDialog extends StatelessWidget {
                     color: AppColors.gold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                   ),
-                  child: Text(
-                    '완벽한 하루 보너스 +$bonusFp FP',
-                    style: AppTypography.label(AppColors.goldDark)
-                        .copyWith(fontWeight: FontWeight.w700),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '오늘의 경건 완료 보너스 +$bonusFp ',
+                        style: AppTypography.label(AppColors.goldDark)
+                            .copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const TalentIcon(size: 14),
+                    ],
                   ),
                 ),
               ],
@@ -176,10 +183,16 @@ class _StreakCelebrationDialog extends StatelessWidget {
                     color: AppColors.streakFlame.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                   ),
-                  child: Text(
-                    '연속 묵상 보너스 +$milestoneBonus FP',
-                    style: AppTypography.label(AppColors.streakFlame)
-                        .copyWith(fontWeight: FontWeight.w700),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '연속 묵상 보너스 +$milestoneBonus ',
+                        style: AppTypography.label(AppColors.streakFlame)
+                            .copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const TalentIcon(size: 14),
+                    ],
                   ),
                 ),
               ],

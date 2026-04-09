@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 
 /// 프로필 화면
@@ -42,7 +43,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         : '에덴 사용자';
     final currentLevel = profile?.currentLevel ?? 1;
     final streakCount = profile?.currentStreak ?? 0;
-    final totalFP = profile?.faithPoints ?? 0;
+    final totalTalents = profile?.faithPoints ?? 0;
 
     // 레벨 인덱스 안전하게 접근
     final levelIndex =
@@ -140,7 +141,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     if (currentLevel < AppConstants.levelThresholds.length) ...[
                       const SizedBox(height: AppTheme.spacingLG),
                       _buildLevelProgress(
-                        currentFP: totalFP,
+                        currentTalents: totalTalents,
                         currentLevel: currentLevel,
                         textColor: textColor,
                         subTextColor: subTextColor,
@@ -174,10 +175,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   const SizedBox(width: AppTheme.spacingMD),
                   Expanded(
                     child: _StatCard(
-                      icon: Icons.stars,
+                      iconWidget: const TalentIcon(size: 24),
                       iconColor: AppColors.gold,
-                      value: '$totalFP',
-                      label: 'FP',
+                      value: '$totalTalents',
+                      label: '달란트',
                     ),
                   ),
                 ],
@@ -244,7 +245,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   /// 레벨 진행 바
   Widget _buildLevelProgress({
-    required int currentFP,
+    required int currentTalents,
     required int currentLevel,
     required Color textColor,
     required Color subTextColor,
@@ -254,7 +255,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ? AppConstants.levelThresholds[currentLevel]
         : AppConstants.levelThresholds.last;
     final progress = nextThreshold > currentThreshold
-        ? ((currentFP - currentThreshold) / (nextThreshold - currentThreshold))
+        ? ((currentTalents - currentThreshold) /
+                (nextThreshold - currentThreshold))
             .clamp(0.0, 1.0)
         : 1.0;
 
@@ -270,9 +272,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
         ),
         const SizedBox(height: AppTheme.spacingXS),
-        Text(
-          '$currentFP / $nextThreshold FP',
-          style: AppTypography.label(subTextColor),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const TalentIcon(size: 14),
+            const SizedBox(width: 4),
+            Text(
+              '$currentTalents / $nextThreshold 달란트',
+              style: AppTypography.label(subTextColor),
+            ),
+          ],
         ),
       ],
     );
@@ -281,17 +290,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
 /// 통계 카드 위젯
 class _StatCard extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
+  final Widget? iconWidget;
   final Color iconColor;
   final String value;
   final String label;
 
   const _StatCard({
-    required this.icon,
+    this.icon,
+    this.iconWidget,
     required this.iconColor,
     required this.value,
     required this.label,
-  });
+  }) : assert(icon != null || iconWidget != null);
 
   @override
   Widget build(BuildContext context) {
@@ -305,7 +316,7 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppTheme.spacingMD),
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 24),
+          iconWidget ?? Icon(icon, color: iconColor, size: 24),
           const SizedBox(height: AppTheme.spacingSM),
           Text(
             value,

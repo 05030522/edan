@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/services/supabase_service.dart';
 import '../../../shared/models/user_profile.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/onboarding_provider.dart';
 
@@ -88,14 +89,10 @@ class OnboardingCompleteScreen extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.stars,
-                      color: AppColors.gold,
-                      size: 20,
-                    ),
+                    const TalentIcon(size: 20),
                     const SizedBox(width: AppTheme.spacingSM),
                     Text(
-                      '+10 FP 획득!',
+                      '+10 달란트 획득!',
                       style: AppTypography.titleMedium(AppColors.gold),
                     ),
                   ],

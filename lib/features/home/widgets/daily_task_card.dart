@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../providers/daily_tasks_provider.dart';
 
 /// 일일 태스크 카드 위젯
@@ -187,10 +188,16 @@ class DailyTaskCard extends StatelessWidget {
                         borderRadius:
                             BorderRadius.circular(AppTheme.radiusRound),
                       ),
-                      child: Text(
-                        '+${task.rewardFp} FP',
-                        style: AppTypography.label(Colors.white)
-                            .copyWith(fontWeight: FontWeight.w700),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '+${task.rewardFp} ',
+                            style: AppTypography.label(Colors.white)
+                                .copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const TalentIcon(size: 14),
+                        ],
                       ),
                     ),
                   ],

@@ -9,8 +9,11 @@ import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/luyang_image.dart';
 import '../../../shared/widgets/point_toast.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../../../shared/utils/streak_helper.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../streak/providers/streak_goal_provider.dart';
+import '../../streak/widgets/streak_broken_dialog.dart';
 import '../providers/daily_tasks_provider.dart';
 import '../widgets/weekly_calendar.dart';
 import '../widgets/daily_task_card.dart';
@@ -22,11 +25,48 @@ String _formatNumber(int n) {
 }
 
 /// 홈 화면 (에덴 정원)
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // 화면 진입 시 연속 묵상 끊김 여부 체크
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkStreakBroken();
+    });
+  }
+
+  void _checkStreakBroken() {
+    if (!mounted) return;
+    final profile = ref.read(authProvider).profile;
+    if (profile == null) return;
+
+    final brokenDays = calcStreakBreakDays(
+      lastStudyDate: profile.lastStudyDate,
+      currentStreak: profile.currentStreak,
+    );
+    if (brokenDays <= 0) return;
+
+    // 오늘 이미 안내했으면 스킵
+    final goalNotifier = ref.read(streakGoalProvider.notifier);
+    if (goalNotifier.wasBrokenNoticeShownToday()) return;
+
+    goalNotifier.markBrokenNoticeShown();
+    StreakBrokenDialog.show(
+      context,
+      previousStreak: profile.currentStreak,
+      daysRested: brokenDays,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor =
         isDark ? AppColors.darkBackground : AppColors.lightBackground;
@@ -193,7 +233,7 @@ class HomeScreen extends ConsumerWidget {
         ),
         const SizedBox(width: 8),
 
-        // FP pill - 상점으로 이동
+        // 달란트 pill - 상점으로 이동
         GestureDetector(
           onTap: () => context.push('/store'),
           child: Container(
@@ -205,7 +245,7 @@ class HomeScreen extends ConsumerWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.star_rounded, color: AppColors.gold, size: 18),
+                const TalentIcon(size: 18),
                 const SizedBox(width: 4),
                 Text(
                   _formatNumber(faithPoints),

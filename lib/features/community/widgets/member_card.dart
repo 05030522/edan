@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../shared/widgets/talent_icon.dart';
 import '../models/church_member.dart';
 
 /// 교회 멤버 카드 위젯
@@ -135,7 +136,7 @@ class MemberCard extends StatelessWidget {
             const SizedBox(width: AppTheme.spacingSM),
           ],
 
-          // 스트릭 + FP
+          // 스트릭 + 달란트
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -158,11 +159,7 @@ class MemberCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.stars,
-                    color: AppColors.gold,
-                    size: 14,
-                  ),
+                  const TalentIcon(size: 14),
                   const SizedBox(width: 2),
                   Text(
                     '${member.faithPoints}',
