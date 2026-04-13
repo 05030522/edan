@@ -19,8 +19,7 @@ class OnboardingPhotoScreen extends ConsumerStatefulWidget {
       _OnboardingPhotoScreenState();
 }
 
-class _OnboardingPhotoScreenState
-    extends ConsumerState<OnboardingPhotoScreen> {
+class _OnboardingPhotoScreenState extends ConsumerState<OnboardingPhotoScreen> {
   Uint8List? _imageBytes;
   bool _isLoading = false;
 
@@ -46,7 +45,8 @@ class _OnboardingPhotoScreenState
             content: Text('사진을 불러올 수 없어요: $e'),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -66,20 +66,21 @@ class _OnboardingPhotoScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingXL,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -138,22 +139,23 @@ class _OnboardingPhotoScreenState
                             child: _isLoading
                                 ? const Center(
                                     child: CircularProgressIndicator(
-                                        color: AppColors.primary),
+                                      color: AppColors.primary,
+                                    ),
                                   )
                                 : _imageBytes != null
-                                    ? ClipOval(
-                                        child: Image.memory(
-                                          _imageBytes!,
-                                          fit: BoxFit.cover,
-                                          width: 130,
-                                          height: 130,
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.person,
-                                        size: 64,
-                                        color: AppColors.primary,
-                                      ),
+                                ? ClipOval(
+                                    child: Image.memory(
+                                      _imageBytes!,
+                                      fit: BoxFit.cover,
+                                      width: 130,
+                                      height: 130,
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.person,
+                                    size: 64,
+                                    color: AppColors.primary,
+                                  ),
                           ),
                           Container(
                             width: 38,
@@ -161,8 +163,7 @@ class _OnboardingPhotoScreenState
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               shape: BoxShape.circle,
-                              border:
-                                  Border.all(color: Colors.white, width: 2),
+                              border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: const Icon(
                               Icons.camera_alt,
@@ -189,10 +190,7 @@ class _OnboardingPhotoScreenState
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _imageBytes != null ? _handleNext : null,
-                  child: Text(
-                    '다음',
-                    style: AppTypography.button(Colors.white),
-                  ),
+                  child: Text('다음', style: AppTypography.button(Colors.white)),
                 ),
               ),
               const SizedBox(height: AppTheme.spacingXXL),

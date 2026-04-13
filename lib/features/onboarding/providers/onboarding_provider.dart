@@ -51,10 +51,7 @@ class OnboardingNotifier extends StateNotifier<OnboardingData> {
   }
 
   void setNotificationTime(int hour, int minute) {
-    state = state.copyWith(
-      notificationHour: hour,
-      notificationMinute: minute,
-    );
+    state = state.copyWith(notificationHour: hour, notificationMinute: minute);
   }
 
   void setAvatarBytes(Uint8List bytes) {
@@ -105,8 +102,8 @@ class OnboardingNotifier extends StateNotifier<OnboardingData> {
 
 final onboardingProvider =
     StateNotifierProvider<OnboardingNotifier, OnboardingData>((ref) {
-  return OnboardingNotifier();
-});
+      return OnboardingNotifier();
+    });
 
 /// 로컬에 저장된 사용자 이름 가져오기
 final localUserNameProvider = FutureProvider<String>((ref) async {

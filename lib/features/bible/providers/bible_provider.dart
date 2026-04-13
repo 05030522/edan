@@ -23,8 +23,12 @@ class BibleNavigationState {
   }) {
     return BibleNavigationState(
       selectedBook: selectedBook ?? this.selectedBook,
-      selectedChapter: clearChapter ? null : (selectedChapter ?? this.selectedChapter),
-      chapterContent: clearContent ? null : (chapterContent ?? this.chapterContent),
+      selectedChapter: clearChapter
+          ? null
+          : (selectedChapter ?? this.selectedChapter),
+      chapterContent: clearContent
+          ? null
+          : (chapterContent ?? this.chapterContent),
     );
   }
 }
@@ -32,8 +36,8 @@ class BibleNavigationState {
 /// 성경 네비게이션 프로바이더
 final bibleNavigationProvider =
     StateNotifierProvider<BibleNavigationNotifier, BibleNavigationState>(
-  (ref) => BibleNavigationNotifier(),
-);
+      (ref) => BibleNavigationNotifier(),
+    );
 
 class BibleNavigationNotifier extends StateNotifier<BibleNavigationState> {
   BibleNavigationNotifier() : super(const BibleNavigationState());

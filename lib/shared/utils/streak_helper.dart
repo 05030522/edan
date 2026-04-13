@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
+import '../../features/achievements/providers/achievement_provider.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/home/providers/daily_tasks_provider.dart';
+import '../widgets/achievement_toast.dart';
 import '../widgets/streak_celebration.dart';
 
 /// 태스크 완료 후 스트릭 체크 공통 유틸
@@ -13,7 +15,9 @@ class StreakHelper {
   /// - 축하 다이얼로그가 뜰 조건이 아니면 즉시 resolve
   /// - 호출자는 await 후에 화면 전환(예: Navigator.pop) 하면 안전함
   static Future<void> checkAndUpdate(
-      BuildContext context, WidgetRef ref) async {
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
     final tasksState = ref.read(dailyTasksProvider);
     if (!tasksState.allCompleted) return;
 
@@ -37,5 +41,20 @@ class StreakHelper {
       streakCount: newStreak,
       bonusFp: perfectDayBonus,
     );
+
+    // 업적 체크
+    if (!context.mounted) return;
+    final profile = ref.read(authProvider).profile;
+    if (profile == null) return;
+
+    final newlyUnlocked = await ref
+        .read(achievementProvider.notifier)
+        .checkAndUnlock(profile: profile);
+
+    for (final ach in newlyUnlocked) {
+      await ref.read(authProvider.notifier).addFaithPoints(ach.rewardFp);
+      if (!context.mounted) return;
+      await AchievementToast.show(context, achievement: ach);
+    }
   }
 }

@@ -9,10 +9,10 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../shared/widgets/luyang_image.dart';
 
-/// 연속 묵상이 깨졌을 때 보여주는 다이얼로그
+/// 묵상을 쉬어갔을 때 보여주는 격려 다이얼로그
 ///
-/// - 루양이 위로 메시지를 전달
-/// - 이전 스트릭 기록을 표시
+/// - 루양이 따뜻한 위로 메시지를 전달
+/// - 이전 동행 기록을 표시
 /// - 새로운 묵상 목표를 다시 설정할 수 있는 버튼 제공
 class StreakBrokenDialog extends ConsumerWidget {
   const StreakBrokenDialog({
@@ -64,10 +64,12 @@ class StreakBrokenDialog extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Center(
       child: Material(
@@ -95,7 +97,7 @@ class StreakBrokenDialog extends ConsumerWidget {
 
               // 타이틀
               Text(
-                '연속 묵상이 끊겼어요',
+                '잠깐 쉬어갔나 봐요',
                 style: AppTypography.titleLarge(textColor),
                 textAlign: TextAlign.center,
               ),
@@ -108,13 +110,14 @@ class StreakBrokenDialog extends ConsumerWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.streakFlame.withValues(alpha: 0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                 ),
                 child: Text(
-                  '이전 기록 $previousStreak일 · $daysRested일 쉼',
-                  style: AppTypography.label(AppColors.streakFlame)
-                      .copyWith(fontWeight: FontWeight.w700),
+                  '$previousStreak일 동행 기록 · $daysRested일 쉼',
+                  style: AppTypography.label(
+                    AppColors.primaryDark,
+                  ).copyWith(fontWeight: FontWeight.w700),
                 ),
               ),
               const SizedBox(height: AppTheme.spacingLG),
@@ -147,8 +150,7 @@ class StreakBrokenDialog extends ConsumerWidget {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusRound),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                     ),
                   ),
                 ),

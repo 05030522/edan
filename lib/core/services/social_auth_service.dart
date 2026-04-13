@@ -6,11 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_service.dart';
 
 /// 소셜 로그인 프로바이더 타입
-enum SocialProvider {
-  kakao,
-  google,
-  naver,
-}
+enum SocialProvider { kakao, google, naver }
 
 /// 소셜 로그인 서비스
 /// Supabase OAuth를 통한 카카오, 구글, 네이버 로그인 처리

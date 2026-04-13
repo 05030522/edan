@@ -61,17 +61,16 @@ class QuizNotifier extends StateNotifier<QuizState> {
   QuizAnswerResult submitAnswer(int optionIndex) {
     if (state.hasAnswered) return state.lastResult;
 
-    final isCorrect =
-        optionIndex == state.currentQuestion.correctIndex;
-    final result =
-        isCorrect ? QuizAnswerResult.correct : QuizAnswerResult.wrong;
+    final isCorrect = optionIndex == state.currentQuestion.correctIndex;
+    final result = isCorrect
+        ? QuizAnswerResult.correct
+        : QuizAnswerResult.wrong;
     final fpEarned = isCorrect ? state.currentQuestion.rewardFp : 0;
 
     state = state.copyWith(
       lastResult: result,
       selectedOptionIndex: optionIndex,
-      correctCount:
-          isCorrect ? state.correctCount + 1 : state.correctCount,
+      correctCount: isCorrect ? state.correctCount + 1 : state.correctCount,
       wrongCount: !isCorrect ? state.wrongCount + 1 : state.wrongCount,
       totalFpEarned: state.totalFpEarned + fpEarned,
     );
@@ -105,6 +104,6 @@ class QuizNotifier extends StateNotifier<QuizState> {
 /// 퀴즈 프로바이더 팩토리
 final quizProvider = StateNotifierProvider.autoDispose
     .family<QuizNotifier, QuizState, String>((ref, lessonId) {
-  final quizSet = DummyQuizData.getQuizForLesson(lessonId);
-  return QuizNotifier(quizSet);
-});
+      final quizSet = DummyQuizData.getQuizForLesson(lessonId);
+      return QuizNotifier(quizSet);
+    });

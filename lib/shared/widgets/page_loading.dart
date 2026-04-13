@@ -5,11 +5,7 @@ import '../../core/theme/app_typography.dart';
 /// 페이지 전환 시 표시되는 자연스러운 로딩 화면
 /// 앱 테마에 맞는 미니멀한 로딩 인디케이터
 class PageLoading extends StatefulWidget {
-  const PageLoading({
-    super.key,
-    this.message,
-    this.icon,
-  });
+  const PageLoading({super.key, this.message, this.icon});
 
   final String? message;
   final IconData? icon;
@@ -31,13 +27,11 @@ class _PageLoadingState extends State<PageLoading>
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    _fadeAnim = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    );
-    _scaleAnim = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _fadeAnim = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _scaleAnim = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
     _controller.forward();
   }
 
@@ -50,10 +44,12 @@ class _PageLoadingState extends State<PageLoading>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,

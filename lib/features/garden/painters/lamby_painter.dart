@@ -141,11 +141,7 @@ class _LambyPainter extends CustomPainter {
     final Offset bodyCenter = Offset(cx, cy + s * 0.08);
 
     // Shadow layer
-    canvas.drawCircle(
-      bodyCenter + Offset(0, s * 0.02),
-      bodyR,
-      woolShadow,
-    );
+    canvas.drawCircle(bodyCenter + Offset(0, s * 0.02), bodyR, woolShadow);
 
     // Main body
     canvas.drawCircle(bodyCenter, bodyR, woolPaint);
@@ -237,11 +233,7 @@ class _LambyPainter extends CustomPainter {
 
     // Outer ear
     canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset.zero,
-        width: s * 0.13,
-        height: s * 0.20,
-      ),
+      Rect.fromCenter(center: Offset.zero, width: s * 0.13, height: s * 0.20),
       outerPaint,
     );
     // Inner ear (pink)
@@ -291,23 +283,35 @@ class _LambyPainter extends CustomPainter {
     // Left eye
     final Offset leftEye = Offset(head.dx - s * 0.08, eyeY);
     canvas.drawCircle(leftEye, eyeR, eyePaint);
-    canvas.drawCircle(leftEye + Offset(-eyeR * 0.3, -eyeR * 0.3),
-        eyeR * 0.4, sparklePaint);
+    canvas.drawCircle(
+      leftEye + Offset(-eyeR * 0.3, -eyeR * 0.3),
+      eyeR * 0.4,
+      sparklePaint,
+    );
 
     // Right eye
     final Offset rightEye = Offset(head.dx + s * 0.08, eyeY);
     canvas.drawCircle(rightEye, eyeR, eyePaint);
-    canvas.drawCircle(rightEye + Offset(-eyeR * 0.3, -eyeR * 0.3),
-        eyeR * 0.4, sparklePaint);
+    canvas.drawCircle(
+      rightEye + Offset(-eyeR * 0.3, -eyeR * 0.3),
+      eyeR * 0.4,
+      sparklePaint,
+    );
 
     // Extra sparkle for excited expression
     if (expression == LambyExpression.excited ||
         expression == LambyExpression.cheering) {
       final Paint starPaint = Paint()..color = _gold;
       canvas.drawCircle(
-          leftEye + Offset(eyeR * 0.4, -eyeR * 0.5), eyeR * 0.25, starPaint);
-      canvas.drawCircle(rightEye + Offset(eyeR * 0.4, -eyeR * 0.5),
-          eyeR * 0.25, starPaint);
+        leftEye + Offset(eyeR * 0.4, -eyeR * 0.5),
+        eyeR * 0.25,
+        starPaint,
+      );
+      canvas.drawCircle(
+        rightEye + Offset(eyeR * 0.4, -eyeR * 0.5),
+        eyeR * 0.25,
+        starPaint,
+      );
     }
   }
 
@@ -359,14 +363,18 @@ class _LambyPainter extends CustomPainter {
     final Offset leftEye = Offset(head.dx - s * 0.08, eyeY);
     canvas.drawCircle(leftEye, eyeR, eyePaint);
     canvas.drawCircle(
-        leftEye + Offset(-eyeR * 0.3, -eyeR * 0.3), eyeR * 0.35,
-        sparklePaint);
+      leftEye + Offset(-eyeR * 0.3, -eyeR * 0.3),
+      eyeR * 0.35,
+      sparklePaint,
+    );
 
     final Offset rightEye = Offset(head.dx + s * 0.08, eyeY);
     canvas.drawCircle(rightEye, eyeR, eyePaint);
     canvas.drawCircle(
-        rightEye + Offset(-eyeR * 0.3, -eyeR * 0.3), eyeR * 0.35,
-        sparklePaint);
+      rightEye + Offset(-eyeR * 0.3, -eyeR * 0.3),
+      eyeR * 0.35,
+      sparklePaint,
+    );
 
     // Sad eyebrows (angled inward-up)
     final Paint browPaint = Paint()
@@ -398,14 +406,18 @@ class _LambyPainter extends CustomPainter {
     final Offset leftEye = Offset(head.dx - s * 0.09, eyeY);
     canvas.drawCircle(leftEye, eyeR, eyePaint);
     canvas.drawCircle(
-        leftEye + Offset(-eyeR * 0.25, -eyeR * 0.25), eyeR * 0.4,
-        sparklePaint);
+      leftEye + Offset(-eyeR * 0.25, -eyeR * 0.25),
+      eyeR * 0.4,
+      sparklePaint,
+    );
 
     final Offset rightEye = Offset(head.dx + s * 0.09, eyeY);
     canvas.drawCircle(rightEye, eyeR, eyePaint);
     canvas.drawCircle(
-        rightEye + Offset(-eyeR * 0.25, -eyeR * 0.25), eyeR * 0.4,
-        sparklePaint);
+      rightEye + Offset(-eyeR * 0.25, -eyeR * 0.25),
+      eyeR * 0.4,
+      sparklePaint,
+    );
   }
 
   void _drawNose(Canvas canvas, double s, Offset head) {
@@ -497,7 +509,8 @@ class _LambyPainter extends CustomPainter {
         break;
       case LambyExpression.surprised:
         // Open "O" mouth
-        final Paint fillMouth = Paint()..color = _darkPink.withValues(alpha: 0.3);
+        final Paint fillMouth = Paint()
+          ..color = _darkPink.withValues(alpha: 0.3);
         canvas.drawOval(
           Rect.fromCenter(
             center: Offset(head.dx, mouthY),
@@ -526,9 +539,15 @@ class _LambyPainter extends CustomPainter {
     final double cheekR = s * 0.04;
 
     canvas.drawCircle(
-        Offset(head.dx - s * 0.14, head.dy + s * 0.04), cheekR, blush);
+      Offset(head.dx - s * 0.14, head.dy + s * 0.04),
+      cheekR,
+      blush,
+    );
     canvas.drawCircle(
-        Offset(head.dx + s * 0.14, head.dy + s * 0.04), cheekR, blush);
+      Offset(head.dx + s * 0.14, head.dy + s * 0.04),
+      cheekR,
+      blush,
+    );
   }
 
   // ─── Expression specific accessories ───
@@ -538,7 +557,11 @@ class _LambyPainter extends CustomPainter {
   }
 
   void _drawExpressionAccessories(
-      Canvas canvas, double s, double cx, double cy) {
+    Canvas canvas,
+    double s,
+    double cx,
+    double cy,
+  ) {
     switch (expression) {
       case LambyExpression.thinking:
         _drawThinkingBubble(canvas, s, cx, cy);
@@ -585,13 +608,22 @@ class _LambyPainter extends CustomPainter {
 
     // Small thought dots
     canvas.drawCircle(
-        Offset(cx + s * 0.18, cy - s * 0.2), s * 0.02, bubblePaint);
+      Offset(cx + s * 0.18, cy - s * 0.2),
+      s * 0.02,
+      bubblePaint,
+    );
     canvas.drawCircle(
-        Offset(cx + s * 0.24, cy - s * 0.28), s * 0.03, bubblePaint);
+      Offset(cx + s * 0.24, cy - s * 0.28),
+      s * 0.03,
+      bubblePaint,
+    );
 
     // Main thought bubble
     canvas.drawCircle(
-        Offset(cx + s * 0.32, cy - s * 0.38), s * 0.08, bubblePaint);
+      Offset(cx + s * 0.32, cy - s * 0.38),
+      s * 0.08,
+      bubblePaint,
+    );
 
     // Question mark
     final Offset qCenter = Offset(cx + s * 0.32, cy - s * 0.40);
@@ -635,12 +667,17 @@ class _LambyPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     void drawZ(Offset origin, double zSize) {
+      canvas.drawLine(origin, origin + Offset(zSize, 0), zPaint);
       canvas.drawLine(
-          origin, origin + Offset(zSize, 0), zPaint);
+        origin + Offset(zSize, 0),
+        origin + Offset(0, zSize),
+        zPaint,
+      );
       canvas.drawLine(
-          origin + Offset(zSize, 0), origin + Offset(0, zSize), zPaint);
-      canvas.drawLine(
-          origin + Offset(0, zSize), origin + Offset(zSize, zSize), zPaint);
+        origin + Offset(0, zSize),
+        origin + Offset(zSize, zSize),
+        zPaint,
+      );
     }
 
     drawZ(Offset(cx + s * 0.2, cy - s * 0.28), s * 0.06);
@@ -651,7 +688,12 @@ class _LambyPainter extends CustomPainter {
   // ── Cheering: confetti sparkles ──
 
   void _drawConfetti(Canvas canvas, double s, double cx, double cy) {
-    final List<Color> colors = [_pink, _gold, const Color(0xFF90CAF9), const Color(0xFFCE93D8)];
+    final List<Color> colors = [
+      _pink,
+      _gold,
+      const Color(0xFF90CAF9),
+      const Color(0xFFCE93D8),
+    ];
     final Random rng = Random(42); // Deterministic for consistent painting.
 
     for (int i = 0; i < 12; i++) {
@@ -672,7 +714,10 @@ class _LambyPainter extends CustomPainter {
         canvas.rotate(angle);
         canvas.drawRect(
           Rect.fromCenter(
-              center: Offset.zero, width: s * 0.025, height: s * 0.012),
+            center: Offset.zero,
+            width: s * 0.025,
+            height: s * 0.012,
+          ),
           p,
         );
         canvas.restore();
@@ -725,12 +770,18 @@ class _LambyPainter extends CustomPainter {
     canvas.rotate(-0.15);
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(-s * 0.02, 0), width: s * 0.08, height: s * 0.14),
+        center: Offset(-s * 0.02, 0),
+        width: s * 0.08,
+        height: s * 0.14,
+      ),
       handPaint,
     );
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(-s * 0.02, 0), width: s * 0.08, height: s * 0.14),
+        center: Offset(-s * 0.02, 0),
+        width: s * 0.08,
+        height: s * 0.14,
+      ),
       linePaint,
     );
     canvas.restore();
@@ -740,12 +791,18 @@ class _LambyPainter extends CustomPainter {
     canvas.rotate(0.15);
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(s * 0.02, 0), width: s * 0.08, height: s * 0.14),
+        center: Offset(s * 0.02, 0),
+        width: s * 0.08,
+        height: s * 0.14,
+      ),
       handPaint,
     );
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(s * 0.02, 0), width: s * 0.08, height: s * 0.14),
+        center: Offset(s * 0.02, 0),
+        width: s * 0.08,
+        height: s * 0.14,
+      ),
       linePaint,
     );
     canvas.restore();
@@ -756,11 +813,7 @@ class _LambyPainter extends CustomPainter {
     final Paint haloPaint = Paint()
       ..color = _gold.withValues(alpha: 0.25)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
-    canvas.drawCircle(
-      Offset(cx, cy - s * 0.35),
-      s * 0.06,
-      haloPaint,
-    );
+    canvas.drawCircle(Offset(cx, cy - s * 0.35), s * 0.06, haloPaint);
   }
 
   // ── Surprised: exclamation mark ──
@@ -791,11 +844,7 @@ class _LambyPainter extends CustomPainter {
       ..color = const Color(0xFF66BB6A)
       ..strokeWidth = s * 0.015
       ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-      flowerPos,
-      flowerPos + Offset(0, s * 0.15),
-      stemPaint,
-    );
+    canvas.drawLine(flowerPos, flowerPos + Offset(0, s * 0.15), stemPaint);
 
     // Leaf
     final Paint leafPaint = Paint()..color = const Color(0xFF81C784);
@@ -882,8 +931,7 @@ class _LambyPainter extends CustomPainter {
 
     // Text lines on left page
     for (int i = 0; i < 3; i++) {
-      final double y =
-          bookCenter.dy - bh / 2 + s * 0.03 + i * s * 0.025;
+      final double y = bookCenter.dy - bh / 2 + s * 0.03 + i * s * 0.025;
       canvas.drawLine(
         Offset(bookCenter.dx - bw / 2 + s * 0.025, y),
         Offset(bookCenter.dx - s * 0.02, y),

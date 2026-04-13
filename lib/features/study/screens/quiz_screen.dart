@@ -13,11 +13,7 @@ import '../providers/quiz_provider.dart';
 
 /// 퀴즈 화면 (듀오링고 스타일)
 class QuizScreen extends ConsumerStatefulWidget {
-  const QuizScreen({
-    super.key,
-    required this.pathId,
-    required this.lessonId,
-  });
+  const QuizScreen({super.key, required this.pathId, required this.lessonId});
 
   final String pathId;
   final String lessonId;
@@ -55,21 +51,22 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final quizState = ref.watch(quizProvider(widget.lessonId));
 
     // 퀴즈 완료 시 결과 화면으로 이동
     if (quizState.isFinished) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go(
-          '/study/${widget.pathId}/${widget.lessonId}/quiz-result',
-        );
+        context.go('/study/${widget.pathId}/${widget.lessonId}/quiz-result');
       });
       return const SizedBox.shrink();
     }
@@ -94,19 +91,14 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                   // 닫기 버튼
                   GestureDetector(
                     onTap: () => _showExitDialog(context),
-                    child: Icon(
-                      Icons.close,
-                      color: subTextColor,
-                      size: 28,
-                    ),
+                    child: Icon(Icons.close, color: subTextColor, size: 28),
                   ),
                   const SizedBox(width: AppTheme.spacingMD),
 
                   // 프로그레스 바
                   Expanded(
                     child: ClipRRect(
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusRound),
+                      borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                       child: TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0, end: progress),
                         duration: const Duration(milliseconds: 400),
@@ -166,9 +158,9 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                     Text(
                       question.question,
                       textAlign: TextAlign.center,
-                      style: AppTypography.headlineMedium(textColor).copyWith(
-                        height: 1.5,
-                      ),
+                      style: AppTypography.headlineMedium(
+                        textColor,
+                      ).copyWith(height: 1.5),
                     ),
                     const SizedBox(height: AppTheme.spacingXXL),
 
@@ -220,8 +212,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
   }) {
     final hasAnswered = quizState.hasAnswered;
     final isSelected = quizState.selectedOptionIndex == index;
-    final isCorrectOption =
-        index == quizState.currentQuestion.correctIndex;
+    final isCorrectOption = index == quizState.currentQuestion.correctIndex;
 
     // 색상 결정
     Color bgColor;
@@ -231,9 +222,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
 
     if (!hasAnswered) {
       // 아직 답변 전
-      bgColor = isDark
-          ? Colors.white.withValues(alpha: 0.06)
-          : Colors.white;
+      bgColor = isDark ? Colors.white.withValues(alpha: 0.06) : Colors.white;
       borderColor = isDark
           ? Colors.white.withValues(alpha: 0.12)
           : AppColors.primary.withValues(alpha: 0.3);
@@ -295,8 +284,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                 color: hasAnswered && (isCorrectOption || isSelected)
                     ? borderColor.withValues(alpha: 0.2)
                     : (isDark
-                        ? Colors.white.withValues(alpha: 0.08)
-                        : AppColors.primary.withValues(alpha: 0.1)),
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : AppColors.primary.withValues(alpha: 0.1)),
               ),
               child: Center(
                 child: Text(
@@ -325,11 +314,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
 
             // 정답/오답 아이콘
             if (trailingIcon != null)
-              Icon(
-                trailingIcon,
-                color: borderColor,
-                size: 24,
-              ),
+              Icon(trailingIcon, color: borderColor, size: 24),
           ],
         ),
       ),
@@ -393,8 +378,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.gold.withValues(alpha: 0.3),
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusRound),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -441,14 +425,10 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.radiusLarge),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
                 ),
               ),
-              child: Text(
-                '계속',
-                style: AppTypography.button(Colors.white),
-              ),
+              child: Text('계속', style: AppTypography.button(Colors.white)),
             ),
           ),
         ],
@@ -470,7 +450,10 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
       final size = MediaQuery.of(context).size;
       PointToast.show(
         context,
-        points: ref.read(quizProvider(widget.lessonId)).currentQuestion.rewardFp,
+        points: ref
+            .read(quizProvider(widget.lessonId))
+            .currentQuestion
+            .rewardFp,
         sourceOffset: Offset(size.width / 2, size.height * 0.3),
       );
     } else {
@@ -503,8 +486,9 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor:
-            isDark ? AppColors.darkBackgroundSecondary : Colors.white,
+        backgroundColor: isDark
+            ? AppColors.darkBackgroundSecondary
+            : Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
         ),
@@ -517,9 +501,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
         content: Text(
           '지금까지의 진행이 사라져요.',
           style: AppTypography.bodyMedium(
-            isDark
-                ? AppColors.darkTextSecondary
-                : AppColors.lightTextSecondary,
+            isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
           ),
         ),
         actions: [
@@ -535,10 +517,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
               Navigator.pop(context);
               context.go('/home');
             },
-            child: Text(
-              '나가기',
-              style: AppTypography.button(AppColors.error),
-            ),
+            child: Text('나가기', style: AppTypography.button(AppColors.error)),
           ),
         ],
       ),

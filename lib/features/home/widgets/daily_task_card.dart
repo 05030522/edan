@@ -55,10 +55,12 @@ class DailyTaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     final cardColor = isDark
         ? Colors.white.withValues(alpha: 0.06)
         : Colors.white.withValues(alpha: 0.8);
@@ -88,11 +90,7 @@ class DailyTaskCard extends StatelessWidget {
                   color: _iconColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
-                child: Icon(
-                  _icon,
-                  color: _iconColor,
-                  size: 22,
-                ),
+                child: Icon(_icon, color: _iconColor, size: 22),
               ),
               const SizedBox(width: AppTheme.spacingMD),
 
@@ -165,8 +163,7 @@ class DailyTaskCard extends StatelessWidget {
                   ),
                   minimumSize: const Size(0, 44),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusMedium),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                   ),
                 ),
                 child: Row(
@@ -174,8 +171,9 @@ class DailyTaskCard extends StatelessWidget {
                   children: [
                     Text(
                       _ctaText,
-                      style: AppTypography.button(Colors.white)
-                          .copyWith(fontSize: 14),
+                      style: AppTypography.button(
+                        Colors.white,
+                      ).copyWith(fontSize: 14),
                     ),
                     const SizedBox(width: 6),
                     Container(
@@ -185,16 +183,18 @@ class DailyTaskCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.25),
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusRound),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusRound,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             '+${task.rewardFp} ',
-                            style: AppTypography.label(Colors.white)
-                                .copyWith(fontWeight: FontWeight.w700),
+                            style: AppTypography.label(
+                              Colors.white,
+                            ).copyWith(fontWeight: FontWeight.w700),
                           ),
                           const TalentIcon(size: 14),
                         ],

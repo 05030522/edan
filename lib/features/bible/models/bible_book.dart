@@ -31,10 +31,7 @@ class BibleVerse {
   final int verse;
   final String text;
 
-  const BibleVerse({
-    required this.verse,
-    required this.text,
-  });
+  const BibleVerse({required this.verse, required this.text});
 }
 
 /// 성경 66권 목록 (장 수 포함)

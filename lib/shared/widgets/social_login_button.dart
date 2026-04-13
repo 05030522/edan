@@ -62,10 +62,9 @@ class SocialLoginButton extends StatelessWidget {
                   // 로그인 텍스트
                   Text(
                     label,
-                    style: AppTypography.button(textColor).copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
+                    style: AppTypography.button(
+                      textColor,
+                    ).copyWith(fontWeight: FontWeight.w600, fontSize: 15),
                   ),
                 ],
               ),
@@ -92,9 +91,7 @@ class _KakaoIcon extends StatelessWidget {
     return SizedBox(
       width: 22,
       height: 22,
-      child: CustomPaint(
-        painter: _KakaoIconPainter(),
-      ),
+      child: CustomPaint(painter: _KakaoIconPainter()),
     );
   }
 }
@@ -137,9 +134,7 @@ class _GoogleIcon extends StatelessWidget {
     return SizedBox(
       width: 20,
       height: 20,
-      child: CustomPaint(
-        painter: _GoogleIconPainter(),
-      ),
+      child: CustomPaint(painter: _GoogleIconPainter()),
     );
   }
 }
@@ -232,9 +227,7 @@ class _NaverIcon extends StatelessWidget {
     return SizedBox(
       width: 20,
       height: 20,
-      child: CustomPaint(
-        painter: _NaverIconPainter(),
-      ),
+      child: CustomPaint(painter: _NaverIconPainter()),
     );
   }
 }

@@ -33,6 +33,7 @@ import '../../features/bible/screens/bible_chapter_screen.dart';
 import '../../features/meditation/screens/meditation_screen.dart';
 import '../../features/store/screens/store_screen.dart';
 import '../../features/garden/screens/garden_screen.dart';
+import '../../features/achievements/screens/achievements_screen.dart';
 import '../theme/app_colors.dart';
 
 /// 라우트 이름 상수
@@ -61,6 +62,7 @@ class AppRoutes {
 
 /// 하단 내비게이션 쉘 (5탭)
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 /// GoRouter 프로바이더
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -68,10 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     initialLocation: AppRoutes.splash,
     routes: [
       // ─── 루트 경로 → 스플래시로 리다이렉트 ───
-      GoRoute(
-        path: '/',
-        redirect: (context, state) => AppRoutes.splash,
-      ),
+      GoRoute(path: '/', redirect: (context, state) => AppRoutes.splash),
       // ─── 인증 플로우 (내비게이션 바 없음) ───
       GoRoute(
         path: AppRoutes.splash,
@@ -195,10 +194,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final pathId = state.pathParameters['pathId'] ?? 'path-1';
           final lessonId = state.pathParameters['lessonId'] ?? 'lesson-1';
-          return LessonScriptureScreen(
-            pathId: pathId,
-            lessonId: lessonId,
-          );
+          return LessonScriptureScreen(pathId: pathId, lessonId: lessonId);
         },
       ),
 
@@ -209,10 +205,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final pathId = state.pathParameters['pathId'] ?? 'path-1';
           final lessonId = state.pathParameters['lessonId'] ?? 'lesson-1';
-          return QuizScreen(
-            pathId: pathId,
-            lessonId: lessonId,
-          );
+          return QuizScreen(pathId: pathId, lessonId: lessonId);
         },
       ),
       GoRoute(
@@ -221,10 +214,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final pathId = state.pathParameters['pathId'] ?? 'path-1';
           final lessonId = state.pathParameters['lessonId'] ?? 'lesson-1';
-          return QuizResultScreen(
-            pathId: pathId,
-            lessonId: lessonId,
-          );
+          return QuizResultScreen(pathId: pathId, lessonId: lessonId);
         },
       ),
 
@@ -235,10 +225,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final pathId = state.pathParameters['pathId'] ?? 'path-1';
           final lessonId = state.pathParameters['lessonId'] ?? 'lesson-1';
-          return ShareCardScreen(
-            pathId: pathId,
-            lessonId: lessonId,
-          );
+          return ShareCardScreen(pathId: pathId, lessonId: lessonId);
         },
       ),
 
@@ -250,10 +237,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const PrayerScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0, 1),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
               child: child,
             );
           },
@@ -268,10 +258,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const BibleReadingScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0, 1),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
               child: child,
             );
           },
@@ -286,10 +279,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const BibleBooksScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1, 0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
               child: child,
             );
           },
@@ -301,18 +297,27 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/bible-full/:bookName',
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (context, state) {
-          final bookName = Uri.decodeComponent(state.pathParameters['bookName']!);
+          final bookName = Uri.decodeComponent(
+            state.pathParameters['bookName']!,
+          );
           return CustomTransitionPage(
             child: BibleChapterScreen(bookName: bookName),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
-                child: child,
-              );
-            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
+                    child: child,
+                  );
+                },
           );
         },
       ),
@@ -325,10 +330,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const MeditationScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(0, 1),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
               child: child,
             );
           },
@@ -343,10 +351,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const StoreScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1, 0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
+              child: child,
+            );
+          },
+        ),
+      ),
+
+      // ─── 업적 갤러리 (풀스크린) ───
+      GoRoute(
+        path: '/achievements',
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) => CustomTransitionPage(
+          child: const AchievementsScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                  ),
               child: child,
             );
           },
@@ -479,9 +511,12 @@ class _AuthCallbackScreenState extends State<_AuthCallbackScreen> {
       await SupabaseService.auth.onAuthStateChange
           .where((data) => data.event == AuthChangeEvent.signedIn)
           .first
-          .timeout(const Duration(seconds: 5), onTimeout: () {
-        throw TimeoutException('인증 타임아웃');
-      });
+          .timeout(
+            const Duration(seconds: 5),
+            onTimeout: () {
+              throw TimeoutException('인증 타임아웃');
+            },
+          );
 
       if (mounted && SupabaseService.isAuthenticated) {
         await _navigateAfterLogin();
@@ -521,7 +556,8 @@ class _AuthCallbackScreenState extends State<_AuthCallbackScreen> {
 
       if (!mounted) return;
 
-      if (data != null && (data['display_name'] as String?)?.isNotEmpty == true) {
+      if (data != null &&
+          (data['display_name'] as String?)?.isNotEmpty == true) {
         // 프로필이 이미 있으면 → 홈
         debugPrint('기존 사용자 → 홈으로 이동');
         context.go(AppRoutes.home);

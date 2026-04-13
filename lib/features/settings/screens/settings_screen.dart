@@ -38,10 +38,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text(
-              '로그아웃',
-              style: TextStyle(color: AppColors.error),
-            ),
+            child: const Text('로그아웃', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -93,12 +90,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               final name = controller.text.trim();
               if (name.isEmpty || name.length < _minNameLength) {
                 setDialogState(
-                    () => errorText = '이름은 $_minNameLength자 이상이어야 해요');
+                  () => errorText = '이름은 $_minNameLength자 이상이어야 해요',
+                );
                 return;
               }
               if (!_validNameRegex.hasMatch(name)) {
-                setDialogState(
-                    () => errorText = '한글, 영어, 숫자만 사용할 수 있어요');
+                setDialogState(() => errorText = '한글, 영어, 숫자만 사용할 수 있어요');
                 return;
               }
 
@@ -128,9 +125,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 autofocus: true,
                 maxLength: _maxNameLength,
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp(r'[가-힣a-zA-Z0-9]'),
-                  ),
+                  FilteringTextInputFormatter.allow(RegExp(r'[가-힣a-zA-Z0-9]')),
                 ],
                 decoration: InputDecoration(
                   hintText: '새 이름을 입력하세요',
@@ -187,9 +182,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ref.invalidate(localUserNameProvider);
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('이름 변경에 실패했어요: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('이름 변경에 실패했어요: $e')));
         }
       }
     }
@@ -249,9 +244,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('교회 변경에 실패했어요: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('교회 변경에 실패했어요: $e')));
       }
     }
   }
@@ -294,9 +289,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         setState(() {});
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('알림 시간 변경에 실패했어요: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('알림 시간 변경에 실패했어요: $e')));
         }
       }
     }
@@ -316,9 +311,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await prefs.setBool('dark_mode', value);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('설정 변경에 실패했어요: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('설정 변경에 실패했어요: $e')));
       }
     }
   }
@@ -326,10 +321,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     final dividerColor = isDark
         ? AppColors.darkBackgroundSecondary
         : AppColors.lightBackgroundSecondary;
@@ -348,10 +345,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => context.pop(),
         ),
-        title: Text(
-          '설정',
-          style: AppTypography.titleLarge(textColor),
-        ),
+        title: Text('설정', style: AppTypography.titleLarge(textColor)),
       ),
       body: ListView(
         children: [
@@ -455,15 +449,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           // --- 로그아웃 ---
           const SizedBox(height: AppTheme.spacingSM),
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.spacingXL,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
             child: TextButton(
               onPressed: _handleSignOut,
-              child: Text(
-                '로그아웃',
-                style: AppTypography.button(AppColors.error),
-              ),
+              child: Text('로그아웃', style: AppTypography.button(AppColors.error)),
             ),
           ),
           const SizedBox(height: AppTheme.spacingXXL),
@@ -480,10 +469,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         AppTheme.spacingXL,
         AppTheme.spacingSM,
       ),
-      child: Text(
-        title,
-        style: AppTypography.label(AppColors.primaryDark),
-      ),
+      child: Text(title, style: AppTypography.label(AppColors.primaryDark)),
     );
   }
 
@@ -498,17 +484,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }) {
     return ListTile(
       leading: Icon(icon, color: subTextColor, size: 22),
-      title: Text(
-        title,
-        style: AppTypography.bodyLarge(textColor),
-      ),
+      title: Text(title, style: AppTypography.bodyLarge(textColor)),
       subtitle: subtitle != null
-          ? Text(
-              subtitle,
-              style: AppTypography.bodySmall(subTextColor),
-            )
+          ? Text(subtitle, style: AppTypography.bodySmall(subTextColor))
           : null,
-      trailing: trailing ??
+      trailing:
+          trailing ??
           (onTap != null
               ? Icon(Icons.chevron_right, color: subTextColor, size: 20)
               : null),
@@ -530,14 +511,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }) {
     return ListTile(
       leading: Icon(icon, color: subTextColor, size: 22),
-      title: Text(
-        title,
-        style: AppTypography.bodyLarge(textColor),
-      ),
-      subtitle: Text(
-        subtitle,
-        style: AppTypography.bodySmall(subTextColor),
-      ),
+      title: Text(title, style: AppTypography.bodyLarge(textColor)),
+      subtitle: Text(subtitle, style: AppTypography.bodySmall(subTextColor)),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
@@ -622,7 +597,9 @@ class _ChurchSearchDialogState extends State<_ChurchSearchDialog> {
                     : null,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 10),
+                  horizontal: 12,
+                  vertical: 10,
+                ),
               ),
               onChanged: _onSearchChanged,
             ),
@@ -631,16 +608,21 @@ class _ChurchSearchDialogState extends State<_ChurchSearchDialog> {
             // 선택된 교회
             if (_selected != null)
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle,
-                        color: AppColors.primaryDark, size: 16),
+                    const Icon(
+                      Icons.check_circle,
+                      color: AppColors.primaryDark,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -663,8 +645,7 @@ class _ChurchSearchDialogState extends State<_ChurchSearchDialog> {
                         _controller.text.isEmpty
                             ? '교회 이름을 입력하세요'
                             : (_isSearching ? '검색 중...' : '결과가 없어요'),
-                        style: TextStyle(
-                            color: Colors.grey[500], fontSize: 13),
+                        style: TextStyle(color: Colors.grey[500], fontSize: 13),
                       ),
                     )
                   : ListView.builder(
@@ -685,9 +666,7 @@ class _ChurchSearchDialogState extends State<_ChurchSearchDialog> {
                             church.name,
                             style: TextStyle(
                               fontSize: 14,
-                              color: isSelected
-                                  ? AppColors.primaryDark
-                                  : null,
+                              color: isSelected ? AppColors.primaryDark : null,
                               fontWeight: isSelected
                                   ? FontWeight.w600
                                   : FontWeight.normal,
@@ -700,8 +679,11 @@ class _ChurchSearchDialogState extends State<_ChurchSearchDialog> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           trailing: isSelected
-                              ? const Icon(Icons.check_circle,
-                                  color: AppColors.primaryDark, size: 18)
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: AppColors.primaryDark,
+                                  size: 18,
+                                )
                               : null,
                           onTap: () {
                             setState(() => _selected = church);

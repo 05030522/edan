@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
@@ -35,15 +34,19 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final navState = ref.watch(bibleNavigationProvider);
-    final book = navState.selectedBook ??
+    final book =
+        navState.selectedBook ??
         bibleBooks.firstWhere(
           (b) => b.name == widget.bookName,
           orElse: () => bibleBooks.first,
@@ -99,9 +102,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
         ),
         Expanded(
           child: GridView.builder(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.spacingLG,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLG),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 5,
               mainAxisSpacing: 10,
@@ -182,9 +183,9 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                     Expanded(
                       child: Text(
                         verse.text,
-                        style: AppTypography.scripture(textColor).copyWith(
-                          height: 1.8,
-                        ),
+                        style: AppTypography.scripture(
+                          textColor,
+                        ).copyWith(height: 1.8),
                       ),
                     ),
                   ],
@@ -222,9 +223,7 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             ? AppColors.darkBackgroundSecondary
             : AppColors.lightBackgroundSecondary,
         border: Border(
-          top: BorderSide(
-            color: subTextColor.withValues(alpha: 0.1),
-          ),
+          top: BorderSide(color: subTextColor.withValues(alpha: 0.1)),
         ),
       ),
       child: SafeArea(
@@ -236,8 +235,8 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             TextButton.icon(
               onPressed: hasPrev
                   ? () => ref
-                      .read(bibleNavigationProvider.notifier)
-                      .selectChapter(chapter - 1)
+                        .read(bibleNavigationProvider.notifier)
+                        .selectChapter(chapter - 1)
                   : null,
               icon: const Icon(Icons.chevron_left, size: 18),
               label: Text(
@@ -250,21 +249,16 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             // 장 목록으로
             TextButton(
               onPressed: () {
-                ref
-                    .read(bibleNavigationProvider.notifier)
-                    .selectBook(book);
+                ref.read(bibleNavigationProvider.notifier).selectBook(book);
               },
-              child: Text(
-                '목록',
-                style: AppTypography.bodySmall(subTextColor),
-              ),
+              child: Text('목록', style: AppTypography.bodySmall(subTextColor)),
             ),
             // 다음 장
             TextButton.icon(
               onPressed: hasNext
                   ? () => ref
-                      .read(bibleNavigationProvider.notifier)
-                      .selectChapter(chapter + 1)
+                        .read(bibleNavigationProvider.notifier)
+                        .selectChapter(chapter + 1)
                   : null,
               icon: Text(
                 hasNext ? '${chapter + 1}장' : '',

@@ -66,17 +66,14 @@ class EdenButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color textPrimary =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final Color textPrimary = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
 
     final Widget child = _buildChild(context, isDark, textPrimary);
 
     if (fullWidth) {
-      return SizedBox(
-        width: double.infinity,
-        height: 52,
-        child: child,
-      );
+      return SizedBox(width: double.infinity, height: 52, child: child);
     }
     return child;
   }
@@ -103,7 +100,9 @@ class EdenButton extends StatelessWidget {
           onPressed: _enabled ? onPressed : null,
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primaryDark,
-            disabledBackgroundColor: AppColors.primaryDark.withValues(alpha: 0.4),
+            disabledBackgroundColor: AppColors.primaryDark.withValues(
+              alpha: 0.4,
+            ),
             foregroundColor: Colors.white,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),

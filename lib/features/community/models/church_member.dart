@@ -36,10 +36,10 @@ class ChurchMember {
 
 /// 친구 관계 상태
 enum FriendshipStatus {
-  none,        // 관계 없음
-  pending,     // 내가 요청 보냄 (대기 중)
-  received,    // 상대방이 나에게 요청 보냄
-  accepted,    // 친구
+  none, // 관계 없음
+  pending, // 내가 요청 보냄 (대기 중)
+  received, // 상대방이 나에게 요청 보냄
+  accepted, // 친구
 }
 
 /// 친구 관계 모델

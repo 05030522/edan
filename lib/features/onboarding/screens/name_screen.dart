@@ -12,6 +12,7 @@ import '../providers/onboarding_provider.dart';
 
 /// 닉네임 최대 글자수
 const int _maxNameLength = 12;
+
 /// 닉네임 최소 글자수
 const int _minNameLength = 2;
 
@@ -99,12 +100,15 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final currentLength = _nameController.text.length;
 
@@ -112,9 +116,7 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingXL,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -125,11 +127,7 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
               const SizedBox(height: AppTheme.spacing3XL),
 
               // 에덴 아이콘
-              const Icon(
-                Icons.eco,
-                size: 48,
-                color: AppColors.primary,
-              ),
+              const Icon(Icons.eco, size: 48, color: AppColors.primary),
               const SizedBox(height: AppTheme.spacingXL),
 
               // 타이틀
@@ -195,10 +193,7 @@ class _OnboardingNameScreenState extends ConsumerState<OnboardingNameScreen> {
                             strokeWidth: 2,
                           ),
                         )
-                      : Text(
-                          '다음',
-                          style: AppTypography.button(Colors.white),
-                        ),
+                      : Text('다음', style: AppTypography.button(Colors.white)),
                 ),
               ),
               const SizedBox(height: AppTheme.spacingXXL),

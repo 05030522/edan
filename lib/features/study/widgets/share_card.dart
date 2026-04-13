@@ -74,9 +74,7 @@ class ShareCard extends StatelessWidget {
               // 날짜
               Text(
                 date,
-                style: AppTypography.label(
-                  Colors.white.withValues(alpha: 0.5),
-                ),
+                style: AppTypography.label(Colors.white.withValues(alpha: 0.5)),
               ),
             ],
           ),

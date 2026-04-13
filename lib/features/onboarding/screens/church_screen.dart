@@ -71,21 +71,22 @@ class _OnboardingChurchScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     final cardColor = isDark ? AppColors.darkCard : AppColors.lightCard;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingXL,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -136,17 +137,17 @@ class _OnboardingChurchScreenState
                           ),
                         )
                       : _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchResults = [];
-                                  _selectedChurch = null;
-                                });
-                              },
-                            )
-                          : null,
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchResults = [];
+                              _selectedChurch = null;
+                            });
+                          },
+                        )
+                      : null,
                 ),
                 onChanged: _onSearchChanged,
               ),
@@ -161,8 +162,7 @@ class _OnboardingChurchScreenState
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusMedium),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                     border: Border.all(
                       color: AppColors.primary.withValues(alpha: 0.3),
                     ),
@@ -182,12 +182,12 @@ class _OnboardingChurchScreenState
                             Text(
                               _selectedChurch!.name,
                               style: AppTypography.bodyLarge(
-                                  AppColors.primaryDark),
+                                AppColors.primaryDark,
+                              ),
                             ),
                             Text(
                               _selectedChurch!.shortAddress,
-                              style:
-                                  AppTypography.bodySmall(subTextColor),
+                              style: AppTypography.bodySmall(subTextColor),
                             ),
                           ],
                         ),
@@ -206,8 +206,7 @@ class _OnboardingChurchScreenState
 
               // 검색 결과 목록
               Expanded(
-                child: _buildSearchResults(
-                    textColor, subTextColor, cardColor),
+                child: _buildSearchResults(textColor, subTextColor, cardColor),
               ),
 
               // 교회 안 다닌다
@@ -231,10 +230,7 @@ class _OnboardingChurchScreenState
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _handleNext,
-                  child: Text(
-                    '다음',
-                    style: AppTypography.button(Colors.white),
-                  ),
+                  child: Text('다음', style: AppTypography.button(Colors.white)),
                 ),
               ),
               const SizedBox(height: AppTheme.spacingXXL),
@@ -246,7 +242,10 @@ class _OnboardingChurchScreenState
   }
 
   Widget _buildSearchResults(
-      Color textColor, Color subTextColor, Color cardColor) {
+    Color textColor,
+    Color subTextColor,
+    Color cardColor,
+  ) {
     // 아직 검색 안 한 경우
     if (_searchController.text.isEmpty && _searchResults.isEmpty) {
       return Center(
@@ -315,9 +314,7 @@ class _OnboardingChurchScreenState
                   children: [
                     Icon(
                       Icons.church_outlined,
-                      color: isSelected
-                          ? AppColors.primaryDark
-                          : subTextColor,
+                      color: isSelected ? AppColors.primaryDark : subTextColor,
                       size: 20,
                     ),
                     const SizedBox(width: AppTheme.spacingMD),
@@ -328,9 +325,7 @@ class _OnboardingChurchScreenState
                           Text(
                             church.name,
                             style: AppTypography.bodyLarge(
-                              isSelected
-                                  ? AppColors.primaryDark
-                                  : textColor,
+                              isSelected ? AppColors.primaryDark : textColor,
                             ),
                           ),
                           const SizedBox(height: 2),

@@ -6,31 +6,22 @@ import '../../../core/theme/app_typography.dart';
 /// 주간 캘린더 스트립 위젯
 /// 월~일 7칸, 오늘 날짜 강조, 완료 상태 표시
 class WeeklyCalendar extends StatelessWidget {
-  const WeeklyCalendar({
-    super.key,
-    this.completedDays = const {},
-  });
+  const WeeklyCalendar({super.key, this.completedDays = const {}});
 
   /// 이번 주에 완료한 요일 인덱스 집합 (0=월, 6=일)
   final Set<int> completedDays;
 
-  static const List<String> _dayLabels = [
-    '월',
-    '화',
-    '수',
-    '목',
-    '금',
-    '토',
-    '일',
-  ];
+  static const List<String> _dayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final now = DateTime.now();
     // 현재 요일 (월=0 ~ 일=6)
@@ -98,18 +89,14 @@ class _DayCell extends StatelessWidget {
                     color: isCompleted
                         ? AppColors.success
                         : (isPast
-                            ? subTextColor.withValues(alpha: 0.2)
-                            : subTextColor.withValues(alpha: 0.1)),
+                              ? subTextColor.withValues(alpha: 0.2)
+                              : subTextColor.withValues(alpha: 0.1)),
                     width: 1.5,
                   ),
           ),
           child: Center(
             child: isCompleted
-                ? const Icon(
-                    Icons.check,
-                    color: AppColors.success,
-                    size: 18,
-                  )
+                ? const Icon(Icons.check, color: AppColors.success, size: 18)
                 : Container(
                     width: 6,
                     height: 6,

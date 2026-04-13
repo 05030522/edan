@@ -8,6 +8,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/luyang_image.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../store/providers/store_provider.dart';
 
 /// 루양의 정원 화면 - 레벨에 따라 정원이 성장하는 시각적 표현
 class GardenScreen extends ConsumerWidget {
@@ -16,29 +17,39 @@ class GardenScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final profile = ref.watch(authProvider).profile;
     final currentLevel = profile?.currentLevel ?? 1;
     final faithPoints = profile?.faithPoints ?? 0;
-    final levelIndex =
-        (currentLevel - 1).clamp(0, AppConstants.levelNames.length - 1);
+    final levelIndex = (currentLevel - 1).clamp(
+      0,
+      AppConstants.levelNames.length - 1,
+    );
     final levelName = AppConstants.levelNames[levelIndex];
 
     // 다음 레벨까지 필요한 포인트
-    final currentThreshold = AppConstants.levelThresholds[
-        currentLevel.clamp(1, AppConstants.levelThresholds.length) - 1];
+    final currentThreshold =
+        AppConstants.levelThresholds[currentLevel.clamp(
+              1,
+              AppConstants.levelThresholds.length,
+            ) -
+            1];
     final nextThreshold = currentLevel < AppConstants.levelThresholds.length
         ? AppConstants.levelThresholds[currentLevel]
         : AppConstants.levelThresholds.last;
     final progress = nextThreshold > currentThreshold
-        ? ((faithPoints - currentThreshold) / (nextThreshold - currentThreshold))
-            .clamp(0.0, 1.0)
+        ? ((faithPoints - currentThreshold) /
+                  (nextThreshold - currentThreshold))
+              .clamp(0.0, 1.0)
         : 1.0;
 
     return Scaffold(
@@ -58,7 +69,14 @@ class GardenScreen extends ConsumerWidget {
         child: Column(
           children: [
             // 정원 시각화
-            _GardenView(level: currentLevel),
+            _GardenView(
+              level: currentLevel,
+              ownedGardenItemIds: ref
+                  .watch(storeProvider)
+                  .ownedItemIds
+                  .where((id) => _gardenItemData.containsKey(id))
+                  .toSet(),
+            ),
             const SizedBox(height: AppTheme.spacingXL),
 
             // 레벨 정보 카드
@@ -78,21 +96,27 @@ class GardenScreen extends ConsumerWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.15),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusRound),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusRound,
+                          ),
                         ),
                         child: Text(
                           'Lv.$currentLevel',
-                          style: AppTypography.label(AppColors.primaryDark)
-                              .copyWith(fontWeight: FontWeight.w700),
+                          style: AppTypography.label(
+                            AppColors.primaryDark,
+                          ).copyWith(fontWeight: FontWeight.w700),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(levelName,
-                          style: AppTypography.headlineMedium(textColor)),
+                      Text(
+                        levelName,
+                        style: AppTypography.headlineMedium(textColor),
+                      ),
                     ],
                   ),
                   const SizedBox(height: AppTheme.spacingLG),
@@ -103,7 +127,9 @@ class GardenScreen extends ConsumerWidget {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 12,
-                      backgroundColor: isDark ? Colors.white12 : Colors.grey.shade200,
+                      backgroundColor: isDark
+                          ? Colors.white12
+                          : Colors.grey.shade200,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         _getLevelColor(currentLevel),
                       ),
@@ -118,8 +144,10 @@ class GardenScreen extends ConsumerWidget {
                         children: [
                           const TalentIcon(size: 12),
                           const SizedBox(width: 3),
-                          Text('$faithPoints',
-                              style: AppTypography.bodySmall(subTextColor)),
+                          Text(
+                            '$faithPoints',
+                            style: AppTypography.bodySmall(subTextColor),
+                          ),
                         ],
                       ),
                       Row(
@@ -127,8 +155,10 @@ class GardenScreen extends ConsumerWidget {
                         children: [
                           const TalentIcon(size: 12),
                           const SizedBox(width: 3),
-                          Text('$nextThreshold',
-                              style: AppTypography.bodySmall(subTextColor)),
+                          Text(
+                            '$nextThreshold',
+                            style: AppTypography.bodySmall(subTextColor),
+                          ),
                         ],
                       ),
                     ],
@@ -157,8 +187,7 @@ class GardenScreen extends ConsumerWidget {
             const SizedBox(height: AppTheme.spacingXL),
 
             // 전체 레벨 로드맵
-            Text('성장 로드맵',
-                style: AppTypography.titleLarge(textColor)),
+            Text('성장 로드맵', style: AppTypography.titleLarge(textColor)),
             const SizedBox(height: AppTheme.spacingMD),
 
             ...List.generate(10, (index) {
@@ -171,17 +200,20 @@ class GardenScreen extends ConsumerWidget {
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 12),
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: isCurrent
                       ? _getLevelColor(level).withValues(alpha: 0.1)
                       : isDark
-                          ? Colors.white.withValues(alpha: 0.03)
-                          : Colors.white.withValues(alpha: 0.6),
+                      ? Colors.white.withValues(alpha: 0.03)
+                      : Colors.white.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(12),
                   border: isCurrent
                       ? Border.all(
-                          color: _getLevelColor(level).withValues(alpha: 0.3))
+                          color: _getLevelColor(level).withValues(alpha: 0.3),
+                        )
                       : null,
                 ),
                 child: Row(
@@ -197,10 +229,12 @@ class GardenScreen extends ConsumerWidget {
                       ),
                       child: Center(
                         child: isUnlocked
-                            ? Icon(_getLevelIcon(level),
-                                color: _getLevelColor(level), size: 18)
-                            : Icon(Icons.lock,
-                                color: subTextColor, size: 14),
+                            ? Icon(
+                                _getLevelIcon(level),
+                                color: _getLevelColor(level),
+                                size: 18,
+                              )
+                            : Icon(Icons.lock, color: subTextColor, size: 14),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -231,17 +265,24 @@ class GardenScreen extends ConsumerWidget {
                     if (isCurrent)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: _getLevelColor(level),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text('현재',
-                            style: AppTypography.label(Colors.white)),
+                        child: Text(
+                          '현재',
+                          style: AppTypography.label(Colors.white),
+                        ),
                       )
                     else if (isUnlocked)
-                      const Icon(Icons.check_circle,
-                          color: AppColors.success, size: 20),
+                      const Icon(
+                        Icons.check_circle,
+                        color: AppColors.success,
+                        size: 20,
+                      ),
                   ],
                 ),
               );
@@ -264,25 +305,61 @@ class GardenScreen extends ConsumerWidget {
 
   IconData _getLevelIcon(int level) {
     switch (level) {
-      case 1: return Icons.landscape;
-      case 2: return Icons.grass;
-      case 3: return Icons.spa;
-      case 4: return Icons.eco;
-      case 5: return Icons.nature;
-      case 6: return Icons.local_florist;
-      case 7: return Icons.emoji_nature;
-      case 8: return Icons.park;
-      case 9: return Icons.forest;
-      case 10: return Icons.auto_awesome;
-      default: return Icons.eco;
+      case 1:
+        return Icons.landscape;
+      case 2:
+        return Icons.grass;
+      case 3:
+        return Icons.spa;
+      case 4:
+        return Icons.eco;
+      case 5:
+        return Icons.nature;
+      case 6:
+        return Icons.local_florist;
+      case 7:
+        return Icons.emoji_nature;
+      case 8:
+        return Icons.park;
+      case 9:
+        return Icons.forest;
+      case 10:
+        return Icons.auto_awesome;
+      default:
+        return Icons.eco;
     }
   }
 }
 
+/// 정원 아이템 데이터 매핑
+const _gardenItemData = <String, (IconData, Color)>{
+  'tree_olive': (Icons.park, Colors.green),
+  'flower_lily': (Icons.local_florist, Colors.white),
+  'flower_rose': (Icons.local_florist, Colors.pink),
+  'animal_dove': (Icons.flutter_dash, Colors.white),
+  'animal_lamb': (Icons.pets, Color(0xFF8D6E63)),
+  'tree_fig': (Icons.nature, Colors.green),
+  'fountain': (Icons.water_drop, Colors.lightBlue),
+  'tree_life': (Icons.eco, AppColors.gardenParadise),
+};
+
+/// 정원 아이템 배치 위치
+const _gardenItemPositions = <String, (double, double)>{
+  'tree_olive': (0.15, 0.2),
+  'flower_lily': (0.78, 0.65),
+  'flower_rose': (0.85, 0.3),
+  'animal_dove': (0.7, 0.12),
+  'animal_lamb': (0.25, 0.7),
+  'tree_fig': (0.1, 0.5),
+  'fountain': (0.5, 0.75),
+  'tree_life': (0.5, 0.15),
+};
+
 /// 정원 시각적 표현 위젯
 class _GardenView extends StatelessWidget {
   final int level;
-  const _GardenView({required this.level});
+  final Set<String> ownedGardenItemIds;
+  const _GardenView({required this.level, this.ownedGardenItemIds = const {}});
 
   @override
   Widget build(BuildContext context) {
@@ -303,6 +380,9 @@ class _GardenView extends StatelessWidget {
           // 배경 장식들
           ..._buildDecorations(),
 
+          // 구매한 정원 아이템들
+          ..._buildOwnedItems(),
+
           // 중앙 루양 캐릭터
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -316,13 +396,36 @@ class _GardenView extends StatelessWidget {
               Text(
                 '루양',
                 style: AppTypography.titleLarge(
-                    Colors.white.withValues(alpha: 0.9)),
+                  Colors.white.withValues(alpha: 0.9),
+                ),
               ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  List<Widget> _buildOwnedItems() {
+    return ownedGardenItemIds.map((id) {
+      final data = _gardenItemData[id];
+      final pos = _gardenItemPositions[id];
+      if (data == null || pos == null) return const SizedBox.shrink();
+      final (icon, color) = data;
+      final (xFrac, yFrac) = pos;
+      return Positioned(
+        left: xFrac * 280, // approximate width
+        top: yFrac * 280, // approximate height
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutBack,
+          builder: (context, value, child) =>
+              Transform.scale(scale: value, child: child),
+          child: Icon(icon, color: color.withValues(alpha: 0.7), size: 28),
+        ),
+      );
+    }).toList();
   }
 
   List<Color> _getGradientColors() {
@@ -355,70 +458,154 @@ class _GardenView extends StatelessWidget {
     // 레벨에 따라 장식 추가
     if (level >= 2) {
       // 씨앗/작은 풀
-      decorations.add(Positioned(
-        bottom: 40, left: 30,
-        child: Icon(Icons.grass, color: Colors.white.withValues(alpha: 0.3), size: 24),
-      ));
+      decorations.add(
+        Positioned(
+          bottom: 40,
+          left: 30,
+          child: Icon(
+            Icons.grass,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 24,
+          ),
+        ),
+      );
     }
     if (level >= 3) {
-      decorations.add(Positioned(
-        bottom: 50, right: 40,
-        child: Icon(Icons.spa, color: Colors.white.withValues(alpha: 0.3), size: 28),
-      ));
+      decorations.add(
+        Positioned(
+          bottom: 50,
+          right: 40,
+          child: Icon(
+            Icons.spa,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 28,
+          ),
+        ),
+      );
     }
     if (level >= 4) {
-      decorations.add(Positioned(
-        bottom: 30, left: 60,
-        child: Icon(Icons.eco, color: Colors.white.withValues(alpha: 0.3), size: 30),
-      ));
+      decorations.add(
+        Positioned(
+          bottom: 30,
+          left: 60,
+          child: Icon(
+            Icons.eco,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 30,
+          ),
+        ),
+      );
     }
     if (level >= 5) {
-      decorations.add(Positioned(
-        top: 50, right: 30,
-        child: Icon(Icons.nature, color: Colors.white.withValues(alpha: 0.3), size: 36),
-      ));
+      decorations.add(
+        Positioned(
+          top: 50,
+          right: 30,
+          child: Icon(
+            Icons.nature,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 36,
+          ),
+        ),
+      );
     }
     if (level >= 6) {
-      decorations.add(Positioned(
-        top: 40, left: 40,
-        child: Icon(Icons.local_florist, color: Colors.white.withValues(alpha: 0.35), size: 28),
-      ));
-      decorations.add(Positioned(
-        bottom: 60, right: 60,
-        child: Icon(Icons.local_florist, color: Colors.white.withValues(alpha: 0.25), size: 22),
-      ));
+      decorations.add(
+        Positioned(
+          top: 40,
+          left: 40,
+          child: Icon(
+            Icons.local_florist,
+            color: Colors.white.withValues(alpha: 0.35),
+            size: 28,
+          ),
+        ),
+      );
+      decorations.add(
+        Positioned(
+          bottom: 60,
+          right: 60,
+          child: Icon(
+            Icons.local_florist,
+            color: Colors.white.withValues(alpha: 0.25),
+            size: 22,
+          ),
+        ),
+      );
     }
     if (level >= 7) {
-      decorations.add(Positioned(
-        top: 30, right: 60,
-        child: Icon(Icons.emoji_nature, color: Colors.white.withValues(alpha: 0.3), size: 24),
-      ));
+      decorations.add(
+        Positioned(
+          top: 30,
+          right: 60,
+          child: Icon(
+            Icons.emoji_nature,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 24,
+          ),
+        ),
+      );
     }
     if (level >= 8) {
-      decorations.add(Positioned(
-        top: 60, left: 20,
-        child: Icon(Icons.park, color: Colors.white.withValues(alpha: 0.3), size: 40),
-      ));
+      decorations.add(
+        Positioned(
+          top: 60,
+          left: 20,
+          child: Icon(
+            Icons.park,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 40,
+          ),
+        ),
+      );
     }
     if (level >= 9) {
-      decorations.add(Positioned(
-        bottom: 40, right: 20,
-        child: Icon(Icons.forest, color: Colors.white.withValues(alpha: 0.3), size: 44),
-      ));
+      decorations.add(
+        Positioned(
+          bottom: 40,
+          right: 20,
+          child: Icon(
+            Icons.forest,
+            color: Colors.white.withValues(alpha: 0.3),
+            size: 44,
+          ),
+        ),
+      );
     }
     if (level >= 10) {
-      decorations.add(Positioned(
-        top: 20, left: 20,
-        child: Icon(Icons.auto_awesome, color: Colors.amber.withValues(alpha: 0.5), size: 24),
-      ));
-      decorations.add(Positioned(
-        top: 20, right: 20,
-        child: Icon(Icons.auto_awesome, color: Colors.amber.withValues(alpha: 0.5), size: 24),
-      ));
-      decorations.add(Positioned(
-        bottom: 20, left: 20,
-        child: Icon(Icons.auto_awesome, color: Colors.amber.withValues(alpha: 0.4), size: 18),
-      ));
+      decorations.add(
+        Positioned(
+          top: 20,
+          left: 20,
+          child: Icon(
+            Icons.auto_awesome,
+            color: Colors.amber.withValues(alpha: 0.5),
+            size: 24,
+          ),
+        ),
+      );
+      decorations.add(
+        Positioned(
+          top: 20,
+          right: 20,
+          child: Icon(
+            Icons.auto_awesome,
+            color: Colors.amber.withValues(alpha: 0.5),
+            size: 24,
+          ),
+        ),
+      );
+      decorations.add(
+        Positioned(
+          bottom: 20,
+          left: 20,
+          child: Icon(
+            Icons.auto_awesome,
+            color: Colors.amber.withValues(alpha: 0.4),
+            size: 18,
+          ),
+        ),
+      );
     }
 
     return decorations;

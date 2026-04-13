@@ -21,10 +21,12 @@ class LessonScriptureScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     // 레슨 데이터 조회
     final lesson =
@@ -37,17 +39,11 @@ class LessonScriptureScreen extends ConsumerWidget {
           icon: Icon(Icons.close, color: textColor),
           onPressed: () => context.go('/home'),
         ),
-        title: Text(
-          '1/5',
-          style: AppTypography.titleMedium(subTextColor),
-        ),
+        title: Text('1/5', style: AppTypography.titleMedium(subTextColor)),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: AppTheme.spacingLG),
-            child: Icon(
-              Icons.more_horiz,
-              color: subTextColor,
-            ),
+            child: Icon(Icons.more_horiz, color: subTextColor),
           ),
         ],
       ),
@@ -97,8 +93,7 @@ class LessonScriptureScreen extends ConsumerWidget {
                     // 성경 구절 레퍼런스
                     Text(
                       lesson.scriptureReference,
-                      style:
-                          AppTypography.scriptureReference(AppColors.gold),
+                      style: AppTypography.scriptureReference(AppColors.gold),
                     ),
                     const SizedBox(height: AppTheme.spacingLG),
 
@@ -110,13 +105,11 @@ class LessonScriptureScreen extends ConsumerWidget {
                         color: isDark
                             ? AppColors.darkCard
                             : AppColors.lightCard,
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusLarge),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusLarge,
+                        ),
                         border: const Border(
-                          left: BorderSide(
-                            color: AppColors.gold,
-                            width: 3,
-                          ),
+                          left: BorderSide(color: AppColors.gold, width: 3),
                         ),
                       ),
                       child: Text(
@@ -133,8 +126,9 @@ class LessonScriptureScreen extends ConsumerWidget {
                         padding: const EdgeInsets.all(AppTheme.spacingLG),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.08),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusMedium),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusMedium,
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,

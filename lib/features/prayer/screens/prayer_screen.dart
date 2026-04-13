@@ -47,8 +47,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
   Future<void> _submitPrayer() async {
     if (_prayerController.text.trim().isEmpty) return;
 
-    final reward =
-        ref.read(dailyTasksProvider.notifier).completeTask(DailyTaskType.prayer);
+    final reward = ref
+        .read(dailyTasksProvider.notifier)
+        .completeTask(DailyTaskType.prayer);
 
     // 프로필 달란트 즉시 반영
     if (reward > 0) {
@@ -82,12 +83,15 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -102,7 +106,9 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
         centerTitle: true,
       ),
       body: SafeArea(
-        child: _isCompleted ? _buildCompleted(textColor) : _buildInput(textColor, subTextColor),
+        child: _isCompleted
+            ? _buildCompleted(textColor)
+            : _buildInput(textColor, subTextColor),
       ),
     );
   }
@@ -217,17 +223,12 @@ class _PrayerScreenState extends ConsumerState<PrayerScreen>
               child: const Icon(Icons.check, color: Colors.white, size: 50),
             ),
             const SizedBox(height: AppTheme.spacingXL),
-            Text(
-              '기도를 올려드렸어요',
-              style: AppTypography.headlineLarge(textColor),
-            ),
+            Text('기도를 올려드렸어요', style: AppTypography.headlineLarge(textColor)),
             const SizedBox(height: AppTheme.spacingSM),
             Text(
               '"${_prayerController.text.trim()}"',
               textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium(
-                textColor.withValues(alpha: 0.7),
-              ),
+              style: AppTypography.bodyMedium(textColor.withValues(alpha: 0.7)),
             ),
           ],
         ),

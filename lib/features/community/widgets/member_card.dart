@@ -28,13 +28,17 @@ class MemberCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
-    final levelIndex =
-        (member.currentLevel - 1).clamp(0, AppConstants.levelNames.length - 1);
+    final levelIndex = (member.currentLevel - 1).clamp(
+      0,
+      AppConstants.levelNames.length - 1,
+    );
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -51,10 +55,7 @@ class MemberCard extends StatelessWidget {
         children: [
           // 랭킹 번호
           if (rank != null) ...[
-            SizedBox(
-              width: 32,
-              child: _buildRankWidget(rank!, textColor),
-            ),
+            SizedBox(width: 32, child: _buildRankWidget(rank!, textColor)),
             const SizedBox(width: AppTheme.spacingSM),
           ],
 
@@ -93,7 +94,9 @@ class MemberCard extends StatelessWidget {
                             ),
                             TextSpan(
                               text: ' ${member.tag}',
-                              style: AppTypography.label(subTextColor).copyWith(fontSize: 11),
+                              style: AppTypography.label(
+                                subTextColor,
+                              ).copyWith(fontSize: 11),
                             ),
                           ],
                         ),
@@ -110,8 +113,9 @@ class MemberCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primaryDark.withValues(alpha: 0.15),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusRound),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusRound,
+                          ),
                         ),
                         child: Text(
                           '나',
@@ -219,10 +223,7 @@ class MemberCard extends StatelessWidget {
       child: Container(
         width: 34,
         height: 34,
-        decoration: BoxDecoration(
-          color: bgColor,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
         child: Icon(icon, color: color, size: 18),
       ),
     );

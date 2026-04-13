@@ -13,10 +13,7 @@ class StreakGoalState {
   /// 마지막으로 '스트릭 깨짐 안내'를 본 날짜 (같은 날 중복 안내 방지)
   final DateTime? lastBrokenNoticeShownAt;
 
-  const StreakGoalState({
-    this.customGoal,
-    this.lastBrokenNoticeShownAt,
-  });
+  const StreakGoalState({this.customGoal, this.lastBrokenNoticeShownAt});
 
   StreakGoalState copyWith({
     int? customGoal,
@@ -116,8 +113,8 @@ class StreakGoalNotifier extends StateNotifier<StreakGoalState> {
 
 final streakGoalProvider =
     StateNotifierProvider<StreakGoalNotifier, StreakGoalState>(
-  (ref) => StreakGoalNotifier(),
-);
+      (ref) => StreakGoalNotifier(),
+    );
 
 /// 스트릭이 깨진 상태인지 판단 (lastStudyDate 기준 2일 이상 경과)
 ///
@@ -130,8 +127,11 @@ int calcStreakBreakDays({
   if (currentStreak <= 0) return 0;
   final now = DateTime.now();
   final today = DateTime(now.year, now.month, now.day);
-  final last =
-      DateTime(lastStudyDate.year, lastStudyDate.month, lastStudyDate.day);
+  final last = DateTime(
+    lastStudyDate.year,
+    lastStudyDate.month,
+    lastStudyDate.day,
+  );
   final diff = today.difference(last).inDays;
   // diff == 0: 오늘 했음, 1: 어제 했음 (아직 안 끊김), 2+: 끊김
   if (diff >= 2) return diff - 1; // 쉰 일수

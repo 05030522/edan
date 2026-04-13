@@ -39,15 +39,15 @@ class ScriptureDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final Color refColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final Color textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final Color refColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     final Color effectiveBorderColor = borderColor ?? AppColors.gold;
-    final Color effectiveBackground = backgroundColor ??
-        (isDark
-            ? AppColors.darkCard
-            : AppColors.lightCard);
+    final Color effectiveBackground =
+        backgroundColor ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
 
     return Container(
       padding: padding ?? const EdgeInsets.all(16),
@@ -73,10 +73,7 @@ class ScriptureDisplay extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    text,
-                    style: AppTypography.scripture(textColor),
-                  ),
+                  Text(text, style: AppTypography.scripture(textColor)),
                   const SizedBox(height: 12),
                   Text(
                     reference,

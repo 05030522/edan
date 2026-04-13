@@ -19,18 +19,18 @@ class GardenState {
       theme: json['theme'] as String? ?? 'default',
       items: json['items'] != null
           ? (json['items'] as List)
-              .map((e) => PlacedItem.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .map((e) => PlacedItem.fromJson(e as Map<String, dynamic>))
+                .toList()
           : [],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'user_id': userId,
-        'garden_level': gardenLevel,
-        'theme': theme,
-        'items': items.map((e) => e.toJson()).toList(),
-      };
+    'user_id': userId,
+    'garden_level': gardenLevel,
+    'theme': theme,
+    'items': items.map((e) => e.toJson()).toList(),
+  };
 
   /// 정원 레벨 이름
   String get levelName {
@@ -91,12 +91,12 @@ class PlacedItem {
   }
 
   Map<String, dynamic> toJson() => {
-        'item_id': itemId,
-        'name': name,
-        'x': x,
-        'y': y,
-        'placed_at': placedAt.toIso8601String(),
-      };
+    'item_id': itemId,
+    'name': name,
+    'x': x,
+    'y': y,
+    'placed_at': placedAt.toIso8601String(),
+  };
 }
 
 /// 정원 아이템 카탈로그

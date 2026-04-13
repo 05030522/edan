@@ -31,13 +31,13 @@ class LearningPath {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'total_days': totalDays,
-        'difficulty': difficulty,
-        'is_active': isActive,
-      };
+    'id': id,
+    'title': title,
+    'description': description,
+    'total_days': totalDays,
+    'difficulty': difficulty,
+    'is_active': isActive,
+  };
 
   String get difficultyLabel {
     switch (difficulty) {

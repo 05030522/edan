@@ -20,42 +20,82 @@ class CommunityScreen extends ConsumerStatefulWidget {
   ConsumerState<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends ConsumerState<CommunityScreen> {
+class _CommunityScreenState extends ConsumerState<CommunityScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 이미 데이터가 있으면 불필요한 재로드 방지
       final state = ref.read(communityProvider);
       if (state.members.isEmpty && !state.isLoading) {
         ref.read(communityProvider.notifier).refresh();
       }
     });
+    _tabController.addListener(() {
+      if (_tabController.index == 1) {
+        // 전체 랭킹 탭 진입 시 로드
+        final state = ref.read(communityProvider);
+        if (state.allUsers.isEmpty && !state.isAllUsersLoading) {
+          ref.read(communityProvider.notifier).loadAllUsersRanking();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final community = ref.watch(communityProvider);
     final currentUserId = ref.watch(authProvider).profile?.id;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '커뮤니티',
-          style: AppTypography.titleLarge(textColor),
+        title: Text('커뮤니티', style: AppTypography.titleLarge(textColor)),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: AppColors.primaryDark,
+          labelColor: AppColors.primaryDark,
+          unselectedLabelColor: isDark
+              ? AppColors.darkTextSecondary
+              : AppColors.lightTextSecondary,
+          tabs: const [
+            Tab(text: '우리 교회'),
+            Tab(text: '전체 랭킹'),
+          ],
         ),
       ),
-      body: _buildBody(
-        community: community,
-        currentUserId: currentUserId,
-        textColor: textColor,
-        subTextColor: subTextColor,
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildBody(
+            community: community,
+            currentUserId: currentUserId,
+            textColor: textColor,
+            subTextColor: subTextColor,
+          ),
+          _buildAllUsersRanking(
+            community: community,
+            currentUserId: currentUserId,
+            textColor: textColor,
+            subTextColor: subTextColor,
+          ),
+        ],
       ),
     );
   }
@@ -101,8 +141,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             ),
             const SizedBox(height: AppTheme.spacingLG),
             ElevatedButton(
-              onPressed: () =>
-                  ref.read(communityProvider.notifier).refresh(),
+              onPressed: () => ref.read(communityProvider.notifier).refresh(),
               child: const Text('다시 시도'),
             ),
           ],
@@ -126,24 +165,102 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
             // 받은 친구 요청 (있을 때만 표시)
             if (community.pendingReceived.isNotEmpty) ...[
               _buildPendingRequests(
-                  community, currentUserId, textColor, subTextColor),
+                community,
+                currentUserId,
+                textColor,
+                subTextColor,
+              ),
               const SizedBox(height: AppTheme.spacingXL),
             ],
 
             // 내 친구 섹션
             _buildFriendsSection(
-                community, currentUserId, textColor, subTextColor),
+              community,
+              currentUserId,
+              textColor,
+              subTextColor,
+            ),
             const SizedBox(height: AppTheme.spacingXL),
 
             // 같은 교회 멤버 섹션
             _buildMembersSection(
-                community, currentUserId, textColor, subTextColor),
+              community,
+              currentUserId,
+              textColor,
+              subTextColor,
+            ),
             const SizedBox(height: AppTheme.spacingXL),
 
             // 교회 랭킹 섹션
             _buildRankingSection(
-                community, currentUserId, textColor, subTextColor),
+              community,
+              currentUserId,
+              textColor,
+              subTextColor,
+            ),
             const SizedBox(height: AppTheme.spacingXL),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 전체 사용자 랭킹 탭
+  Widget _buildAllUsersRanking({
+    required CommunityState community,
+    required String? currentUserId,
+    required Color textColor,
+    required Color subTextColor,
+  }) {
+    if (community.isAllUsersLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      );
+    }
+
+    final sorted = community.sortedAllUsers;
+
+    return RefreshIndicator(
+      onRefresh: () =>
+          ref.read(communityProvider.notifier).loadAllUsersRanking(),
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(AppTheme.spacingXL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSortChips(community.sortBy, textColor, subTextColor),
+            const SizedBox(height: AppTheme.spacingMD),
+
+            if (sorted.isEmpty)
+              GlassCard(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.spacingXL),
+                    child: Text(
+                      '랭킹 데이터가 없어요',
+                      style: AppTypography.bodyMedium(subTextColor),
+                    ),
+                  ),
+                ),
+              )
+            else
+              GlassCard(
+                padding: const EdgeInsets.symmetric(
+                  vertical: AppTheme.spacingSM,
+                  horizontal: AppTheme.spacingXS,
+                ),
+                child: Column(
+                  children: List.generate(sorted.length, (index) {
+                    final member = sorted[index];
+                    return MemberCard(
+                      member: member,
+                      rank: index + 1,
+                      isCurrentUser: member.id == currentUserId,
+                    );
+                  }),
+                ),
+              ),
           ],
         ),
       ),
@@ -208,12 +325,13 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.person_add, color: AppColors.streakFlame, size: 18),
-            const SizedBox(width: AppTheme.spacingSM),
-            Text(
-              '받은 친구 요청',
-              style: AppTypography.titleMedium(textColor),
+            const Icon(
+              Icons.person_add,
+              color: AppColors.streakFlame,
+              size: 18,
             ),
+            const SizedBox(width: AppTheme.spacingSM),
+            Text('받은 친구 요청', style: AppTypography.titleMedium(textColor)),
             const SizedBox(width: AppTheme.spacingSM),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -246,7 +364,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 ),
               );
               return _buildPendingCard(
-                  requester, friendship, textColor, subTextColor);
+                requester,
+                friendship,
+                textColor,
+                subTextColor,
+              );
             }).toList(),
           ),
         ),
@@ -275,7 +397,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
               color: AppColors.primary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.person, color: AppColors.primaryDark, size: 22),
+            child: const Icon(
+              Icons.person,
+              color: AppColors.primaryDark,
+              size: 22,
+            ),
           ),
           const SizedBox(width: AppTheme.spacingMD),
           Expanded(
@@ -289,7 +415,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           // 수락
           GestureDetector(
             onTap: () {
-              ref.read(communityProvider.notifier).acceptFriendRequest(friendship.id);
+              ref
+                  .read(communityProvider.notifier)
+                  .acceptFriendRequest(friendship.id);
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -297,17 +425,16 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 color: AppColors.primaryDark,
                 borderRadius: BorderRadius.circular(AppTheme.radiusRound),
               ),
-              child: Text(
-                '수락',
-                style: AppTypography.label(Colors.white),
-              ),
+              child: Text('수락', style: AppTypography.label(Colors.white)),
             ),
           ),
           const SizedBox(width: AppTheme.spacingSM),
           // 거절
           GestureDetector(
             onTap: () {
-              ref.read(communityProvider.notifier).removeFriendship(friendship.id);
+              ref
+                  .read(communityProvider.notifier)
+                  .removeFriendship(friendship.id);
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -315,10 +442,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                 color: AppColors.error.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppTheme.radiusRound),
               ),
-              child: Text(
-                '거절',
-                style: AppTypography.label(AppColors.error),
-              ),
+              child: Text('거절', style: AppTypography.label(AppColors.error)),
             ),
           ),
         ],
@@ -340,10 +464,7 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
           children: [
             const Icon(Icons.people, color: AppColors.primaryDark, size: 18),
             const SizedBox(width: AppTheme.spacingSM),
-            Text(
-              '내 친구',
-              style: AppTypography.titleMedium(textColor),
-            ),
+            Text('내 친구', style: AppTypography.titleMedium(textColor)),
             const SizedBox(width: AppTheme.spacingSM),
             Text(
               '${community.friends.length}명',
@@ -407,12 +528,13 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.church_outlined, color: AppColors.primaryDark, size: 18),
-            const SizedBox(width: AppTheme.spacingSM),
-            Text(
-              '같은 교회 멤버',
-              style: AppTypography.titleMedium(textColor),
+            const Icon(
+              Icons.church_outlined,
+              color: AppColors.primaryDark,
+              size: 18,
             ),
+            const SizedBox(width: AppTheme.spacingSM),
+            Text('같은 교회 멤버', style: AppTypography.titleMedium(textColor)),
           ],
         ),
         const SizedBox(height: AppTheme.spacingMD),
@@ -449,7 +571,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                   onFriendAction: isMe
                       ? null
                       : () => _handleFriendAction(
-                            member, friendStatus, community, currentUserId),
+                          member,
+                          friendStatus,
+                          community,
+                          currentUserId,
+                        ),
                 );
               }).toList(),
             ),
@@ -510,13 +636,13 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
       children: [
         Row(
           children: [
-            const Icon(Icons.emoji_events_outlined,
-                color: AppColors.gold, size: 18),
-            const SizedBox(width: AppTheme.spacingSM),
-            Text(
-              '교회 랭킹',
-              style: AppTypography.titleMedium(textColor),
+            const Icon(
+              Icons.emoji_events_outlined,
+              color: AppColors.gold,
+              size: 18,
             ),
+            const SizedBox(width: AppTheme.spacingSM),
+            Text('교회 랭킹', style: AppTypography.titleMedium(textColor)),
           ],
         ),
         const SizedBox(height: AppTheme.spacingSM),
@@ -585,8 +711,9 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen> {
                     ? Icon(
                         icon,
                         size: 14,
-                        color:
-                            isSelected ? AppColors.primaryDark : subTextColor,
+                        color: isSelected
+                            ? AppColors.primaryDark
+                            : subTextColor,
                       )
                     : const TalentIcon(size: 14),
                 const SizedBox(width: 4),

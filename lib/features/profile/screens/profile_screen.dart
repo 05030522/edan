@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
@@ -9,6 +10,8 @@ import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../store/providers/store_provider.dart';
+import '../../store/screens/store_screen.dart';
 
 /// 프로필 화면
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -31,13 +34,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     // Auth 프로바이더에서 프로필만 선택적으로 watch
     final profile = ref.watch(authProvider.select((s) => s.profile));
+    final store = ref.watch(storeProvider);
     final displayName = profile?.displayName.isNotEmpty == true
         ? profile!.displayName
         : '에덴 사용자';
@@ -46,16 +52,31 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final totalTalents = profile?.faithPoints ?? 0;
 
     // 레벨 인덱스 안전하게 접근
-    final levelIndex =
-        (currentLevel - 1).clamp(0, AppConstants.levelNames.length - 1);
+    final levelIndex = (currentLevel - 1).clamp(
+      0,
+      AppConstants.levelNames.length - 1,
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          '내 정보',
-          style: AppTypography.titleLarge(textColor),
-        ),
+        title: Text('내 정보', style: AppTypography.titleLarge(textColor)),
         actions: [
+          IconButton(
+            icon: Icon(Icons.share_outlined, color: textColor),
+            onPressed: () {
+              final levelIdx = (currentLevel - 1).clamp(
+                0,
+                AppConstants.levelNames.length - 1,
+              );
+              Share.share(
+                '에덴에서 Lv.$currentLevel ${AppConstants.levelNames[levelIdx]}까지 성장했어요! 🌿\n'
+                '연속 묵상 $streakCount일 · 달란트 $totalTalents\n\n'
+                '나도 에덴에서 매일 묵상하기 👇\n'
+                'https://05030522.github.io/edan/',
+                subject: '에덴 묵상 - 내 프로필 공유',
+              );
+            },
+          ),
           IconButton(
             icon: Icon(Icons.settings_outlined, color: textColor),
             onPressed: () => context.push('/profile/settings'),
@@ -73,18 +94,44 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               GlassCard(
                 child: Column(
                   children: [
-                    // 아바타
+                    // 아바타 (장착 프레임 반영)
                     Container(
-                      width: 72,
-                      height: 72,
+                      width: 76,
+                      height: 76,
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
+                        border: store.equippedFrame == 'frame_gold'
+                            ? Border.all(color: AppColors.gold, width: 3)
+                            : store.equippedFrame == 'frame_rainbow'
+                            ? Border.all(color: Colors.purple, width: 3)
+                            : null,
+                        gradient: store.equippedFrame == 'frame_rainbow'
+                            ? const SweepGradient(
+                                colors: [
+                                  Colors.red,
+                                  Colors.orange,
+                                  Colors.yellow,
+                                  Colors.green,
+                                  Colors.blue,
+                                  Colors.purple,
+                                  Colors.red,
+                                ],
+                              )
+                            : null,
                       ),
-                      child: const Icon(
-                        Icons.person,
-                        color: AppColors.primaryDark,
-                        size: 40,
+                      child: Container(
+                        margin: store.equippedFrame != null
+                            ? const EdgeInsets.all(3)
+                            : EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.person,
+                          color: AppColors.primaryDark,
+                          size: 40,
+                        ),
                       ),
                     ),
                     const SizedBox(height: AppTheme.spacingMD),
@@ -108,8 +155,42 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
 
+                    // 장착된 칭호
+                    if (store.equippedTitle != null) ...[
+                      const SizedBox(height: 6),
+                      Builder(
+                        builder: (context) {
+                          final titleItem = _findTitleItem(
+                            store.equippedTitle!,
+                          );
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: (titleItem?.rarityColor ?? Colors.grey)
+                                  .withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(
+                                AppTheme.radiusRound,
+                              ),
+                            ),
+                            child: Text(
+                              titleItem?.name.replaceFirst('칭호: ', '') ?? '',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: titleItem?.rarityColor ?? Colors.grey,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+
                     // 교회 이름
-                    if (profile?.churchName != null && profile!.churchName!.isNotEmpty) ...[
+                    if (profile?.churchName != null &&
+                        profile!.churchName!.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         profile.churchName!,
@@ -128,8 +209,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.gardenSoil.withValues(alpha: 0.15),
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusRound),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusRound,
+                        ),
                       ),
                       child: Text(
                         'Lv.$currentLevel ${AppConstants.levelNames[levelIndex]}',
@@ -190,7 +272,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               const SizedBox(height: AppTheme.spacingXL),
 
               // 교회 정보
-              if (profile?.churchName != null && profile!.churchName!.isNotEmpty) ...[
+              if (profile?.churchName != null &&
+                  profile!.churchName!.isNotEmpty) ...[
                 GlassCard(
                   child: Row(
                     children: [
@@ -224,16 +307,50 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 const SizedBox(height: AppTheme.spacingXL),
               ],
 
+              // 업적 바로가기
+              Material(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
+                  onTap: () => context.push('/achievements'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppTheme.spacingLG),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.emoji_events_outlined,
+                          color: AppColors.gold,
+                          size: 22,
+                        ),
+                        const SizedBox(width: AppTheme.spacingMD),
+                        Expanded(
+                          child: Text(
+                            '업적',
+                            style: AppTypography.titleMedium(textColor),
+                          ),
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: subTextColor.withValues(alpha: 0.5),
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppTheme.spacingMD),
+
               // 설정 버튼
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () => context.push('/profile/settings'),
                   icon: Icon(Icons.settings_outlined, color: subTextColor),
-                  label: Text(
-                    '설정',
-                    style: AppTypography.button(subTextColor),
-                  ),
+                  label: Text('설정', style: AppTypography.button(subTextColor)),
                 ),
               ),
             ],
@@ -256,8 +373,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         : AppConstants.levelThresholds.last;
     final progress = nextThreshold > currentThreshold
         ? ((currentTalents - currentThreshold) /
-                (nextThreshold - currentThreshold))
-            .clamp(0.0, 1.0)
+                  (nextThreshold - currentThreshold))
+              .clamp(0.0, 1.0)
         : 1.0;
 
     return Column(
@@ -288,6 +405,46 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
+/// 칭호 아이템 찾기 헬퍼
+StoreItem? _findTitleItem(String titleId) {
+  const titles = [
+    StoreItem(
+      id: 'title_prayer',
+      name: '칭호: 기도의 용사',
+      description: '',
+      price: 0,
+      icon: Icons.military_tech,
+      color: Colors.orange,
+      category: 'profile',
+    ),
+    StoreItem(
+      id: 'title_faithful',
+      name: '칭호: 충성된 종',
+      description: '',
+      price: 0,
+      icon: Icons.military_tech,
+      color: Colors.teal,
+      category: 'profile',
+      rarity: 'rare',
+    ),
+    StoreItem(
+      id: 'title_eden',
+      name: '칭호: 에덴의 수호자',
+      description: '',
+      price: 0,
+      icon: Icons.military_tech,
+      color: AppColors.gold,
+      category: 'profile',
+      rarity: 'legendary',
+    ),
+  ];
+  try {
+    return titles.firstWhere((t) => t.id == titleId);
+  } catch (_) {
+    return null;
+  }
+}
+
 /// 통계 카드 위젯
 class _StatCard extends StatelessWidget {
   final IconData? icon;
@@ -307,10 +464,12 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return GlassCard(
       padding: const EdgeInsets.all(AppTheme.spacingMD),
@@ -318,15 +477,9 @@ class _StatCard extends StatelessWidget {
         children: [
           iconWidget ?? Icon(icon, color: iconColor, size: 24),
           const SizedBox(height: AppTheme.spacingSM),
-          Text(
-            value,
-            style: AppTypography.streakNumber(textColor),
-          ),
+          Text(value, style: AppTypography.streakNumber(textColor)),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: AppTypography.label(subTextColor),
-          ),
+          Text(label, style: AppTypography.label(subTextColor)),
         ],
       ),
     );
@@ -369,10 +522,12 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final authState = ref.watch(authProvider);
     final profile = authState.profile;
@@ -390,13 +545,14 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final isCurrentMonth = _displayMonth.year == now.year &&
-        _displayMonth.month == now.month;
+    final isCurrentMonth =
+        _displayMonth.year == now.year && _displayMonth.month == now.month;
 
     // 이번 달 묵상 횟수
     final monthCompleted = completedDays
-        .where((d) =>
-            d.year == _displayMonth.year && d.month == _displayMonth.month)
+        .where(
+          (d) => d.year == _displayMonth.year && d.month == _displayMonth.month,
+        )
         .length;
 
     // 달력 계산
@@ -408,8 +564,19 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
 
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
     final monthNames = [
-      '', '1월', '2월', '3월', '4월', '5월', '6월',
-      '7월', '8월', '9월', '10월', '11월', '12월',
+      '',
+      '1월',
+      '2월',
+      '3월',
+      '4월',
+      '5월',
+      '6월',
+      '7월',
+      '8월',
+      '9월',
+      '10월',
+      '11월',
+      '12월',
     ];
 
     return GlassCard(
@@ -423,7 +590,11 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
                 onTap: _prevMonth,
                 child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Icon(Icons.chevron_left, color: subTextColor, size: 22),
+                  child: Icon(
+                    Icons.chevron_left,
+                    color: subTextColor,
+                    size: 22,
+                  ),
                 ),
               ),
               Text(
@@ -488,7 +659,10 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
                   }
 
                   final date = DateTime(
-                      _displayMonth.year, _displayMonth.month, dayNum);
+                    _displayMonth.year,
+                    _displayMonth.month,
+                    dayNum,
+                  );
                   final isCompleted = completedDays.contains(date);
                   final isToday = date == today;
                   final isFuture = date.isAfter(today);
@@ -501,8 +675,8 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
                         // 완료일: 따뜻한 금빛 배경
                         color: isCompleted
                             ? (isDark
-                                ? AppColors.gold.withValues(alpha: 0.25)
-                                : AppColors.gold.withValues(alpha: 0.18))
+                                  ? AppColors.gold.withValues(alpha: 0.25)
+                                  : AppColors.gold.withValues(alpha: 0.18))
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(10),
                         border: isToday
@@ -526,13 +700,14 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
                                 color: isFuture
                                     ? subTextColor.withValues(alpha: 0.3)
                                     : isCompleted
-                                        ? (isDark
-                                            ? AppColors.gold
-                                            : const Color(0xFFB8960A))
-                                        : (col == 0
-                                            ? AppColors.streakFlame
-                                                .withValues(alpha: 0.7)
-                                            : textColor),
+                                    ? (isDark
+                                          ? AppColors.gold
+                                          : const Color(0xFFB8960A))
+                                    : (col == 0
+                                          ? AppColors.streakFlame.withValues(
+                                              alpha: 0.7,
+                                            )
+                                          : textColor),
                               ),
                             ),
                             if (isCompleted)
@@ -561,7 +736,9 @@ class _StainedGlassCalendarState extends ConsumerState<_StainedGlassCalendar> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(
-                vertical: AppTheme.spacingSM, horizontal: AppTheme.spacingMD),
+              vertical: AppTheme.spacingSM,
+              horizontal: AppTheme.spacingMD,
+            ),
             decoration: BoxDecoration(
               color: isDark
                   ? AppColors.gold.withValues(alpha: 0.08)

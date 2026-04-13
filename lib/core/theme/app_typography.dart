@@ -9,110 +9,77 @@ class AppTypography {
 
   /// UI 텍스트 스타일 (Noto Sans KR - Pretendard 대체)
   static TextStyle get _baseUI => GoogleFonts.notoSansKr().copyWith(
-        fontFamilyFallback: const ['Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', 'sans-serif'],
-      );
+    fontFamilyFallback: const [
+      'Noto Sans KR',
+      'Malgun Gothic',
+      'Apple SD Gothic Neo',
+      'sans-serif',
+    ],
+  );
 
   /// 성경 구절 전용 스타일 (Noto Serif KR + 한글 fallback)
   static TextStyle get _baseScripture => GoogleFonts.notoSerifKr().copyWith(
-        fontFamilyFallback: const ['Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
-      );
+    fontFamilyFallback: const ['Noto Sans KR', 'Malgun Gothic', 'sans-serif'],
+  );
 
   // ─── 디스플레이 ───
-  static TextStyle displayLarge(Color color) => _baseUI.copyWith(
-        fontSize: 28,
-        fontWeight: FontWeight.w500,
-        color: color,
-      );
+  static TextStyle displayLarge(Color color) =>
+      _baseUI.copyWith(fontSize: 28, fontWeight: FontWeight.w500, color: color);
 
-  static TextStyle displayMedium(Color color) => _baseUI.copyWith(
-        fontSize: 24,
-        fontWeight: FontWeight.w500,
-        color: color,
-      );
+  static TextStyle displayMedium(Color color) =>
+      _baseUI.copyWith(fontSize: 24, fontWeight: FontWeight.w500, color: color);
 
   // ─── 헤드라인 ───
-  static TextStyle headlineLarge(Color color) => _baseUI.copyWith(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        color: color,
-      );
+  static TextStyle headlineLarge(Color color) =>
+      _baseUI.copyWith(fontSize: 24, fontWeight: FontWeight.w700, color: color);
 
-  static TextStyle headlineMedium(Color color) => _baseUI.copyWith(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: color,
-      );
+  static TextStyle headlineMedium(Color color) =>
+      _baseUI.copyWith(fontSize: 20, fontWeight: FontWeight.w600, color: color);
 
   // ─── 타이틀 ───
-  static TextStyle titleLarge(Color color) => _baseUI.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: color,
-      );
+  static TextStyle titleLarge(Color color) =>
+      _baseUI.copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: color);
 
-  static TextStyle titleMedium(Color color) => _baseUI.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: color,
-      );
+  static TextStyle titleMedium(Color color) =>
+      _baseUI.copyWith(fontSize: 14, fontWeight: FontWeight.w600, color: color);
 
   // ─── 본문 ───
-  static TextStyle bodyLarge(Color color) => _baseUI.copyWith(
-        fontSize: 16,
-        color: color,
-        height: 1.6,
-      );
+  static TextStyle bodyLarge(Color color) =>
+      _baseUI.copyWith(fontSize: 16, color: color, height: 1.6);
 
-  static TextStyle bodyMedium(Color color) => _baseUI.copyWith(
-        fontSize: 14,
-        color: color,
-        height: 1.6,
-      );
+  static TextStyle bodyMedium(Color color) =>
+      _baseUI.copyWith(fontSize: 14, color: color, height: 1.6);
 
-  static TextStyle bodySmall(Color color) => _baseUI.copyWith(
-        fontSize: 12,
-        color: color,
-      );
+  static TextStyle bodySmall(Color color) =>
+      _baseUI.copyWith(fontSize: 12, color: color);
 
   // ─── 성경 구절 ───
   static TextStyle scripture(Color color) => _baseScripture.copyWith(
-        fontSize: 18,
-        fontWeight: FontWeight.w400,
-        color: color,
-        height: 1.8,
-        letterSpacing: 0.3,
-      );
+    fontSize: 18,
+    fontWeight: FontWeight.w400,
+    color: color,
+    height: 1.8,
+    letterSpacing: 0.3,
+  );
 
   static TextStyle scriptureReference(Color color) => _baseScripture.copyWith(
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        color: color,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: color,
+  );
 
   // ─── 포인트/숫자 ───
-  static TextStyle pointDisplay(Color color) => _baseUI.copyWith(
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-        color: color,
-      );
+  static TextStyle pointDisplay(Color color) =>
+      _baseUI.copyWith(fontSize: 32, fontWeight: FontWeight.w700, color: color);
 
-  static TextStyle streakNumber(Color color) => _baseUI.copyWith(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        color: color,
-      );
+  static TextStyle streakNumber(Color color) =>
+      _baseUI.copyWith(fontSize: 20, fontWeight: FontWeight.w700, color: color);
 
   // ─── 버튼 ───
-  static TextStyle button(Color color) => _baseUI.copyWith(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: color,
-      );
+  static TextStyle button(Color color) =>
+      _baseUI.copyWith(fontSize: 16, fontWeight: FontWeight.w600, color: color);
 
   // ─── 레이블 ───
-  static TextStyle label(Color color) => _baseUI.copyWith(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: color,
-      );
+  static TextStyle label(Color color) =>
+      _baseUI.copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: color);
 }

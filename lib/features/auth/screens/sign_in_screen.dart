@@ -87,12 +87,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final authState = ref.watch(authProvider);
 
@@ -108,9 +111,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingXL,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -131,16 +132,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               // 에러 메시지
               if (authState.error != null)
                 Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: AppTheme.spacingLG,
-                  ),
+                  padding: const EdgeInsets.only(bottom: AppTheme.spacingLG),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(AppTheme.spacingMD),
                     decoration: BoxDecoration(
                       color: AppColors.error.withValues(alpha: 0.1),
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.radiusMedium),
+                      borderRadius: BorderRadius.circular(
+                        AppTheme.radiusMedium,
+                      ),
                     ),
                     child: Text(
                       authState.error!,

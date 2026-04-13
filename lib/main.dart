@@ -43,24 +43,13 @@ void main() async {
 
   // Sentry 크래시 리포팅 초기화
   if (_sentryDsn.isNotEmpty) {
-    await SentryFlutter.init(
-      (options) {
-        options.dsn = _sentryDsn;
-        options.tracesSampleRate = 0.3; // 성능 모니터링 30% 샘플링
-        options.environment = 'production';
-      },
-      appRunner: () => runApp(
-        const ProviderScope(
-          child: EdenApp(),
-        ),
-      ),
-    );
+    await SentryFlutter.init((options) {
+      options.dsn = _sentryDsn;
+      options.tracesSampleRate = 0.3; // 성능 모니터링 30% 샘플링
+      options.environment = 'production';
+    }, appRunner: () => runApp(const ProviderScope(child: EdenApp())));
   } else {
     // DSN 미설정 시 Sentry 없이 실행
-    runApp(
-      const ProviderScope(
-        child: EdenApp(),
-      ),
-    );
+    runApp(const ProviderScope(child: EdenApp()));
   }
 }

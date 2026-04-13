@@ -8,11 +8,7 @@ import '../../core/theme/app_colors.dart';
 /// - 바깥 테두리(rim) + 안쪽 원(각인선)으로 "동전 얼굴" 느낌
 /// - 글자/기호 없이 모든 크기에서 일관된 금화 형태
 class TalentIcon extends StatelessWidget {
-  const TalentIcon({
-    super.key,
-    this.size = 18,
-    this.color,
-  });
+  const TalentIcon({super.key, this.size = 18, this.color});
 
   /// 아이콘 크기 (px)
   final double size;
@@ -26,10 +22,10 @@ class TalentIcon extends StatelessWidget {
     // 어두운 톤: 기본 goldDark, 커스텀 컬러일 경우 15% 어둡게
     final rim = color != null
         ? HSLColor.fromColor(color!)
-            .withLightness(
-              (HSLColor.fromColor(color!).lightness - 0.18).clamp(0.0, 1.0),
-            )
-            .toColor()
+              .withLightness(
+                (HSLColor.fromColor(color!).lightness - 0.18).clamp(0.0, 1.0),
+              )
+              .toColor()
         : AppColors.goldDark;
     final highlight = Color.lerp(base, Colors.white, 0.55)!;
 
@@ -49,18 +45,11 @@ class TalentIcon extends StatelessWidget {
         gradient: RadialGradient(
           center: const Alignment(-0.35, -0.4),
           radius: 1.0,
-          colors: [
-            highlight,
-            base,
-            rim,
-          ],
+          colors: [highlight, base, rim],
           stops: const [0.0, 0.55, 1.0],
         ),
         // 바깥 테두리 (코인 림)
-        border: Border.all(
-          color: rim,
-          width: rimWidth,
-        ),
+        border: Border.all(color: rim, width: rimWidth),
       ),
       child: Center(
         // 안쪽 각인 원 (동전 얼굴의 테두리 느낌)

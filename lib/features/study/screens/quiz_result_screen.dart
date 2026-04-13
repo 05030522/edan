@@ -93,12 +93,15 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final quizState = ref.watch(quizProvider(widget.lessonId));
 
@@ -106,13 +109,16 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     final totalQuestions = quizState.totalQuestions;
     final wrongCount = quizState.wrongCount;
     final totalFp = quizState.totalFpEarned;
-    final percentage =
-        totalQuestions > 0 ? (correctCount / totalQuestions * 100).round() : 0;
+    final percentage = totalQuestions > 0
+        ? (correctCount / totalQuestions * 100).round()
+        : 0;
     final isPerfect = correctCount == totalQuestions;
 
     // 루양 격려 메시지
-    final encouragement = AppConstants.lambyEncouragements[
-        Random().nextInt(AppConstants.lambyEncouragements.length)];
+    final encouragement =
+        AppConstants.lambyEncouragements[Random().nextInt(
+          AppConstants.lambyEncouragements.length,
+        )];
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -131,8 +137,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                     // ━━━ 결과 타이틀 ━━━
                     Text(
                       isPerfect ? '완벽해요! 🎉' : '퀴즈 완료!',
-                      style:
-                          AppTypography.headlineLarge(textColor),
+                      style: AppTypography.headlineLarge(textColor),
                     ),
                     const SizedBox(height: AppTheme.spacingSM),
                     Text(
@@ -150,10 +155,10 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                           height: 180,
                           child: CustomPaint(
                             painter: _ScoreRingPainter(
-                              progress: _scoreAnimation.value *
+                              progress:
+                                  _scoreAnimation.value *
                                   (correctCount / totalQuestions),
-                              correctRatio:
-                                  correctCount / totalQuestions,
+                              correctRatio: correctCount / totalQuestions,
                               isDark: isDark,
                             ),
                             child: Center(
@@ -168,8 +173,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                                   ),
                                   Text(
                                     '$correctCount / $totalQuestions',
-                                    style:
-                                        AppTypography.titleMedium(subTextColor),
+                                    style: AppTypography.titleMedium(
+                                      subTextColor,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -237,8 +243,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                           color: isDark
                               ? Colors.white.withValues(alpha: 0.05)
                               : AppColors.primary.withValues(alpha: 0.08),
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusXLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusXLarge,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -254,15 +261,13 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                                   Text(
                                     '루양',
                                     style: AppTypography.label(
-                                            AppColors.primaryDark)
-                                        .copyWith(
-                                            fontWeight: FontWeight.w700),
+                                      AppColors.primaryDark,
+                                    ).copyWith(fontWeight: FontWeight.w700),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
                                     encouragement,
-                                    style: AppTypography.bodyMedium(
-                                        textColor),
+                                    style: AppTypography.bodyMedium(textColor),
                                   ),
                                 ],
                               ),
@@ -300,8 +305,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLarge,
+                          ),
                         ),
                       ),
                     ),
@@ -318,8 +324,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                         foregroundColor: AppColors.primaryDark,
                         side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLarge,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -347,8 +354,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
                         foregroundColor: AppColors.primaryDark,
                         side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLarge,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -383,9 +391,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
         vertical: AppTheme.spacingLG,
       ),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.05)
-            : Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
         boxShadow: isDark
             ? null
@@ -401,10 +407,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
         children: [
           iconWidget ?? Icon(icon, color: iconColor, size: 28),
           const SizedBox(height: AppTheme.spacingSM),
-          Text(
-            value,
-            style: AppTypography.headlineMedium(textColor),
-          ),
+          Text(value, style: AppTypography.headlineMedium(textColor)),
           const SizedBox(height: 2),
           Text(
             label,
@@ -459,11 +462,9 @@ class _ScoreRingPainter extends CustomPainter {
         colors: correctRatio >= 0.8
             ? [AppColors.quizCorrect, AppColors.gardenSprout]
             : correctRatio >= 0.5
-                ? [AppColors.gold, AppColors.streakFlame]
-                : [AppColors.error, AppColors.warning],
-      ).createShader(
-        Rect.fromCircle(center: center, radius: radius),
-      );
+            ? [AppColors.gold, AppColors.streakFlame]
+            : [AppColors.error, AppColors.warning],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
 
     final sweepAngle = 2 * pi * progress;
     canvas.drawArc(

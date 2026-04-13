@@ -68,10 +68,7 @@ class StudyProgressNotifier extends StateNotifier<StudyProgressState> {
         completed.putIfAbsent(pathId, () => {}).add(lessonId);
       }
 
-      state = state.copyWith(
-        completedLessons: completed,
-        isLoading: false,
-      );
+      state = state.copyWith(completedLessons: completed, isLoading: false);
     } catch (e) {
       debugPrint('학습 진척도 로드 실패: $e');
       state = state.copyWith(isLoading: false);
@@ -101,12 +98,12 @@ class StudyProgressNotifier extends StateNotifier<StudyProgressState> {
       await SupabaseService.client
           .from(SupabaseConstants.tableUserProgress)
           .upsert({
-        'user_id': userId,
-        'path_id': pathId,
-        'lesson_id': lessonId,
-        'completed': true,
-        'completed_at': DateTime.now().toIso8601String(),
-      });
+            'user_id': userId,
+            'path_id': pathId,
+            'lesson_id': lessonId,
+            'completed': true,
+            'completed_at': DateTime.now().toIso8601String(),
+          });
     } catch (e) {
       debugPrint('레슨 완료 저장 실패: $e');
     }
@@ -121,5 +118,5 @@ class StudyProgressNotifier extends StateNotifier<StudyProgressState> {
 /// 프로바이더 정의
 final studyProgressProvider =
     StateNotifierProvider<StudyProgressNotifier, StudyProgressState>((ref) {
-  return StudyProgressNotifier(ref);
-});
+      return StudyProgressNotifier(ref);
+    });

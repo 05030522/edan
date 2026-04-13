@@ -32,7 +32,8 @@ class GlassCard extends StatelessWidget {
         ? Colors.white.withValues(alpha: opacity ?? 0.08)
         : Colors.white.withValues(alpha: opacity ?? 0.7);
 
-    final Border effectiveBorder = border ??
+    final Border effectiveBorder =
+        border ??
         Border.all(
           color: isDark
               ? Colors.white.withValues(alpha: 0.12)

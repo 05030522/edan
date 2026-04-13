@@ -11,10 +11,12 @@ class TermsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       appBar: AppBar(
@@ -22,20 +24,14 @@ class TermsScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          '이용약관',
-          style: AppTypography.titleLarge(textColor),
-        ),
+        title: Text('이용약관', style: AppTypography.titleLarge(textColor)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.spacingXL),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '에덴 서비스 이용약관',
-              style: AppTypography.headlineMedium(textColor),
-            ),
+            Text('에덴 서비스 이용약관', style: AppTypography.headlineMedium(textColor)),
             const SizedBox(height: AppTheme.spacingSM),
             Text(
               '시행일: 2026년 3월 6일',
@@ -121,15 +117,9 @@ class TermsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: AppTypography.titleMedium(textColor),
-          ),
+          Text(title, style: AppTypography.titleMedium(textColor)),
           const SizedBox(height: AppTheme.spacingSM),
-          Text(
-            content,
-            style: AppTypography.bodyMedium(subTextColor),
-          ),
+          Text(content, style: AppTypography.bodyMedium(subTextColor)),
         ],
       ),
     );

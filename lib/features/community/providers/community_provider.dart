@@ -7,11 +7,7 @@ import '../../auth/providers/auth_provider.dart';
 import '../models/church_member.dart';
 
 /// 랭킹 정렬 기준
-enum RankingSortType {
-  streak,
-  faithPoints,
-  level,
-}
+enum RankingSortType { streak, faithPoints, level }
 
 /// 커뮤니티 상태
 class CommunityState {
@@ -28,6 +24,10 @@ class CommunityState {
   final List<Friendship> pendingReceived; // 받은 요청
   final bool isFriendsLoading;
 
+  /// 전체 사용자 랭킹
+  final List<ChurchMember> allUsers;
+  final bool isAllUsersLoading;
+
   const CommunityState({
     this.members = const [],
     this.churchName,
@@ -39,6 +39,8 @@ class CommunityState {
     this.friendships = const [],
     this.pendingReceived = const [],
     this.isFriendsLoading = false,
+    this.allUsers = const [],
+    this.isAllUsersLoading = false,
   });
 
   CommunityState copyWith({
@@ -52,6 +54,8 @@ class CommunityState {
     List<Friendship>? friendships,
     List<Friendship>? pendingReceived,
     bool? isFriendsLoading,
+    List<ChurchMember>? allUsers,
+    bool? isAllUsersLoading,
   }) {
     return CommunityState(
       members: members ?? this.members,
@@ -64,6 +68,8 @@ class CommunityState {
       friendships: friendships ?? this.friendships,
       pendingReceived: pendingReceived ?? this.pendingReceived,
       isFriendsLoading: isFriendsLoading ?? this.isFriendsLoading,
+      allUsers: allUsers ?? this.allUsers,
+      isAllUsersLoading: isAllUsersLoading ?? this.isAllUsersLoading,
     );
   }
 
@@ -81,11 +87,27 @@ class CommunityState {
     return sorted;
   }
 
+  /// 전체 사용자 정렬
+  List<ChurchMember> get sortedAllUsers {
+    final sorted = List<ChurchMember>.from(allUsers);
+    switch (sortBy) {
+      case RankingSortType.streak:
+        sorted.sort((a, b) => b.currentStreak.compareTo(a.currentStreak));
+      case RankingSortType.faithPoints:
+        sorted.sort((a, b) => b.faithPoints.compareTo(a.faithPoints));
+      case RankingSortType.level:
+        sorted.sort((a, b) => b.currentLevel.compareTo(a.currentLevel));
+    }
+    return sorted;
+  }
+
   /// 특정 유저와의 친구 상태 확인
   FriendshipStatus getFriendshipStatus(String userId, String currentUserId) {
     for (final f in friendships) {
-      final isRequester = f.requesterId == currentUserId && f.receiverId == userId;
-      final isReceiver = f.receiverId == currentUserId && f.requesterId == userId;
+      final isRequester =
+          f.requesterId == currentUserId && f.receiverId == userId;
+      final isReceiver =
+          f.receiverId == currentUserId && f.requesterId == userId;
 
       if (isRequester || isReceiver) {
         if (f.status == 'accepted') return FriendshipStatus.accepted;
@@ -114,8 +136,10 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
     final profile = authState.profile;
 
     // churchId와 churchName 둘 다 없으면 빈 상태
-    final hasChurchId = profile?.churchId != null && profile!.churchId!.isNotEmpty;
-    final hasChurchName = profile?.churchName != null && profile!.churchName!.isNotEmpty;
+    final hasChurchId =
+        profile?.churchId != null && profile!.churchId!.isNotEmpty;
+    final hasChurchName =
+        profile?.churchName != null && profile!.churchName!.isNotEmpty;
 
     if (!hasChurchId && !hasChurchName) {
       // 교회 없음 → 완전 초기화 (copyWith는 null을 유지하므로 새 객체 생성)
@@ -147,13 +171,17 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
       if (hasChurchId) {
         data = await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
-            .select('id, display_name, current_level, current_streak, faith_points')
+            .select(
+              'id, display_name, current_level, current_streak, faith_points',
+            )
             .eq('church_id', profile.churchId!)
             .order('current_streak', ascending: false);
       } else {
         data = await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
-            .select('id, display_name, current_level, current_streak, faith_points')
+            .select(
+              'id, display_name, current_level, current_streak, faith_points',
+            )
             .eq('church_name', profile.churchName!)
             .order('current_streak', ascending: false);
       }
@@ -162,16 +190,10 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
           .map((json) => ChurchMember.fromJson(json as Map<String, dynamic>))
           .toList();
 
-      state = state.copyWith(
-        isLoading: false,
-        members: members,
-      );
+      state = state.copyWith(isLoading: false, members: members);
     } catch (e) {
       debugPrint('교회 멤버 로드 실패: $e');
-      state = state.copyWith(
-        isLoading: false,
-        error: '멤버 목록을 불러오지 못했어요',
-      );
+      state = state.copyWith(isLoading: false, error: '멤버 목록을 불러오지 못했어요');
     }
   }
 
@@ -202,9 +224,7 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
 
       for (final f in allFriendships) {
         if (f.status == 'accepted') {
-          friendIds.add(
-            f.requesterId == userId ? f.receiverId : f.requesterId,
-          );
+          friendIds.add(f.requesterId == userId ? f.receiverId : f.requesterId);
         } else if (f.status == 'pending' && f.receiverId == userId) {
           pendingReceived.add(f);
         }
@@ -215,7 +235,9 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
       if (friendIds.isNotEmpty) {
         final friendData = await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
-            .select('id, display_name, current_level, current_streak, faith_points')
+            .select(
+              'id, display_name, current_level, current_streak, faith_points',
+            )
             .inFilter('id', friendIds);
 
         friends = (friendData as List)
@@ -259,7 +281,10 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
     try {
       await SupabaseService.client
           .from('friendships')
-          .update({'status': 'accepted', 'updated_at': DateTime.now().toIso8601String()})
+          .update({
+            'status': 'accepted',
+            'updated_at': DateTime.now().toIso8601String(),
+          })
           .eq('id', friendshipId);
       await loadFriendships();
       return true;
@@ -284,38 +309,128 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
     }
   }
 
+  /// 전체 사용자 랭킹 로드
+  Future<void> loadAllUsersRanking() async {
+    final authState = _ref.read(authProvider);
+    if (authState.isDevMode) {
+      state = state.copyWith(allUsers: _mockMembers, isAllUsersLoading: false);
+      return;
+    }
+
+    state = state.copyWith(isAllUsersLoading: true);
+    try {
+      final orderCol = switch (state.sortBy) {
+        RankingSortType.streak => 'current_streak',
+        RankingSortType.faithPoints => 'faith_points',
+        RankingSortType.level => 'current_level',
+      };
+
+      final data = await SupabaseService.client
+          .from(SupabaseConstants.tableProfiles)
+          .select(
+            'id, display_name, current_level, current_streak, faith_points',
+          )
+          .order(orderCol, ascending: false)
+          .limit(50);
+
+      final users = (data as List)
+          .map((json) => ChurchMember.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      state = state.copyWith(allUsers: users, isAllUsersLoading: false);
+    } catch (e) {
+      debugPrint('전체 랭킹 로드 실패: $e');
+      state = state.copyWith(isAllUsersLoading: false);
+    }
+  }
+
   /// 랭킹 정렬 기준 변경
   void changeSortType(RankingSortType type) {
     state = state.copyWith(sortBy: type);
+    // 전체 랭킹도 이미 로드했으면 재정렬
+    if (state.allUsers.isNotEmpty) {
+      loadAllUsersRanking();
+    }
   }
 
   /// 전체 새로고침
   Future<void> refresh() async {
-    await Future.wait([
-      loadChurchMembers(),
-      loadFriendships(),
-    ]);
+    await Future.wait([loadChurchMembers(), loadFriendships()]);
   }
 
   /// Dev 모드용 목데이터
   static const _mockMembers = [
-    ChurchMember(id: 'mock-1', displayName: '김민수', currentLevel: 5, currentStreak: 14, faithPoints: 1200),
-    ChurchMember(id: 'mock-2', displayName: '이서연', currentLevel: 3, currentStreak: 7, faithPoints: 620),
-    ChurchMember(id: 'mock-3', displayName: '박지훈', currentLevel: 4, currentStreak: 5, faithPoints: 980),
-    ChurchMember(id: 'mock-4', displayName: '정하은', currentLevel: 2, currentStreak: 3, faithPoints: 280),
-    ChurchMember(id: 'mock-5', displayName: '최예진', currentLevel: 6, currentStreak: 21, faithPoints: 1850),
-    ChurchMember(id: 'mock-6', displayName: '한도윤', currentLevel: 1, currentStreak: 1, faithPoints: 50),
+    ChurchMember(
+      id: 'mock-1',
+      displayName: '김민수',
+      currentLevel: 5,
+      currentStreak: 14,
+      faithPoints: 1200,
+    ),
+    ChurchMember(
+      id: 'mock-2',
+      displayName: '이서연',
+      currentLevel: 3,
+      currentStreak: 7,
+      faithPoints: 620,
+    ),
+    ChurchMember(
+      id: 'mock-3',
+      displayName: '박지훈',
+      currentLevel: 4,
+      currentStreak: 5,
+      faithPoints: 980,
+    ),
+    ChurchMember(
+      id: 'mock-4',
+      displayName: '정하은',
+      currentLevel: 2,
+      currentStreak: 3,
+      faithPoints: 280,
+    ),
+    ChurchMember(
+      id: 'mock-5',
+      displayName: '최예진',
+      currentLevel: 6,
+      currentStreak: 21,
+      faithPoints: 1850,
+    ),
+    ChurchMember(
+      id: 'mock-6',
+      displayName: '한도윤',
+      currentLevel: 1,
+      currentStreak: 1,
+      faithPoints: 50,
+    ),
   ];
 
   static final _mockFriendships = [
-    Friendship(id: 'f-1', requesterId: 'dev-user', receiverId: 'mock-1', status: 'accepted', createdAt: DateTime.now()),
-    Friendship(id: 'f-2', requesterId: 'dev-user', receiverId: 'mock-5', status: 'accepted', createdAt: DateTime.now()),
-    Friendship(id: 'f-3', requesterId: 'mock-3', receiverId: 'dev-user', status: 'pending', createdAt: DateTime.now()),
+    Friendship(
+      id: 'f-1',
+      requesterId: 'dev-user',
+      receiverId: 'mock-1',
+      status: 'accepted',
+      createdAt: DateTime.now(),
+    ),
+    Friendship(
+      id: 'f-2',
+      requesterId: 'dev-user',
+      receiverId: 'mock-5',
+      status: 'accepted',
+      createdAt: DateTime.now(),
+    ),
+    Friendship(
+      id: 'f-3',
+      requesterId: 'mock-3',
+      receiverId: 'dev-user',
+      status: 'pending',
+      createdAt: DateTime.now(),
+    ),
   ];
 }
 
 /// 프로바이더 정의
 final communityProvider =
     StateNotifierProvider<CommunityNotifier, CommunityState>((ref) {
-  return CommunityNotifier(ref);
-});
+      return CommunityNotifier(ref);
+    });

@@ -34,10 +34,12 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
 
     // 레슨 데이터 조회
     final lesson =
@@ -53,10 +55,7 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
           icon: Icon(Icons.close, color: textColor),
           onPressed: () => context.go('/home'),
         ),
-        title: Text(
-          '묵상 완료',
-          style: AppTypography.titleLarge(textColor),
-        ),
+        title: Text('묵상 완료', style: AppTypography.titleLarge(textColor)),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -124,16 +123,16 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
                           : const Icon(Icons.share, size: 20),
                       label: Text(
                         _isCapturing ? '준비 중...' : '카드 공유하기',
-                        style:
-                            AppTypography.button(Colors.white),
+                        style: AppTypography.button(Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryDark,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLarge,
+                          ),
                         ),
                       ),
                     ),
@@ -150,8 +149,9 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
                         foregroundColor: AppColors.primaryDark,
                         side: const BorderSide(color: AppColors.primary),
                         shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.radiusLarge),
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusLarge,
+                          ),
                         ),
                       ),
                       child: Text(
@@ -176,13 +176,13 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
 
     try {
       // RepaintBoundary → 이미지 캡처
-      final boundary = _repaintKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          _repaintKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return;
 
       final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
 
       final bytes = byteData.buffer.asUint8List();
@@ -192,7 +192,8 @@ class _ShareCardScreenState extends ConsumerState<ShareCardScreen> {
           LessonDataStore.getLesson(widget.pathId, widget.lessonId) ??
           LessonDataStore.defaultLesson;
 
-      final shareText = '오늘의 묵상: ${lesson.title} 🌿\n'
+      final shareText =
+          '오늘의 묵상: ${lesson.title} 🌿\n'
           '${lesson.scriptureReference}\n\n'
           '나도 에덴에서 매일 묵상하기 👇\n'
           'https://github.com/05030522/edan';

@@ -49,10 +49,7 @@ class _LambyDialogueState extends State<LambyDialogue>
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _opacity = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    );
+    _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     // Start fully visible.
     _controller.value = 1.0;
 
@@ -83,8 +80,9 @@ class _LambyDialogueState extends State<LambyDialogue>
     final Color bubbleColor = isDark
         ? AppColors.darkBackgroundSecondary
         : Colors.white;
-    final Color textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final Color textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
 
     return FadeTransition(
       opacity: _opacity,

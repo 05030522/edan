@@ -100,12 +100,15 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -202,9 +205,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                         },
                         child: Text(
                           '다음',
-                          style: AppTypography.button(
-                            Colors.white,
-                          ),
+                          style: AppTypography.button(Colors.white),
                         ),
                       ),
                     )
@@ -212,8 +213,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     // 마지막 페이지: 소셜 로그인 버튼만
                     SocialLoginButton(
                       provider: SocialProvider.kakao,
-                      onPressed: () =>
-                          _handleSocialLogin(SocialProvider.kakao),
+                      onPressed: () => _handleSocialLogin(SocialProvider.kakao),
                       isLoading: _loadingProvider == SocialProvider.kakao,
                     ),
                     const SizedBox(height: 10),
@@ -226,8 +226,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                     const SizedBox(height: 10),
                     SocialLoginButton(
                       provider: SocialProvider.naver,
-                      onPressed: () =>
-                          _handleSocialLogin(SocialProvider.naver),
+                      onPressed: () => _handleSocialLogin(SocialProvider.naver),
                       isLoading: _loadingProvider == SocialProvider.naver,
                     ),
                   ],

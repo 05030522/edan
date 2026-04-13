@@ -54,9 +54,10 @@ class _LuyangImageState extends State<LuyangImage>
         vsync: this,
         duration: const Duration(milliseconds: 1500),
       )..repeat(reverse: true);
-      _bounceAnimation = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(parent: _controller!, curve: Curves.easeInOut),
-      );
+      _bounceAnimation = Tween<double>(
+        begin: 0,
+        end: 1,
+      ).animate(CurvedAnimation(parent: _controller!, curve: Curves.easeInOut));
     }
   }
 
@@ -75,10 +76,7 @@ class _LuyangImageState extends State<LuyangImage>
         animation: _bounceAnimation!,
         builder: (context, child) {
           final offset = _bounceAnimation!.value * -6.0;
-          return Transform.translate(
-            offset: Offset(0, offset),
-            child: child,
-          );
+          return Transform.translate(offset: Offset(0, offset), child: child);
         },
         child: image,
       );
@@ -89,7 +87,8 @@ class _LuyangImageState extends State<LuyangImage>
 
   Widget _buildImage(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = widget.backgroundColor ??
+    final bgColor =
+        widget.backgroundColor ??
         (isDark
             ? const Color(0xFF2A3A2E) // 다크 모드: 어두운 에덴 그린
             : const Color(0xFFF5F0E6)); // 라이트 모드: 따뜻한 크림색 (루양 배경과 자연스러움)
@@ -97,7 +96,9 @@ class _LuyangImageState extends State<LuyangImage>
     final decoration = BoxDecoration(
       color: bgColor,
       shape: widget.circular ? BoxShape.circle : BoxShape.rectangle,
-      borderRadius: widget.circular ? null : BorderRadius.circular(widget.size * 0.2),
+      borderRadius: widget.circular
+          ? null
+          : BorderRadius.circular(widget.size * 0.2),
       border: widget.borderWidth > 0 && widget.borderColor != null
           ? Border.all(color: widget.borderColor!, width: widget.borderWidth)
           : null,

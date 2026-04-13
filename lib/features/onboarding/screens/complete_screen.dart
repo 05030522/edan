@@ -18,23 +18,26 @@ class OnboardingCompleteScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final onboardingData = ref.watch(onboardingProvider);
-    final userName = onboardingData.name.isNotEmpty ? onboardingData.name : '사용자';
+    final userName = onboardingData.name.isNotEmpty
+        ? onboardingData.name
+        : '사용자';
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingXL,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             children: [
               const SizedBox(height: AppTheme.spacing3XL),
@@ -83,8 +86,7 @@ class OnboardingCompleteScreen extends ConsumerWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.gold.withValues(alpha: 0.2),
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.radiusRound),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusRound),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

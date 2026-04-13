@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// 일일 태스크 타입
 enum DailyTaskType {
@@ -87,10 +88,9 @@ const _defaultTasks = [
 /// 일일 태스크 프로바이더
 class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
   DailyTasksNotifier()
-      : super(DailyTasksState(
-          tasks: _defaultTasks,
-          lastResetDate: DateTime.now(),
-        )) {
+    : super(
+        DailyTasksState(tasks: _defaultTasks, lastResetDate: DateTime.now()),
+      ) {
     // 초기화 시 날짜 체크
     _checkAndResetIfNewDay();
   }
@@ -138,7 +138,22 @@ class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
       totalFpEarned: state.totalFpEarned + reward,
     );
 
+    // 활동 카운터 증가 (업적용)
+    _incrementCounter(type);
+
     return reward;
+  }
+
+  /// 활동 카운터 증가 (업적 추적용)
+  Future<void> _incrementCounter(DailyTaskType type) async {
+    final key = switch (type) {
+      DailyTaskType.meditation => 'total_meditation_count',
+      DailyTaskType.prayer => 'total_prayer_count',
+      DailyTaskType.bibleReading => 'total_bible_count',
+    };
+    final prefs = await SharedPreferences.getInstance();
+    final current = prefs.getInt(key) ?? 0;
+    await prefs.setInt(key, current + 1);
   }
 
   /// 태스크 완료 상태 토글 (테스트용)
@@ -157,5 +172,5 @@ class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
 /// 프로바이더 정의
 final dailyTasksProvider =
     StateNotifierProvider<DailyTasksNotifier, DailyTasksState>((ref) {
-  return DailyTasksNotifier();
-});
+      return DailyTasksNotifier();
+    });

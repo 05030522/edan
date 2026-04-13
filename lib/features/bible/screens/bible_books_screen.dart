@@ -39,12 +39,15 @@ class _BibleBooksScreenState extends ConsumerState<BibleBooksScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     final oldTestament = _oldTestament;
     final newTestament = _newTestament;
@@ -100,16 +103,12 @@ class _BibleBooksScreenState extends ConsumerState<BibleBooksScreen>
         return Padding(
           padding: const EdgeInsets.only(bottom: AppTheme.spacingSM),
           child: Material(
-            color: isDark
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.white,
+            color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
             borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
             child: InkWell(
               borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
               onTap: () {
-                ref
-                    .read(bibleNavigationProvider.notifier)
-                    .selectBook(book);
+                ref.read(bibleNavigationProvider.notifier).selectBook(book);
                 context.push('/bible-full/${Uri.encodeComponent(book.name)}');
               },
               child: Padding(
@@ -125,14 +124,16 @@ class _BibleBooksScreenState extends ConsumerState<BibleBooksScreen>
                       height: 40,
                       decoration: BoxDecoration(
                         color: AppColors.primaryDark.withValues(alpha: 0.1),
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusSmall),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusSmall,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           book.name.substring(0, 1),
                           style: AppTypography.titleMedium(
-                              AppColors.primaryDark),
+                            AppColors.primaryDark,
+                          ),
                         ),
                       ),
                     ),

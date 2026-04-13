@@ -49,7 +49,9 @@ class AppTheme {
         displayLarge: AppTypography.displayLarge(AppColors.lightTextPrimary),
         displayMedium: AppTypography.displayMedium(AppColors.lightTextPrimary),
         headlineLarge: AppTypography.headlineLarge(AppColors.lightTextPrimary),
-        headlineMedium: AppTypography.headlineMedium(AppColors.lightTextPrimary),
+        headlineMedium: AppTypography.headlineMedium(
+          AppColors.lightTextPrimary,
+        ),
         titleLarge: AppTypography.titleLarge(AppColors.lightTextPrimary),
         titleMedium: AppTypography.titleMedium(AppColors.lightTextPrimary),
         bodyLarge: AppTypography.bodyLarge(AppColors.lightTextPrimary),

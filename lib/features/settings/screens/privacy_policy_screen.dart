@@ -11,10 +11,12 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       appBar: AppBar(
@@ -22,10 +24,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: textColor),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          '개인정보 처리방침',
-          style: AppTypography.titleLarge(textColor),
-        ),
+        title: Text('개인정보 처리방침', style: AppTypography.titleLarge(textColor)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.spacingXL),
@@ -97,8 +96,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
             _buildSection(
               title: '6. 문의',
-              content:
-                  '개인정보 처리방침에 관한 문의사항은 앱 내 설정 > 문의하기를 통해 연락해 주세요.',
+              content: '개인정보 처리방침에 관한 문의사항은 앱 내 설정 > 문의하기를 통해 연락해 주세요.',
               textColor: textColor,
               subTextColor: subTextColor,
             ),
@@ -121,15 +119,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: AppTypography.titleMedium(textColor),
-          ),
+          Text(title, style: AppTypography.titleMedium(textColor)),
           const SizedBox(height: AppTheme.spacingSM),
-          Text(
-            content,
-            style: AppTypography.bodyMedium(subTextColor),
-          ),
+          Text(content, style: AppTypography.bodyMedium(subTextColor)),
         ],
       ),
     );

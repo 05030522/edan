@@ -10,12 +10,7 @@ import '../../../core/constants/supabase_constants.dart';
 import '../../../core/constants/app_constants.dart';
 
 /// 인증 상태
-enum AuthStatus {
-  initial,
-  authenticated,
-  unauthenticated,
-  loading,
-}
+enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
 /// 인증 상태 모델
 class AuthState {
@@ -61,10 +56,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void _init() {
     final user = SupabaseService.currentUser;
     if (user != null) {
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-      );
+      state = state.copyWith(status: AuthStatus.authenticated, user: user);
       _loadProfile();
     } else {
       state = state.copyWith(status: AuthStatus.unauthenticated);
@@ -117,7 +109,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (!success) {
         state = state.copyWith(
           status: AuthStatus.unauthenticated,
-          error: '${SocialAuthService.getProviderDisplayName(provider)} 로그인에 실패했습니다.',
+          error:
+              '${SocialAuthService.getProviderDisplayName(provider)} 로그인에 실패했습니다.',
         );
       }
       // 성공 시 onAuthStateChange 리스너가 상태를 업데이트함
@@ -254,9 +247,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // 서버 비동기 저장 (dev 모드면 스킵)
     if (!state.isDevMode) {
       try {
-        final updateData = <String, dynamic>{
-          'faith_points': newFp,
-        };
+        final updateData = <String, dynamic>{'faith_points': newFp};
         if (newLevel != profile.currentLevel) {
           updateData['current_level'] = newLevel;
         }
@@ -310,8 +301,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       newStreak = 1;
     }
 
-    final newLongest =
-        newStreak > profile.longestStreak ? newStreak : profile.longestStreak;
+    final newLongest = newStreak > profile.longestStreak
+        ? newStreak
+        : profile.longestStreak;
 
     final updated = profile.copyWith(
       currentStreak: newStreak,
@@ -328,10 +320,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
             .update({
-          'current_streak': newStreak,
-          'longest_streak': newLongest,
-          'last_study_date': now.toIso8601String(),
-        }).eq('id', profile.id);
+              'current_streak': newStreak,
+              'longest_streak': newLongest,
+              'last_study_date': now.toIso8601String(),
+            })
+            .eq('id', profile.id);
       } catch (e) {
         debugPrint('스트릭 저장 실패: $e');
       }

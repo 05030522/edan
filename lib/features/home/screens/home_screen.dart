@@ -10,6 +10,7 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/luyang_image.dart';
 import '../../../shared/widgets/point_toast.dart';
 import '../../../shared/widgets/talent_icon.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../shared/utils/streak_helper.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../streak/providers/streak_goal_provider.dart';
@@ -68,10 +69,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
 
     final profile = ref.watch(authProvider.select((s) => s.profile));
     final streakCount = profile?.currentStreak ?? 0;
@@ -104,8 +107,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // 루양 인사 (한국 시간대별)
     final greeting = AppConstants.getGreetingByTime();
 
-    final levelIndex =
-        (currentLevel - 1).clamp(0, AppConstants.levelNames.length - 1);
+    final levelIndex = (currentLevel - 1).clamp(
+      0,
+      AppConstants.levelNames.length - 1,
+    );
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -140,8 +145,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   color: isDark
                       ? Colors.white.withValues(alpha: 0.05)
                       : AppColors.primary.withValues(alpha: 0.08),
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.radiusMedium),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
                 ),
                 child: Row(
                   children: [
@@ -160,8 +164,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: AppTheme.spacingXL),
 
-              _buildLambyCard(context,
-                  greeting: greeting, textColor: textColor),
+              _buildLambyCard(
+                context,
+                greeting: greeting,
+                textColor: textColor,
+              ),
               const SizedBox(height: AppTheme.spacingXL),
 
               _buildGardenPreview(
@@ -171,8 +178,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: AppTheme.spacingXL),
 
-              _buildDailyTasks(context, ref,
-                  tasksState: tasksState, textColor: textColor),
+              _buildDailyTasks(
+                context,
+                ref,
+                tasksState: tasksState,
+                textColor: textColor,
+              ),
               const SizedBox(height: AppTheme.spacingXL),
 
               _buildBibleFullButton(context, textColor: textColor),
@@ -220,13 +231,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.local_fire_department,
-                  color: AppColors.streakFlame, size: 18),
+              const Icon(
+                Icons.local_fire_department,
+                color: AppColors.streakFlame,
+                size: 18,
+              ),
               const SizedBox(width: 4),
               Text(
                 '연속 묵상 ${_formatNumber(streakCount)}일',
-                style: AppTypography.label(AppColors.streakFlame)
-                    .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+                style: AppTypography.label(
+                  AppColors.streakFlame,
+                ).copyWith(fontWeight: FontWeight.w700, fontSize: 13),
               ),
             ],
           ),
@@ -249,8 +264,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const SizedBox(width: 4),
                 Text(
                   _formatNumber(faithPoints),
-                  style: AppTypography.label(AppColors.goldDark)
-                      .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+                  style: AppTypography.label(
+                    AppColors.goldDark,
+                  ).copyWith(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               ],
             ),
@@ -285,8 +301,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               left: AppTheme.spacingLG,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacingMD,
-                    vertical: AppTheme.spacingSM),
+                  horizontal: AppTheme.spacingMD,
+                  vertical: AppTheme.spacingSM,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(AppTheme.radiusRound),
@@ -307,9 +324,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shadow: false,
                   ),
                   const SizedBox(height: 8),
-                  Text('루양의 정원',
-                      style: AppTypography.label(
-                          Colors.white.withValues(alpha: 0.8))),
+                  Text(
+                    '루양의 정원',
+                    style: AppTypography.label(
+                      Colors.white.withValues(alpha: 0.8),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -318,7 +338,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               right: AppTheme.spacingLG,
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 6),
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(AppTheme.radiusRound),
@@ -328,9 +350,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     const Icon(Icons.touch_app, color: Colors.white, size: 14),
                     const SizedBox(width: 4),
-                    Text('들어가기',
-                        style: AppTypography.label(Colors.white)
-                            .copyWith(fontSize: 11)),
+                    Text(
+                      '들어가기',
+                      style: AppTypography.label(
+                        Colors.white,
+                      ).copyWith(fontSize: 11),
+                    ),
                   ],
                 ),
               ),
@@ -347,13 +372,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required Color textColor,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Material(
-      color: isDark
-          ? Colors.white.withValues(alpha: 0.05)
-          : Colors.white,
+      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
       borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
@@ -447,9 +471,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _handleTaskComplete(
-      BuildContext context, WidgetRef ref, DailyTaskType type) async {
-    final reward =
-        ref.read(dailyTasksProvider.notifier).completeTask(type);
+    BuildContext context,
+    WidgetRef ref,
+    DailyTaskType type,
+  ) async {
+    final reward = ref.read(dailyTasksProvider.notifier).completeTask(type);
     if (reward > 0) {
       // 프로필 달란트 즉시 반영
       ref.read(authProvider.notifier).addFaithPoints(reward);
@@ -470,6 +496,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (!context.mounted) return;
     // await하면 사용자가 '확인했어요'를 누를 때까지 블록됨
     await StreakHelper.checkAndUpdate(context, ref);
+
+    // 퍼펙트 데이 공유 제안
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('오늘 경건 완료! 친구에게 공유해보세요'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        action: SnackBarAction(
+          label: '공유하기',
+          onPressed: () {
+            Share.share(
+              '오늘도 에덴에서 경건의 시간을 마쳤어요! 🌿\n'
+              '묵상 · 기도 · 말씀 읽기 모두 완료!\n\n'
+              '나도 에덴에서 매일 묵상하기 👇\n'
+              'https://05030522.github.io/edan/',
+              subject: '에덴 묵상 - 오늘의 경건 완료!',
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildLambyCard(
@@ -486,12 +534,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('루양',
-                    style: AppTypography.label(AppColors.primaryDark)
-                        .copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  '루양',
+                  style: AppTypography.label(
+                    AppColors.primaryDark,
+                  ).copyWith(fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 2),
-                Text(greeting,
-                    style: AppTypography.bodyMedium(textColor)),
+                Text(greeting, style: AppTypography.bodyMedium(textColor)),
               ],
             ),
           ),

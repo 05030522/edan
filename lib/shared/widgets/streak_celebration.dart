@@ -20,10 +20,12 @@ class StreakCelebration {
   }) {
     HapticFeedback.mediumImpact();
 
-    final isMilestone =
-        AppConstants.streakMilestoneRewards.containsKey(streakCount);
-    final milestoneBonus =
-        isMilestone ? AppConstants.streakMilestoneRewards[streakCount] : null;
+    final isMilestone = AppConstants.streakMilestoneRewards.containsKey(
+      streakCount,
+    );
+    final milestoneBonus = isMilestone
+        ? AppConstants.streakMilestoneRewards[streakCount]
+        : null;
 
     // 사용자가 직접 닫기 버튼을 눌러야 닫히도록 자동 닫기 제거
     // 배경 탭으로도 실수로 닫히지 않도록 barrierDismissible: false
@@ -98,15 +100,14 @@ class _StreakCelebrationDialog extends StatelessWidget {
                     end: Alignment.bottomCenter,
                     colors: isMilestone
                         ? [AppColors.gold, AppColors.streakFlame]
-                        : [
-                            AppColors.streakFlameBright,
-                            AppColors.streakFlame,
-                          ],
+                        : [AppColors.streakFlameBright, AppColors.streakFlame],
                   ),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isMilestone ? Icons.emoji_events : Icons.local_fire_department,
+                  isMilestone
+                      ? Icons.emoji_events
+                      : Icons.local_fire_department,
                   color: Colors.white,
                   size: 44,
                 ),
@@ -136,9 +137,7 @@ class _StreakCelebrationDialog extends StatelessWidget {
                   const SizedBox(width: 4),
                   Text(
                     '연속 $streakCount일',
-                    style: AppTypography.headlineLarge(
-                      AppColors.streakFlame,
-                    ),
+                    style: AppTypography.headlineLarge(AppColors.streakFlame),
                   ),
                 ],
               ),
@@ -160,8 +159,9 @@ class _StreakCelebrationDialog extends StatelessWidget {
                     children: [
                       Text(
                         '오늘의 경건 완료 보너스 +$bonusFp ',
-                        style: AppTypography.label(AppColors.goldDark)
-                            .copyWith(fontWeight: FontWeight.w700),
+                        style: AppTypography.label(
+                          AppColors.goldDark,
+                        ).copyWith(fontWeight: FontWeight.w700),
                       ),
                       const TalentIcon(size: 14),
                     ],
@@ -185,8 +185,9 @@ class _StreakCelebrationDialog extends StatelessWidget {
                     children: [
                       Text(
                         '연속 묵상 보너스 +$milestoneBonus ',
-                        style: AppTypography.label(AppColors.streakFlame)
-                            .copyWith(fontWeight: FontWeight.w700),
+                        style: AppTypography.label(
+                          AppColors.streakFlame,
+                        ).copyWith(fontWeight: FontWeight.w700),
                       ),
                       const TalentIcon(size: 14),
                     ],
@@ -222,8 +223,10 @@ class _StreakCelebrationDialog extends StatelessWidget {
                               '${_getMessage(streakCount).replaceAll('\n', ' ')}\n\n'
                               '나도 에덴에서 매일 묵상하기 👇\n'
                               'https://05030522.github.io/edan/';
-                          Share.share(text,
-                              subject: '에덴 묵상 - 연속 $streakCount일 달성!');
+                          Share.share(
+                            text,
+                            subject: '에덴 묵상 - 연속 $streakCount일 달성!',
+                          );
                         },
                         icon: const Icon(Icons.share, size: 18),
                         label: Text(
@@ -236,8 +239,9 @@ class _StreakCelebrationDialog extends StatelessWidget {
                             color: AppColors.primaryDark.withValues(alpha: 0.4),
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusRound),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusRound,
+                            ),
                           ),
                         ),
                       ),
@@ -262,8 +266,9 @@ class _StreakCelebrationDialog extends StatelessWidget {
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppTheme.radiusRound),
+                            borderRadius: BorderRadius.circular(
+                              AppTheme.radiusRound,
+                            ),
                           ),
                         ),
                       ),

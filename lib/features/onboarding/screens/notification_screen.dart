@@ -53,20 +53,21 @@ class _OnboardingNotificationScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor =
-        isDark ? AppColors.darkBackground : AppColors.lightBackground;
-    final textColor =
-        isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary;
-    final subTextColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final backgroundColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
+    final textColor = isDark
+        ? AppColors.darkTextPrimary
+        : AppColors.lightTextPrimary;
+    final subTextColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingXL,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -118,8 +119,7 @@ class _OnboardingNotificationScreenState
                   ),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.darkCard : AppColors.lightCard,
-                    borderRadius:
-                        BorderRadius.circular(AppTheme.radiusXLarge),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -174,10 +174,7 @@ class _OnboardingNotificationScreenState
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _handleNext,
-                  child: Text(
-                    '다음',
-                    style: AppTypography.button(Colors.white),
-                  ),
+                  child: Text('다음', style: AppTypography.button(Colors.white)),
                 ),
               ),
               const SizedBox(height: AppTheme.spacingXXL),
@@ -199,23 +196,12 @@ class _OnboardingNotificationScreenState
       children: [
         IconButton(
           onPressed: onIncrement,
-          icon: Icon(
-            Icons.keyboard_arrow_up,
-            color: textColor,
-            size: 32,
-          ),
+          icon: Icon(Icons.keyboard_arrow_up, color: textColor, size: 32),
         ),
-        Text(
-          value,
-          style: AppTypography.pointDisplay(textColor),
-        ),
+        Text(value, style: AppTypography.pointDisplay(textColor)),
         IconButton(
           onPressed: onDecrement,
-          icon: Icon(
-            Icons.keyboard_arrow_down,
-            color: textColor,
-            size: 32,
-          ),
+          icon: Icon(Icons.keyboard_arrow_down, color: textColor, size: 32),
         ),
       ],
     );

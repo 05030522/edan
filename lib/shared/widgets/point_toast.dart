@@ -72,25 +72,22 @@ class _PointToastState extends State<PointToast>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
 
     // Float up by 60px.
-    _translateY = Tween<double>(begin: 0, end: -60).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOut,
-      ),
-    );
+    _translateY = Tween<double>(
+      begin: 0,
+      end: -60,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     // Fade out in the last 40% of the animation.
     _opacity = TweenSequence<double>([
       TweenSequenceItem(tween: ConstantTween(1.0), weight: 60),
       TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 0.0)
-            .chain(CurveTween(curve: Curves.easeIn)),
+        tween: Tween<double>(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeIn)),
         weight: 40,
       ),
     ]).animate(_controller);
@@ -98,14 +95,13 @@ class _PointToastState extends State<PointToast>
     // Slight scale-up on entry.
     _scale = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.6, end: 1.2)
-            .chain(CurveTween(curve: Curves.easeOutBack)),
+        tween: Tween<double>(
+          begin: 0.6,
+          end: 1.2,
+        ).chain(CurveTween(curve: Curves.easeOutBack)),
         weight: 30,
       ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.2, end: 1.0),
-        weight: 20,
-      ),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.2, end: 1.0), weight: 20),
       TweenSequenceItem(tween: ConstantTween(1.0), weight: 50),
     ]).animate(_controller);
 
@@ -129,10 +125,7 @@ class _PointToastState extends State<PointToast>
           offset: Offset(0, _translateY.value),
           child: Opacity(
             opacity: _opacity.value,
-            child: Transform.scale(
-              scale: _scale.value,
-              child: child,
-            ),
+            child: Transform.scale(scale: _scale.value, child: child),
           ),
         );
       },
