@@ -62,14 +62,16 @@ class BibleNavigationNotifier extends StateNotifier<BibleNavigationState> {
       return;
     }
 
-    // 다른 책은 placeholder
-    final placeholderVerses = List.generate(
-      10,
-      (i) => BibleVerse(
-        verse: i + 1,
-        text: '$bookName $chapter장 ${i + 1}절 내용이 여기에 표시됩니다.',
+    // 다른 책은 준비 중 안내
+    final placeholderVerses = [
+      BibleVerse(
+        verse: 1,
+        text:
+            '$bookName $chapter장은 아직 준비 중이에요.\n\n'
+            '현재 마태복음 전문을 읽을 수 있어요.\n'
+            '다른 성경 본문도 곧 추가될 예정이에요!',
       ),
-    );
+    ];
 
     state = state.copyWith(
       selectedChapter: chapter,
