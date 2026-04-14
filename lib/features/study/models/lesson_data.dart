@@ -1,3 +1,5 @@
+import '../data/luke_meditation_data.dart';
+import '../data/mark_meditation_data.dart';
 import '../data/matthew_meditation_data.dart';
 
 /// 레슨 콘텐츠 데이터 모델
@@ -94,10 +96,28 @@ class LessonDataStore {
 
   /// pathId와 lessonId로 레슨 콘텐츠 찾기
   static LessonContent? getLesson(String pathId, String lessonId) {
-    // 마태복음 경로는 별도 데이터에서 조회
+    // 복음서 경로는 별도 데이터에서 조회
     if (pathId == 'path-matthew') {
       try {
         return MatthewMeditationData.lessons.firstWhere(
+          (l) => l.lessonId == lessonId,
+        );
+      } catch (_) {
+        return null;
+      }
+    }
+    if (pathId == 'path-mark') {
+      try {
+        return MarkMeditationData.lessons.firstWhere(
+          (l) => l.lessonId == lessonId,
+        );
+      } catch (_) {
+        return null;
+      }
+    }
+    if (pathId == 'path-luke') {
+      try {
+        return LukeMeditationData.lessons.firstWhere(
           (l) => l.lessonId == lessonId,
         );
       } catch (_) {
@@ -116,9 +136,9 @@ class LessonDataStore {
 
   /// pathId로 해당 경로의 모든 레슨 가져오기
   static List<LessonContent> getLessonsForPath(String pathId) {
-    if (pathId == 'path-matthew') {
-      return MatthewMeditationData.lessons;
-    }
+    if (pathId == 'path-matthew') return MatthewMeditationData.lessons;
+    if (pathId == 'path-mark') return MarkMeditationData.lessons;
+    if (pathId == 'path-luke') return LukeMeditationData.lessons;
     return lessons.where((l) => l.pathId == pathId).toList();
   }
 

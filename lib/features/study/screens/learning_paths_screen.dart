@@ -42,9 +42,13 @@ class LearningPathsScreen extends ConsumerWidget {
     final pathMatthewLessons = LessonDataStore.getLessonsForPath(
       'path-matthew',
     );
+    final pathMarkLessons = LessonDataStore.getLessonsForPath('path-mark');
+    final pathLukeLessons = LessonDataStore.getLessonsForPath('path-luke');
     final path1Completed = progress.completedCountForPath('path-1');
     final path2Completed = progress.completedCountForPath('path-2');
     final pathMatthewCompleted = progress.completedCountForPath('path-matthew');
+    final pathMarkCompleted = progress.completedCountForPath('path-mark');
+    final pathLukeCompleted = progress.completedCountForPath('path-luke');
 
     return Scaffold(
       appBar: AppBar(
@@ -89,6 +93,42 @@ class LearningPathsScreen extends ConsumerWidget {
             onTap: () {
               final nextLesson = _nextLessonId('path-matthew', progress);
               context.push('/study/path-matthew/$nextLesson/scripture');
+            },
+          ),
+          const SizedBox(height: AppTheme.spacingLG),
+
+          // 경로 마가복음: 마가복음 여정
+          _LearningPathCard(
+            title: '마가복음 여정',
+            description:
+                '마가복음 전체를 16일에 걸쳐 읽고, 퀴즈와 묵상으로 '
+                '빠르게 예수님의 사역을 경험해요.',
+            difficulty: '입문',
+            totalDays: pathMarkLessons.length,
+            completedDays: pathMarkCompleted,
+            iconData: Icons.auto_stories,
+            iconColor: const Color(0xFF3498DB),
+            onTap: () {
+              final nextLesson = _nextLessonId('path-mark', progress);
+              context.push('/study/path-mark/$nextLesson/scripture');
+            },
+          ),
+          const SizedBox(height: AppTheme.spacingLG),
+
+          // 경로 누가복음: 누가복음 여정
+          _LearningPathCard(
+            title: '누가복음 여정',
+            description:
+                '누가복음 전체를 24일에 걸쳐 읽고, 하나님의 긍휼과 '
+                '구원의 이야기를 깊이 묵상해요.',
+            difficulty: '입문',
+            totalDays: pathLukeLessons.length,
+            completedDays: pathLukeCompleted,
+            iconData: Icons.auto_stories,
+            iconColor: const Color(0xFF27AE60),
+            onTap: () {
+              final nextLesson = _nextLessonId('path-luke', progress);
+              context.push('/study/path-luke/$nextLesson/scripture');
             },
           ),
           const SizedBox(height: AppTheme.spacingLG),

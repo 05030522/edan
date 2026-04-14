@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/quiz_question.dart';
 
@@ -55,7 +57,18 @@ class QuizState {
 
 /// 퀴즈 노티파이어
 class QuizNotifier extends StateNotifier<QuizState> {
-  QuizNotifier(QuizSet quizSet) : super(QuizState(quizSet: quizSet));
+  QuizNotifier(QuizSet quizSet)
+    : super(QuizState(quizSet: _shuffleOptions(quizSet)));
+
+  /// 퀴즈 세트의 모든 문제 선택지를 셔플
+  static QuizSet _shuffleOptions(QuizSet quizSet) {
+    final rng = Random();
+    return QuizSet(
+      lessonId: quizSet.lessonId,
+      title: quizSet.title,
+      questions: quizSet.questions.map((q) => q.shuffled(rng)).toList(),
+    );
+  }
 
   /// 답변 제출
   QuizAnswerResult submitAnswer(int optionIndex) {

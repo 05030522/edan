@@ -1,3 +1,8 @@
+import 'dart:math';
+
+import '../data/john_quiz_data.dart';
+import '../data/luke_quiz_data.dart';
+import '../data/mark_quiz_data.dart';
 import '../data/matthew_quiz_data.dart';
 
 /// 퀴즈 문제 모델
@@ -17,6 +22,21 @@ class QuizQuestion {
     this.explanation,
     this.rewardFp = 5,
   });
+
+  /// 선택지 순서를 셔플한 새 QuizQuestion 반환
+  QuizQuestion shuffled(Random rng) {
+    final correctAnswer = options[correctIndex];
+    final shuffled = List<String>.from(options)..shuffle(rng);
+    final newCorrectIndex = shuffled.indexOf(correctAnswer);
+    return QuizQuestion(
+      id: id,
+      question: question,
+      options: shuffled,
+      correctIndex: newCorrectIndex,
+      explanation: explanation,
+      rewardFp: rewardFp,
+    );
+  }
 }
 
 /// 퀴즈 세트 (묵상 주제별)
@@ -201,7 +221,7 @@ class DummyQuizData {
 
   /// lessonId로 퀴즈 세트 찾기 (없으면 기본 퀴즈)
   static QuizSet getQuizForLesson(String lessonId) {
-    // 마태복음 퀴즈 확인
+    // 복음서 퀴즈 확인
     if (lessonId.startsWith('matthew-lesson-')) {
       final match = RegExp(r'matthew-lesson-(\d+)').firstMatch(lessonId);
       if (match != null) {
@@ -211,6 +231,15 @@ class DummyQuizData {
           if (mqSet != null) return mqSet;
         }
       }
+    }
+    if (lessonId.startsWith('mark-lesson-')) {
+      return MarkQuizData.getQuizForLesson(lessonId);
+    }
+    if (lessonId.startsWith('luke-lesson-')) {
+      return LukeQuizData.getQuizForLesson(lessonId);
+    }
+    if (lessonId.startsWith('john-lesson-')) {
+      return JohnQuizData.getQuizForLesson(lessonId);
     }
 
     return quizSets.firstWhere(
