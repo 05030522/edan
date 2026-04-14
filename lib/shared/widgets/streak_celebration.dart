@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_constants.dart';
+import 'celebration_particles.dart';
 import 'talent_icon.dart';
 
 /// 스트릭 달성 축하 다이얼로그
@@ -71,214 +72,245 @@ class _StreakCelebrationDialog extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: 300,
-          padding: const EdgeInsets.all(AppTheme.spacingXXL),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.darkBackgroundSecondary : Colors.white,
-            borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.streakFlame.withValues(alpha: 0.3),
-                blurRadius: 24,
-                spreadRadius: 2,
-              ),
-            ],
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Positioned.fill(
+            child: CelebrationParticles(
+              style: isMilestone ? ParticleStyle.fire : ParticleStyle.stars,
+            ),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 불꽃 아이콘
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: isMilestone
-                        ? [AppColors.gold, AppColors.streakFlame]
-                        : [AppColors.streakFlameBright, AppColors.streakFlame],
+          Material(
+            color: Colors.transparent,
+            child: Container(
+              width: 300,
+              padding: const EdgeInsets.all(AppTheme.spacingXXL),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.darkBackgroundSecondary
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(AppTheme.radiusXLarge),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.streakFlame.withValues(alpha: 0.3),
+                    blurRadius: 24,
+                    spreadRadius: 2,
                   ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isMilestone
-                      ? Icons.emoji_events
-                      : Icons.local_fire_department,
-                  color: Colors.white,
-                  size: 44,
-                ),
+                ],
               ),
-              const SizedBox(height: AppTheme.spacingLG),
-
-              // 타이틀
-              Text(
-                isMilestone ? '마일스톤 달성!' : '연속 묵상 달성!',
-                style: AppTypography.titleLarge(
-                  isDark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.lightTextPrimary,
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacingSM),
-
-              // 스트릭 카운트
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
-                    Icons.local_fire_department,
-                    color: AppColors.streakFlame,
-                    size: 28,
+                  // 불꽃 아이콘
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: isMilestone
+                            ? [AppColors.gold, AppColors.streakFlame]
+                            : [
+                                AppColors.streakFlameBright,
+                                AppColors.streakFlame,
+                              ],
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isMilestone
+                          ? Icons.emoji_events
+                          : Icons.local_fire_department,
+                      color: Colors.white,
+                      size: 44,
+                    ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(height: AppTheme.spacingLG),
+
+                  // 타이틀
                   Text(
-                    '연속 $streakCount일',
-                    style: AppTypography.headlineLarge(AppColors.streakFlame),
+                    isMilestone ? '마일스톤 달성!' : '연속 묵상 달성!',
+                    style: AppTypography.titleLarge(
+                      isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.lightTextPrimary,
+                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: AppTheme.spacingMD),
+                  const SizedBox(height: AppTheme.spacingSM),
 
-              // 보너스 달란트
-              if (bonusFp != null && bonusFp! > 0) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.gold.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusRound),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  // 스트릭 카운트
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        '오늘의 경건 완료 보너스 +$bonusFp ',
-                        style: AppTypography.label(
-                          AppColors.goldDark,
-                        ).copyWith(fontWeight: FontWeight.w700),
+                      const Icon(
+                        Icons.local_fire_department,
+                        color: AppColors.streakFlame,
+                        size: 28,
                       ),
-                      const TalentIcon(size: 14),
-                    ],
-                  ),
-                ),
-              ],
-
-              if (milestoneBonus != null) ...[
-                const SizedBox(height: AppTheme.spacingSM),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.streakFlame.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppTheme.radiusRound),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
+                      const SizedBox(width: 4),
                       Text(
-                        '연속 묵상 보너스 +$milestoneBonus ',
-                        style: AppTypography.label(
+                        '연속 $streakCount일',
+                        style: AppTypography.headlineLarge(
                           AppColors.streakFlame,
-                        ).copyWith(fontWeight: FontWeight.w700),
+                        ),
                       ),
-                      const TalentIcon(size: 14),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: AppTheme.spacingMD),
 
-              const SizedBox(height: AppTheme.spacingLG),
-
-              // 격려 메시지
-              Text(
-                _getMessage(streakCount),
-                textAlign: TextAlign.center,
-                style: AppTypography.bodyMedium(
-                  isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacingLG),
-
-              // 버튼 영역: 공유하기 + 확인
-              Row(
-                children: [
-                  // 공유하기 버튼 (보조)
-                  Expanded(
-                    child: SizedBox(
-                      height: 46,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          final text =
-                              '에덴에서 연속 $streakCount일 묵상 달성! 🔥\n'
-                              '${_getMessage(streakCount).replaceAll('\n', ' ')}\n\n'
-                              '나도 에덴에서 매일 묵상하기 👇\n'
-                              'https://05030522.github.io/edan/';
-                          Share.share(
-                            text,
-                            subject: '에덴 묵상 - 연속 $streakCount일 달성!',
-                          );
-                        },
-                        icon: const Icon(Icons.share, size: 18),
-                        label: Text(
-                          '공유',
-                          style: AppTypography.button(AppColors.primaryDark),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryDark,
-                          side: BorderSide(
-                            color: AppColors.primaryDark.withValues(alpha: 0.4),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusRound,
-                            ),
-                          ),
+                  // 보너스 달란트
+                  if (bonusFp != null && bonusFp! > 0) ...[
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusRound,
                         ),
                       ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '오늘의 경건 완료 보너스 +$bonusFp ',
+                            style: AppTypography.label(
+                              AppColors.goldDark,
+                            ).copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const TalentIcon(size: 14),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  if (milestoneBonus != null) ...[
+                    const SizedBox(height: AppTheme.spacingSM),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.streakFlame.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(
+                          AppTheme.radiusRound,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '연속 묵상 보너스 +$milestoneBonus ',
+                            style: AppTypography.label(
+                              AppColors.streakFlame,
+                            ).copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          const TalentIcon(size: 14),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: AppTheme.spacingLG),
+
+                  // 격려 메시지
+                  Text(
+                    _getMessage(streakCount),
+                    textAlign: TextAlign.center,
+                    style: AppTypography.bodyMedium(
+                      isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
                     ),
                   ),
-                  const SizedBox(width: AppTheme.spacingSM),
-                  // 확인 버튼 (주요)
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                      height: 46,
-                      child: ElevatedButton.icon(
-                        onPressed: () =>
-                            Navigator.of(context, rootNavigator: true).pop(),
-                        icon: const Icon(Icons.check_circle_outline, size: 18),
-                        label: Text(
-                          '확인했어요',
-                          style: AppTypography.button(Colors.white),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryDark,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppTheme.radiusRound,
+                  const SizedBox(height: AppTheme.spacingLG),
+
+                  // 버튼 영역: 공유하기 + 확인
+                  Row(
+                    children: [
+                      // 공유하기 버튼 (보조)
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              final text =
+                                  '에덴에서 연속 $streakCount일 묵상 달성! 🔥\n'
+                                  '${_getMessage(streakCount).replaceAll('\n', ' ')}\n\n'
+                                  '나도 에덴에서 매일 묵상하기 👇\n'
+                                  'https://05030522.github.io/edan/';
+                              Share.share(
+                                text,
+                                subject: '에덴 묵상 - 연속 $streakCount일 달성!',
+                              );
+                            },
+                            icon: const Icon(Icons.share, size: 18),
+                            label: Text(
+                              '공유',
+                              style: AppTypography.button(
+                                AppColors.primaryDark,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primaryDark,
+                              side: BorderSide(
+                                color: AppColors.primaryDark.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusRound,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: AppTheme.spacingSM),
+                      // 확인 버튼 (주요)
+                      Expanded(
+                        flex: 2,
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton.icon(
+                            onPressed: () => Navigator.of(
+                              context,
+                              rootNavigator: true,
+                            ).pop(),
+                            icon: const Icon(
+                              Icons.check_circle_outline,
+                              size: 18,
+                            ),
+                            label: Text(
+                              '확인했어요',
+                              style: AppTypography.button(Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryDark,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppTheme.radiusRound,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

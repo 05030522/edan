@@ -8,9 +8,12 @@ import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/talent_icon.dart';
+import '../../../shared/utils/icon_helper.dart';
+import '../../../shared/widgets/point_toast.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../home/providers/daily_tasks_provider.dart';
 import '../../streak/providers/streak_goal_provider.dart';
+import '../providers/weekly_quest_provider.dart';
 
 /// 일일 퀘스트 화면
 class QuestsScreen extends ConsumerWidget {
@@ -145,6 +148,13 @@ class QuestsScreen extends ConsumerWidget {
                     : () => _navigateToActivity(context, quest.taskType),
               ),
             ),
+          ),
+
+          // 주간 퀘스트
+          const SizedBox(height: AppTheme.spacingXL),
+          _WeeklyQuestsSection(
+            textColor: textColor,
+            subTextColor: subTextColor,
           ),
 
           // 스트릭 목표 시스템
@@ -714,6 +724,189 @@ class _StreakGoalSectionState extends ConsumerState<_StreakGoalSection> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+    );
+  }
+}
+
+/// 주간 퀘스트 섹션
+class _WeeklyQuestsSection extends ConsumerWidget {
+  final Color textColor;
+  final Color subTextColor;
+
+  const _WeeklyQuestsSection({
+    required this.textColor,
+    required this.subTextColor,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(weeklyQuestProvider);
+    if (state.quests.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(
+              Icons.flag_circle_outlined,
+              color: AppColors.primaryDark,
+              size: 20,
+            ),
+            const SizedBox(width: AppTheme.spacingSM),
+            Text('주간 도전', style: AppTypography.titleMedium(textColor)),
+          ],
+        ),
+        const SizedBox(height: AppTheme.spacingSM),
+        Text(
+          '매주 새로운 3개의 도전이 배정돼요',
+          style: AppTypography.bodySmall(subTextColor),
+        ),
+        const SizedBox(height: AppTheme.spacingMD),
+        ...state.quests.map(
+          (quest) => Padding(
+            padding: const EdgeInsets.only(bottom: AppTheme.spacingMD),
+            child: _WeeklyQuestCard(
+              quest: quest,
+              textColor: textColor,
+              subTextColor: subTextColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// 주간 퀘스트 카드
+class _WeeklyQuestCard extends ConsumerWidget {
+  final ActiveWeeklyQuest quest;
+  final Color textColor;
+  final Color subTextColor;
+
+  const _WeeklyQuestCard({
+    required this.quest,
+    required this.textColor,
+    required this.subTextColor,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final def = quest.def;
+    if (def == null) return const SizedBox.shrink();
+
+    final isClaimable = quest.isCompleted && !quest.rewardClaimed;
+    final isDone = quest.rewardClaimed;
+
+    return GlassCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: isDone
+                  ? AppColors.success.withValues(alpha: 0.15)
+                  : AppColors.gold.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              isDone ? Icons.check_circle : iconFromName(def.iconName),
+              color: isDone ? AppColors.success : AppColors.goldDark,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: AppTheme.spacingMD),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(def.title, style: AppTypography.titleMedium(textColor)),
+                const SizedBox(height: 2),
+                Text(
+                  def.description,
+                  style: AppTypography.bodySmall(subTextColor),
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: quest.progressPercent,
+                    minHeight: 6,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                    color: isDone ? AppColors.success : AppColors.primaryDark,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      '${quest.progress} / ${def.target}',
+                      style: AppTypography.label(subTextColor),
+                    ),
+                    const Spacer(),
+                    const TalentIcon(size: 12),
+                    const SizedBox(width: 2),
+                    Text(
+                      '+${def.rewardFp}',
+                      style: AppTypography.label(AppColors.goldDark),
+                    ),
+                  ],
+                ),
+                if (isClaimable) ...[
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 36,
+                    child: ElevatedButton.icon(
+                      onPressed: () => _claimReward(context, ref),
+                      icon: const Icon(Icons.card_giftcard, size: 16),
+                      label: const Text('보상 받기'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.gold,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppTheme.radiusRound,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ] else if (isDone) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '보상 수령 완료',
+                    style: AppTypography.label(AppColors.success),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _claimReward(BuildContext context, WidgetRef ref) async {
+    final reward = await ref
+        .read(weeklyQuestProvider.notifier)
+        .claimReward(quest.defId);
+    if (reward <= 0) return;
+
+    await ref.read(authProvider.notifier).addFaithPoints(reward);
+
+    if (!context.mounted) return;
+    final size = MediaQuery.of(context).size;
+    PointToast.show(
+      context,
+      points: reward,
+      sourceOffset: Offset(size.width / 2, size.height * 0.3),
     );
   }
 }

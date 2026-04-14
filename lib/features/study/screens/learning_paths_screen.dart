@@ -44,11 +44,13 @@ class LearningPathsScreen extends ConsumerWidget {
     );
     final pathMarkLessons = LessonDataStore.getLessonsForPath('path-mark');
     final pathLukeLessons = LessonDataStore.getLessonsForPath('path-luke');
+    final pathJohnLessons = LessonDataStore.getLessonsForPath('path-john');
     final path1Completed = progress.completedCountForPath('path-1');
     final path2Completed = progress.completedCountForPath('path-2');
     final pathMatthewCompleted = progress.completedCountForPath('path-matthew');
     final pathMarkCompleted = progress.completedCountForPath('path-mark');
     final pathLukeCompleted = progress.completedCountForPath('path-luke');
+    final pathJohnCompleted = progress.completedCountForPath('path-john');
 
     return Scaffold(
       appBar: AppBar(
@@ -129,6 +131,24 @@ class LearningPathsScreen extends ConsumerWidget {
             onTap: () {
               final nextLesson = _nextLessonId('path-luke', progress);
               context.push('/study/path-luke/$nextLesson/scripture');
+            },
+          ),
+          const SizedBox(height: AppTheme.spacingLG),
+
+          // 경로 요한복음: 요한복음 여정 (1~2장만 반영, 나머지는 준비 중)
+          _LearningPathCard(
+            title: '요한복음 여정',
+            description:
+                '생명의 빛이신 예수님을 만나는 여정이에요. '
+                '현재 1~2장 묵상이 준비되어 있어요.',
+            difficulty: '입문',
+            totalDays: pathJohnLessons.length,
+            completedDays: pathJohnCompleted,
+            iconData: Icons.auto_stories,
+            iconColor: const Color(0xFF9B59B6),
+            onTap: () {
+              final nextLesson = _nextLessonId('path-john', progress);
+              context.push('/study/path-john/$nextLesson/scripture');
             },
           ),
           const SizedBox(height: AppTheme.spacingLG),

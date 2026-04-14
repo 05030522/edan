@@ -4,11 +4,29 @@ import '../../core/constants/app_constants.dart';
 import '../../features/achievements/providers/achievement_provider.dart';
 import '../../features/auth/providers/auth_provider.dart';
 import '../../features/home/providers/daily_tasks_provider.dart';
+import '../../features/quests/providers/weekly_quest_provider.dart';
 import '../widgets/achievement_toast.dart';
 import '../widgets/streak_celebration.dart';
 
 /// 태스크 완료 후 스트릭 체크 공통 유틸
 class StreakHelper {
+  /// 개별 태스크 완료 시 주간 퀘스트 진행도 증가
+  ///
+  /// 각 태스크 완료 시점에 홈 화면에서 호출해줘야 해요.
+  static Future<void> trackTaskCompletion(
+    WidgetRef ref,
+    DailyTaskType type,
+  ) async {
+    final notifier = ref.read(weeklyQuestProvider.notifier);
+    final condition = switch (type) {
+      DailyTaskType.meditation => 'meditation_week',
+      DailyTaskType.prayer => 'prayer_week',
+      DailyTaskType.bibleReading => 'bible_week',
+    };
+    await notifier.incrementProgress(condition);
+    await notifier.incrementProgress('all_task_week');
+  }
+
   /// 모든 일일 태스크가 완료되었으면 스트릭 업데이트 + 축하 표시
   ///
   /// 반환: 축하 다이얼로그가 사용자에 의해 닫힌 뒤 resolve되는 Future.
@@ -33,6 +51,11 @@ class StreakHelper {
     if (milestoneBonus != null) {
       await ref.read(authProvider.notifier).addFaithPoints(milestoneBonus);
     }
+
+    // 주간 퀘스트: 퍼펙트 데이 진행도 증가
+    await ref
+        .read(weeklyQuestProvider.notifier)
+        .incrementProgress('perfect_day_week');
 
     // 축하 다이얼로그 (사용자가 닫을 때까지 await)
     if (!context.mounted) return;

@@ -1,3 +1,4 @@
+import '../data/john_meditation_data.dart';
 import '../data/luke_meditation_data.dart';
 import '../data/mark_meditation_data.dart';
 import '../data/matthew_meditation_data.dart';
@@ -124,6 +125,15 @@ class LessonDataStore {
         return null;
       }
     }
+    if (pathId == 'path-john') {
+      try {
+        return JohnMeditationData.lessons.firstWhere(
+          (l) => l.lessonId == lessonId,
+        );
+      } catch (_) {
+        return null;
+      }
+    }
 
     try {
       return lessons.firstWhere(
@@ -139,6 +149,7 @@ class LessonDataStore {
     if (pathId == 'path-matthew') return MatthewMeditationData.lessons;
     if (pathId == 'path-mark') return MarkMeditationData.lessons;
     if (pathId == 'path-luke') return LukeMeditationData.lessons;
+    if (pathId == 'path-john') return JohnMeditationData.lessons;
     return lessons.where((l) => l.pathId == pathId).toList();
   }
 

@@ -9,6 +9,15 @@ import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/store_provider.dart';
 
+/// 상점 아이템 카테고리
+enum StoreCategory { profile, garden }
+
+/// 상점 아이템 서브타입 (장착 가능 여부/규칙 판별)
+enum StoreSubtype { frame, title, background, gardenDecor }
+
+/// 아이템 희귀도
+enum StoreRarity { common, rare, epic, legendary }
+
 /// 상점 아이템 모델
 class StoreItem {
   final String id;
@@ -17,9 +26,9 @@ class StoreItem {
   final int price;
   final IconData icon;
   final Color color;
-  final String category; // 'profile' or 'garden'
-  final String rarity; // 'common', 'rare', 'epic', 'legendary'
-  final bool isPurchased;
+  final StoreCategory category;
+  final StoreSubtype subtype;
+  final StoreRarity rarity;
 
   const StoreItem({
     required this.id,
@@ -29,35 +38,26 @@ class StoreItem {
     required this.icon,
     required this.color,
     required this.category,
-    this.rarity = 'common',
-    this.isPurchased = false,
+    required this.subtype,
+    this.rarity = StoreRarity.common,
   });
 
-  Color get rarityColor {
-    switch (rarity) {
-      case 'rare':
-        return Colors.blue;
-      case 'epic':
-        return Colors.purple;
-      case 'legendary':
-        return AppColors.gold;
-      default:
-        return Colors.grey;
-    }
-  }
+  bool get isEquippable =>
+      subtype == StoreSubtype.frame || subtype == StoreSubtype.title;
 
-  String get rarityLabel {
-    switch (rarity) {
-      case 'rare':
-        return '희귀';
-      case 'epic':
-        return '에픽';
-      case 'legendary':
-        return '전설';
-      default:
-        return '일반';
-    }
-  }
+  Color get rarityColor => switch (rarity) {
+    StoreRarity.rare => Colors.blue,
+    StoreRarity.epic => Colors.purple,
+    StoreRarity.legendary => AppColors.gold,
+    StoreRarity.common => Colors.grey,
+  };
+
+  String get rarityLabel => switch (rarity) {
+    StoreRarity.rare => '희귀',
+    StoreRarity.epic => '에픽',
+    StoreRarity.legendary => '전설',
+    StoreRarity.common => '일반',
+  };
 }
 
 /// 상점 아이템 조회 (id 기반)
@@ -80,8 +80,9 @@ const _profileItems = [
     price: 200,
     icon: Icons.filter_frames,
     color: AppColors.gold,
-    category: 'profile',
-    rarity: 'rare',
+    category: StoreCategory.profile,
+    subtype: StoreSubtype.frame,
+    rarity: StoreRarity.rare,
   ),
   StoreItem(
     id: 'frame_rainbow',
@@ -90,8 +91,9 @@ const _profileItems = [
     price: 500,
     icon: Icons.filter_frames,
     color: Colors.purple,
-    category: 'profile',
-    rarity: 'epic',
+    category: StoreCategory.profile,
+    subtype: StoreSubtype.frame,
+    rarity: StoreRarity.epic,
   ),
   StoreItem(
     id: 'title_prayer',
@@ -100,7 +102,8 @@ const _profileItems = [
     price: 150,
     icon: Icons.military_tech,
     color: Colors.orange,
-    category: 'profile',
+    category: StoreCategory.profile,
+    subtype: StoreSubtype.title,
   ),
   StoreItem(
     id: 'title_faithful',
@@ -109,8 +112,9 @@ const _profileItems = [
     price: 300,
     icon: Icons.military_tech,
     color: Colors.teal,
-    category: 'profile',
-    rarity: 'rare',
+    category: StoreCategory.profile,
+    subtype: StoreSubtype.title,
+    rarity: StoreRarity.rare,
   ),
   StoreItem(
     id: 'title_eden',
@@ -119,8 +123,9 @@ const _profileItems = [
     price: 2000,
     icon: Icons.military_tech,
     color: AppColors.gold,
-    category: 'profile',
-    rarity: 'legendary',
+    category: StoreCategory.profile,
+    subtype: StoreSubtype.title,
+    rarity: StoreRarity.legendary,
   ),
   StoreItem(
     id: 'bg_sunset',
@@ -129,8 +134,9 @@ const _profileItems = [
     price: 250,
     icon: Icons.wallpaper,
     color: Colors.deepOrange,
-    category: 'profile',
-    rarity: 'rare',
+    category: StoreCategory.profile,
+    subtype: StoreSubtype.background,
+    rarity: StoreRarity.rare,
   ),
 ];
 
@@ -142,7 +148,8 @@ const _gardenItems = [
     price: 100,
     icon: Icons.park,
     color: Colors.green,
-    category: 'garden',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
   ),
   StoreItem(
     id: 'flower_lily',
@@ -151,7 +158,8 @@ const _gardenItems = [
     price: 80,
     icon: Icons.local_florist,
     color: Colors.white,
-    category: 'garden',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
   ),
   StoreItem(
     id: 'flower_rose',
@@ -160,8 +168,9 @@ const _gardenItems = [
     price: 120,
     icon: Icons.local_florist,
     color: Colors.pink,
-    category: 'garden',
-    rarity: 'rare',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
+    rarity: StoreRarity.rare,
   ),
   StoreItem(
     id: 'animal_dove',
@@ -170,8 +179,9 @@ const _gardenItems = [
     price: 300,
     icon: Icons.flutter_dash,
     color: Colors.white,
-    category: 'garden',
-    rarity: 'rare',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
+    rarity: StoreRarity.rare,
   ),
   StoreItem(
     id: 'animal_lamb',
@@ -180,7 +190,8 @@ const _gardenItems = [
     price: 200,
     icon: Icons.pets,
     color: Colors.brown,
-    category: 'garden',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
   ),
   StoreItem(
     id: 'tree_fig',
@@ -189,7 +200,8 @@ const _gardenItems = [
     price: 150,
     icon: Icons.nature,
     color: Colors.green,
-    category: 'garden',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
   ),
   StoreItem(
     id: 'fountain',
@@ -198,8 +210,9 @@ const _gardenItems = [
     price: 500,
     icon: Icons.water_drop,
     color: Colors.lightBlue,
-    category: 'garden',
-    rarity: 'epic',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
+    rarity: StoreRarity.epic,
   ),
   StoreItem(
     id: 'tree_life',
@@ -208,8 +221,9 @@ const _gardenItems = [
     price: 3000,
     icon: Icons.eco,
     color: AppColors.gardenParadise,
-    category: 'garden',
-    rarity: 'legendary',
+    category: StoreCategory.garden,
+    subtype: StoreSubtype.gardenDecor,
+    rarity: StoreRarity.legendary,
   ),
 ];
 
@@ -318,10 +332,8 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
   /// 장착/해제 다이얼로그
   void _showEquipDialog(StoreItem item) {
     final store = ref.read(storeProvider);
-    final isFrame = item.id.startsWith('frame_');
-    final isTitle = item.id.startsWith('title_');
 
-    if (!isFrame && !isTitle) {
+    if (!item.isEquippable) {
       // 정원/배경 아이템은 장착 개념 없음
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -335,6 +347,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
       return;
     }
 
+    final isFrame = item.subtype == StoreSubtype.frame;
     final isEquipped = isFrame
         ? store.equippedFrame == item.id
         : store.equippedTitle == item.id;
@@ -479,7 +492,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
               border: Border.all(
                 color: isEquipped
                     ? AppColors.primaryDark
-                    : item.rarity != 'common'
+                    : item.rarity != StoreRarity.common
                     ? item.rarityColor.withValues(alpha: 0.3)
                     : (isDark ? Colors.white12 : Colors.grey.shade200),
                 width: isEquipped ? 2 : 1,
@@ -520,7 +533,7 @@ class _StoreScreenState extends ConsumerState<StoreScreen>
                       const SizedBox.shrink(),
 
                     // 레어도 뱃지
-                    if (item.rarity != 'common')
+                    if (item.rarity != StoreRarity.common)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 6,

@@ -479,6 +479,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (reward > 0) {
       // 프로필 달란트 즉시 반영
       ref.read(authProvider.notifier).addFaithPoints(reward);
+      // 주간 퀘스트 진행도 증가
+      StreakHelper.trackTaskCompletion(ref, type);
 
       final size = MediaQuery.of(context).size;
       PointToast.show(
