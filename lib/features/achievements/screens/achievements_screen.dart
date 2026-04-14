@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/utils/icon_helper.dart';
 import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../../quests/models/quest.dart';
@@ -136,7 +137,7 @@ class _AchievementTile extends StatelessWidget {
               child: Icon(
                 isHidden
                     ? Icons.help_outline
-                    : _iconFromName(achievement.iconName),
+                    : iconFromName(achievement.iconName),
                 color: unlocked ? AppColors.gold : subTextColor,
                 size: 28,
               ),
@@ -192,21 +193,5 @@ class _AchievementTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static IconData _iconFromName(String name) {
-    const map = <String, IconData>{
-      'menu_book': Icons.menu_book,
-      'volunteer_activism': Icons.volunteer_activism,
-      'auto_stories': Icons.auto_stories,
-      'local_fire_department': Icons.local_fire_department,
-      'emoji_events': Icons.emoji_events,
-      'spa': Icons.spa,
-      'nature': Icons.nature,
-      'eco': Icons.eco,
-      'auto_awesome': Icons.auto_awesome,
-      'monetization_on': Icons.monetization_on,
-    };
-    return map[name] ?? Icons.star;
   }
 }

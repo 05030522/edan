@@ -80,21 +80,17 @@ class AchievementNotifier extends StateNotifier<AchievementState> {
     }
   }
 
-  /// 활동 카운터 읽기
-  Future<int> _getCounter(String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getInt(key) ?? 0;
-  }
-
   /// 조건 체크 후 새로 달성된 업적 반환
   Future<List<Achievement>> checkAndUnlock({
     required UserProfile profile,
   }) async {
     final newlyUnlocked = <Achievement>[];
 
-    final meditationCount = await _getCounter('total_meditation_count');
-    final prayerCount = await _getCounter('total_prayer_count');
-    final bibleCount = await _getCounter('total_bible_count');
+    // SharedPreferences 인스턴스 1회 획득 + 카운터 동시 읽기
+    final prefs = await SharedPreferences.getInstance();
+    final meditationCount = prefs.getInt('total_meditation_count') ?? 0;
+    final prayerCount = prefs.getInt('total_prayer_count') ?? 0;
+    final bibleCount = prefs.getInt('total_bible_count') ?? 0;
 
     for (final achievement in kAchievements) {
       if (state.isUnlocked(achievement.id)) continue;

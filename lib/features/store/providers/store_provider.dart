@@ -94,23 +94,23 @@ class StoreNotifier extends StateNotifier<StoreState> {
   }
 
   /// 프레임 장착/해제
-  void equipFrame(String? frameId) {
+  Future<void> equipFrame(String? frameId) async {
     if (frameId == state.equippedFrame) {
       state = state.copyWith(clearFrame: true);
     } else {
       state = state.copyWith(equippedFrame: frameId);
     }
-    _save();
+    await _save();
   }
 
   /// 칭호 장착/해제
-  void equipTitle(String? titleId) {
+  Future<void> equipTitle(String? titleId) async {
     if (titleId == state.equippedTitle) {
       state = state.copyWith(clearTitle: true);
     } else {
       state = state.copyWith(equippedTitle: titleId);
     }
-    _save();
+    await _save();
   }
 }
 

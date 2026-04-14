@@ -27,6 +27,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.initState();
     // 화면 진입 시 프로필 최신 데이터로 갱신
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       ref.read(authProvider.notifier).refreshProfile();
     });
   }
@@ -160,9 +161,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       const SizedBox(height: 6),
                       Builder(
                         builder: (context) {
-                          final titleItem = _findTitleItem(
-                            store.equippedTitle!,
-                          );
+                          final titleItem = findStoreItem(store.equippedTitle!);
                           return Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
@@ -402,46 +401,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
       ],
     );
-  }
-}
-
-/// 칭호 아이템 찾기 헬퍼
-StoreItem? _findTitleItem(String titleId) {
-  const titles = [
-    StoreItem(
-      id: 'title_prayer',
-      name: '칭호: 기도의 용사',
-      description: '',
-      price: 0,
-      icon: Icons.military_tech,
-      color: Colors.orange,
-      category: 'profile',
-    ),
-    StoreItem(
-      id: 'title_faithful',
-      name: '칭호: 충성된 종',
-      description: '',
-      price: 0,
-      icon: Icons.military_tech,
-      color: Colors.teal,
-      category: 'profile',
-      rarity: 'rare',
-    ),
-    StoreItem(
-      id: 'title_eden',
-      name: '칭호: 에덴의 수호자',
-      description: '',
-      price: 0,
-      icon: Icons.military_tech,
-      color: AppColors.gold,
-      category: 'profile',
-      rarity: 'legendary',
-    ),
-  ];
-  try {
-    return titles.firstWhere((t) => t.id == titleId);
-  } catch (_) {
-    return null;
   }
 }
 

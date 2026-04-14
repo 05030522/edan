@@ -60,6 +60,17 @@ class StoreItem {
   }
 }
 
+/// 상점 아이템 조회 (id 기반)
+StoreItem? findStoreItem(String id) {
+  for (final item in _profileItems) {
+    if (item.id == id) return item;
+  }
+  for (final item in _gardenItems) {
+    if (item.id == id) return item;
+  }
+  return null;
+}
+
 // 상점 아이템 목록
 const _profileItems = [
   StoreItem(

@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_typography.dart';
 import '../../features/quests/models/quest.dart';
+import '../utils/icon_helper.dart';
 import 'talent_icon.dart';
 
 /// 업적 달성 토스트 다이얼로그
@@ -77,7 +78,7 @@ class _AchievementDialog extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  _iconFromName(achievement.iconName),
+                  iconFromName(achievement.iconName),
                   color: Colors.white,
                   size: 44,
                 ),
@@ -207,21 +208,5 @@ class _AchievementDialog extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static IconData _iconFromName(String name) {
-    const map = <String, IconData>{
-      'menu_book': Icons.menu_book,
-      'volunteer_activism': Icons.volunteer_activism,
-      'auto_stories': Icons.auto_stories,
-      'local_fire_department': Icons.local_fire_department,
-      'emoji_events': Icons.emoji_events,
-      'spa': Icons.spa,
-      'nature': Icons.nature,
-      'eco': Icons.eco,
-      'auto_awesome': Icons.auto_awesome,
-      'monetization_on': Icons.monetization_on,
-    };
-    return map[name] ?? Icons.star;
   }
 }
