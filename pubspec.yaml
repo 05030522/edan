@@ -57,6 +57,7 @@ dev_dependencies:
   riverpod_generator: ^2.6.3
   build_runner: ^2.4.14
   json_serializable: ^6.9.4
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
@@ -65,3 +66,23 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/sounds/
+
+# ─── 앱 아이콘 자동 생성 설정 ───
+# 사용: dart run flutter_launcher_icons
+# 참고: 현재 루양.png는 크림색 배경. 완전한 투명 배경은 별도 이미지 에디터로
+#       배경 제거 후 assets/images/icon_luyang.png로 저장 → image_path 변경.
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/images/루양.png"
+  min_sdk_android: 21
+  # 안드로이드 어댑티브 아이콘 (Android 8.0+)
+  adaptive_icon_background: "#B8D4BE"  # 에덴 그린 (브랜드)
+  adaptive_icon_foreground: "assets/images/루양.png"
+  # 웹 favicon
+  web:
+    generate: true
+    image_path: "assets/images/루양.png"
+    background_color: "#FDF6ED"  # 새벽빛 (라이트 모드 배경)
+    theme_color: "#B8D4BE"
