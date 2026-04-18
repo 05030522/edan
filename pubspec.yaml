@@ -48,7 +48,7 @@ dependencies:
   http: ^1.6.0
 
   # Crash Reporting & Analytics
-  sentry_flutter: ^8.12.0
+  sentry_flutter: ^9.18.0
 
 dev_dependencies:
   flutter_test:
