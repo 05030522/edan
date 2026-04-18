@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/utils/context_theme.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../providers/daily_tasks_provider.dart';
 
@@ -54,13 +55,9 @@ class DailyTaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark
-        ? AppColors.darkTextPrimary
-        : AppColors.lightTextPrimary;
-    final subTextColor = isDark
-        ? AppColors.darkTextSecondary
-        : AppColors.lightTextSecondary;
+    final isDark = context.isDark;
+    final textColor = context.textPrimary;
+    final subTextColor = context.textSecondary;
     final cardColor = isDark
         ? Colors.white.withValues(alpha: 0.06)
         : Colors.white.withValues(alpha: 0.8);

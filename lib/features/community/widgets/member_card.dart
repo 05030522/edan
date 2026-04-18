@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../shared/utils/context_theme.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../models/church_member.dart';
 
@@ -27,13 +28,8 @@ class MemberCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark
-        ? AppColors.darkTextPrimary
-        : AppColors.lightTextPrimary;
-    final subTextColor = isDark
-        ? AppColors.darkTextSecondary
-        : AppColors.lightTextSecondary;
+    final textColor = context.textPrimary;
+    final subTextColor = context.textSecondary;
 
     final levelIndex = (member.currentLevel - 1).clamp(
       0,

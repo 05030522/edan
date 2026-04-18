@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../shared/utils/context_theme.dart';
 
 /// 주간 캘린더 스트립 위젯
 /// 월~일 7칸, 오늘 날짜 강조, 완료 상태 표시
@@ -15,13 +16,8 @@ class WeeklyCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark
-        ? AppColors.darkTextPrimary
-        : AppColors.lightTextPrimary;
-    final subTextColor = isDark
-        ? AppColors.darkTextSecondary
-        : AppColors.lightTextSecondary;
+    final textColor = context.textPrimary;
+    final subTextColor = context.textSecondary;
 
     final now = DateTime.now();
     // 현재 요일 (월=0 ~ 일=6)

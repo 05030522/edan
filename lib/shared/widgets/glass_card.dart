@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
+import '../utils/context_theme.dart';
 
 /// Glass-style card with semi-transparent background.
 ///
@@ -26,7 +26,7 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isDark = context.isDark;
 
     final Color backgroundColor = isDark
         ? Colors.white.withValues(alpha: opacity ?? 0.08)

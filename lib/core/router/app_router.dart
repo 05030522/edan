@@ -94,6 +94,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/welcome/auth/callback',
         builder: (context, state) => const _AuthCallbackScreen(),
       ),
+      // ─── 공개 법적 문서 (인증 불필요, Play Store/App Store 심사자용) ───
+      GoRoute(
+        path: '/privacy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(path: '/terms', builder: (context, state) => const TermsScreen()),
       // ─── 온보딩 플로우 (내비게이션 바 없음) ───
       GoRoute(
         path: AppRoutes.onboardingName,

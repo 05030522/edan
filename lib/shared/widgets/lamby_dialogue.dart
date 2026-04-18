@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../utils/context_theme.dart';
 
 /// A speech bubble from the Lamby character.
 ///
@@ -76,13 +77,10 @@ class _LambyDialogueState extends State<LambyDialogue>
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color bubbleColor = isDark
+    final Color bubbleColor = context.isDark
         ? AppColors.darkBackgroundSecondary
         : Colors.white;
-    final Color textColor = isDark
-        ? AppColors.darkTextPrimary
-        : AppColors.lightTextPrimary;
+    final Color textColor = context.textPrimary;
 
     return FadeTransition(
       opacity: _opacity,

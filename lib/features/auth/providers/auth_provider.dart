@@ -7,7 +7,7 @@ import '../../../core/services/supabase_service.dart';
 import '../../../core/services/social_auth_service.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../core/constants/supabase_constants.dart';
-import '../../../core/constants/app_constants.dart';
+import '../../../shared/utils/level_calculator.dart';
 
 /// 인증 상태
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
@@ -216,26 +216,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// FP에 따른 레벨 계산
-  int _calculateLevel(int fp) {
-    final thresholds = AppConstants.levelThresholds;
-    int level = 1;
-    for (int i = thresholds.length - 1; i >= 0; i--) {
-      if (fp >= thresholds[i]) {
-        level = i + 1;
-        break;
-      }
-    }
-    return level;
-  }
-
   /// 달란트 추가 (로컬 즉시 반영 + 자동 레벨업 + 서버 비동기 저장)
   Future<void> addFaithPoints(int points) async {
     final profile = state.profile;
     if (profile == null || points <= 0) return;
 
     final newFp = profile.faithPoints + points;
-    final newLevel = _calculateLevel(newFp);
+    final newLevel = LevelCalculator.calculate(newFp);
 
     final updated = profile.copyWith(
       faithPoints: newFp,
