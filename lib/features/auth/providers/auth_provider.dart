@@ -7,6 +7,7 @@ import '../../../core/services/supabase_service.dart';
 import '../../../core/services/social_auth_service.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../core/constants/supabase_constants.dart';
+import '../../../shared/models/app_error.dart';
 import '../../../shared/utils/level_calculator.dart';
 
 /// 인증 상태
@@ -116,9 +117,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // 성공 시 onAuthStateChange 리스너가 상태를 업데이트함
     } catch (e) {
       debugPrint('소셜 로그인 에러: $e');
+      final err = AppError.from(e);
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
-        error: '로그인 중 오류가 발생했습니다: ${e.toString()}',
+        error: err.message,
       );
     }
   }
