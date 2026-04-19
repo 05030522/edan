@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/context_theme.dart';
+
 /// 루양 캐릭터 이미지 위젯.
 ///
 /// 에셋 이미지(`assets/images/루양.png`)를 원형 또는 사각형으로 표시하며,
@@ -86,10 +88,9 @@ class _LuyangImageState extends State<LuyangImage>
   }
 
   Widget _buildImage(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor =
         widget.backgroundColor ??
-        (isDark
+        (context.isDark
             ? const Color(0xFF2A3A2E) // 다크 모드: 어두운 에덴 그린
             : const Color(0xFFF5F0E6)); // 라이트 모드: 따뜻한 크림색 (루양 배경과 자연스러움)
 

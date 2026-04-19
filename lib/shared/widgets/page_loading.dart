@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../utils/context_theme.dart';
 
 /// 페이지 전환 시 표시되는 자연스러운 로딩 화면
 /// 앱 테마에 맞는 미니멀한 로딩 인디케이터
@@ -43,13 +44,8 @@ class _PageLoadingState extends State<PageLoading>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark
-        ? AppColors.darkBackground
-        : AppColors.lightBackground;
-    final textColor = isDark
-        ? AppColors.darkTextSecondary
-        : AppColors.lightTextSecondary;
+    final backgroundColor = context.bg;
+    final textColor = context.textSecondary;
 
     return Scaffold(
       backgroundColor: backgroundColor,

@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/theme/app_typography.dart';
 import '../../features/quests/models/quest.dart';
+import '../utils/context_theme.dart';
 import '../utils/icon_helper.dart';
 import 'celebration_particles.dart';
 import 'talent_icon.dart';
@@ -44,7 +45,7 @@ class _AchievementDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDark;
 
     return Center(
       child: Stack(
