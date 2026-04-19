@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/context_theme.dart';
+
 /// 스켈레톤 로딩 위젯 (shimmer 효과)
 class ShimmerLoading extends StatefulWidget {
   const ShimmerLoading({
@@ -38,7 +40,7 @@ class _ShimmerLoadingState extends State<ShimmerLoading>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDark;
     final baseColor = isDark ? Colors.white12 : Colors.grey.shade200;
     final highlightColor = isDark ? Colors.white24 : Colors.grey.shade100;
 

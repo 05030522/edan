@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/services/social_auth_service.dart';
 import '../../core/theme/app_typography.dart';
+import '../utils/context_theme.dart';
 
 /// 소셜 로그인 버튼 위젯
 /// 카카오(노란색), 구글(흰색), 네이버(녹색) 브랜드 가이드라인 준수
@@ -282,7 +283,7 @@ class SocialLoginButtonGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = context.isDark;
     final dividerColor = isDark ? Colors.white24 : Colors.black12;
     final orTextColor = isDark ? Colors.white54 : Colors.black45;
 

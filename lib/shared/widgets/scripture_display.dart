@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../utils/context_theme.dart';
 
 /// Displays a Bible verse with a gold left border and serif typography.
 ///
@@ -38,16 +39,10 @@ class ScriptureDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color textColor = isDark
-        ? AppColors.darkTextPrimary
-        : AppColors.lightTextPrimary;
-    final Color refColor = isDark
-        ? AppColors.darkTextSecondary
-        : AppColors.lightTextSecondary;
+    final Color textColor = context.textPrimary;
+    final Color refColor = context.textSecondary;
     final Color effectiveBorderColor = borderColor ?? AppColors.gold;
-    final Color effectiveBackground =
-        backgroundColor ?? (isDark ? AppColors.darkCard : AppColors.lightCard);
+    final Color effectiveBackground = backgroundColor ?? context.card;
 
     return Container(
       padding: padding ?? const EdgeInsets.all(16),
