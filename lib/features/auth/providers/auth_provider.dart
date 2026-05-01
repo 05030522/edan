@@ -10,6 +10,31 @@ import '../../../core/constants/supabase_constants.dart';
 import '../../../shared/models/app_error.dart';
 import '../../../shared/utils/level_calculator.dart';
 
+/// 현재 OAuth 사용자 metadata에서 프사 URL 추출.
+///
+/// 카카오/구글/네이버가 각기 다른 키를 쓰므로 후보를 순회.
+/// - 카카오: `avatar_url` 또는 `picture`
+/// - 구글: `picture` 또는 `avatar_url`
+/// - 네이버: `picture` 또는 `profile_image`
+///
+/// 신규 프로필 생성(complete_screen) 및 기존 프로필 백필(auth_provider) 양쪽에서 사용.
+String? extractOAuthAvatarUrl() {
+  final metadata = SupabaseService.currentUser?.userMetadata;
+  if (metadata == null) return null;
+
+  const candidateKeys = [
+    'avatar_url',
+    'picture',
+    'profile_image',
+    'profile_image_url',
+  ];
+  for (final key in candidateKeys) {
+    final value = metadata[key];
+    if (value is String && value.isNotEmpty) return value;
+  }
+  return null;
+}
+
 /// 인증 상태
 enum AuthStatus { initial, authenticated, unauthenticated, loading }
 
@@ -83,6 +108,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// 프로필 로드
+  ///
+  /// avatar_url이 비어 있으면 OAuth metadata에서 자동 백필.
   Future<void> _loadProfile() async {
     final userId = SupabaseService.currentUserId;
     if (userId == null) return;
@@ -95,10 +122,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
           .maybeSingle();
 
       if (data != null) {
-        state = state.copyWith(profile: UserProfile.fromJson(data));
+        var profile = UserProfile.fromJson(data);
+
+        // OAuth 프사 자동 동기화: 프로필에 avatar_url이 없는 경우만 채움
+        if (profile.avatarUrl == null) {
+          final oauthAvatar = extractOAuthAvatarUrl();
+          if (oauthAvatar != null) {
+            profile = profile.copyWith(avatarUrl: oauthAvatar);
+            // 서버에도 비동기 저장 (실패해도 로컬은 반영됨)
+            unawaited(_persistAvatarUrl(userId, oauthAvatar));
+          }
+        }
+
+        state = state.copyWith(profile: profile);
       }
     } catch (e) {
       debugPrint('프로필 로드 실패: $e');
+    }
+  }
+
+  /// avatar_url을 서버 profiles 테이블에 비동기 저장.
+  Future<void> _persistAvatarUrl(String userId, String avatarUrl) async {
+    try {
+      await SupabaseService.client
+          .from(SupabaseConstants.tableProfiles)
+          .update({'avatar_url': avatarUrl})
+          .eq('id', userId);
+    } catch (e) {
+      debugPrint('avatar_url 저장 실패: $e');
     }
   }
 
@@ -169,6 +220,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
     if (profile.churchId != oldProfile.churchId) {
       changes['church_id'] = profile.churchId;
+    }
+    if (profile.avatarUrl != oldProfile.avatarUrl) {
+      changes['avatar_url'] = profile.avatarUrl;
     }
     if (profile.darkMode != oldProfile.darkMode) {
       changes['dark_mode'] = profile.darkMode;

@@ -128,11 +128,33 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                           color: AppColors.primary.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
-                          Icons.person,
-                          color: AppColors.primaryDark,
-                          size: 40,
-                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: profile?.avatarUrl != null
+                            ? Image.network(
+                                profile!.avatarUrl!,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                                errorBuilder: (context, error, stack) =>
+                                    const Icon(
+                                      Icons.person,
+                                      color: AppColors.primaryDark,
+                                      size: 40,
+                                    ),
+                                loadingBuilder: (context, child, progress) {
+                                  if (progress == null) return child;
+                                  return const Icon(
+                                    Icons.person,
+                                    color: AppColors.primaryDark,
+                                    size: 40,
+                                  );
+                                },
+                              )
+                            : const Icon(
+                                Icons.person,
+                                color: AppColors.primaryDark,
+                                size: 40,
+                              ),
                       ),
                     ),
                     const SizedBox(height: AppTheme.spacingMD),

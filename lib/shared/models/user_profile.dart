@@ -13,6 +13,14 @@ class UserProfile {
   String get displayNameWithTag => '$displayName $tag';
   final String? churchId;
   final String? churchName;
+
+  /// 프로필 사진 URL.
+  ///
+  /// - OAuth 로그인 시 자동 채워짐 (카카오/구글/네이버 프사)
+  /// - 사용자가 갤러리에서 직접 업로드 시 Supabase Storage URL로 교체
+  /// - null이면 기본 아이콘 표시
+  final String? avatarUrl;
+
   final int faithPoints;
   final int currentLevel;
   final int currentStreak;
@@ -29,6 +37,7 @@ class UserProfile {
     required this.displayName,
     this.churchId,
     this.churchName,
+    this.avatarUrl,
     this.faithPoints = 0,
     this.currentLevel = 1,
     this.currentStreak = 0,
@@ -47,6 +56,7 @@ class UserProfile {
       displayName: json['display_name'] as String? ?? '',
       churchId: json['church_id'] as String?,
       churchName: json['church_name'] as String?,
+      avatarUrl: json['avatar_url'] as String?,
       faithPoints: json['faith_points'] as int? ?? 0,
       currentLevel: json['current_level'] as int? ?? 1,
       currentStreak: json['current_streak'] as int? ?? 0,
@@ -68,6 +78,7 @@ class UserProfile {
       'display_name': displayName,
       'church_id': churchId,
       'church_name': churchName,
+      'avatar_url': avatarUrl,
       'faith_points': faithPoints,
       'current_level': currentLevel,
       'current_streak': currentStreak,
@@ -81,11 +92,14 @@ class UserProfile {
   }
 
   /// clearChurchName: true면 교회를 null로 초기화
+  /// clearAvatarUrl: true면 프로필 사진을 null로 초기화 (제거)
   UserProfile copyWith({
     String? displayName,
     String? churchId,
     String? churchName,
     bool clearChurchName = false,
+    String? avatarUrl,
+    bool clearAvatarUrl = false,
     int? faithPoints,
     int? currentLevel,
     int? currentStreak,
@@ -100,6 +114,7 @@ class UserProfile {
       displayName: displayName ?? this.displayName,
       churchId: churchId ?? this.churchId,
       churchName: clearChurchName ? null : (churchName ?? this.churchName),
+      avatarUrl: clearAvatarUrl ? null : (avatarUrl ?? this.avatarUrl),
       faithPoints: faithPoints ?? this.faithPoints,
       currentLevel: currentLevel ?? this.currentLevel,
       currentStreak: currentStreak ?? this.currentStreak,

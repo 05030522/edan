@@ -117,17 +117,24 @@ class OnboardingCompleteScreen extends ConsumerWidget {
                       final currentProfile = ref.read(authProvider).profile;
                       final now = DateTime.now();
 
+                      // OAuth 프사 URL (카카오/구글/네이버에서 자동 가져옴)
+                      final oauthAvatar = extractOAuthAvatarUrl();
+
                       final updatedProfile = currentProfile != null
                           ? currentProfile.copyWith(
                               displayName: onboardingData.name,
                               churchName: onboardingData.churchName,
                               notificationTime:
                                   onboardingData.notificationTimeFormatted,
+                              // 기존에 avatarUrl 없으면 OAuth 프사 적용
+                              avatarUrl:
+                                  currentProfile.avatarUrl ?? oauthAvatar,
                             )
                           : UserProfile(
                               id: userId,
                               displayName: onboardingData.name,
                               churchName: onboardingData.churchName,
+                              avatarUrl: oauthAvatar,
                               notificationTime:
                                   onboardingData.notificationTimeFormatted,
                               faithPoints: 10, // 온보딩 완료 보너스

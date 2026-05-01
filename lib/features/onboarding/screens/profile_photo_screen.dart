@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../providers/onboarding_provider.dart';
 
 /// 온보딩 - 프로필 사진 설정 화면
@@ -22,6 +23,9 @@ class OnboardingPhotoScreen extends ConsumerStatefulWidget {
 class _OnboardingPhotoScreenState extends ConsumerState<OnboardingPhotoScreen> {
   Uint8List? _imageBytes;
   bool _isLoading = false;
+
+  /// OAuth(카카오/구글/네이버) 프사 URL — 갤러리에서 안 골랐을 때 폴백
+  String? get _oauthAvatarUrl => extractOAuthAvatarUrl();
 
   Future<void> _pickImage() async {
     setState(() => _isLoading = true);
@@ -110,7 +114,9 @@ class _OnboardingPhotoScreenState extends ConsumerState<OnboardingPhotoScreen> {
               ),
               const SizedBox(height: AppTheme.spacingSM),
               Text(
-                '언제든지 변경할 수 있어요',
+                _oauthAvatarUrl != null
+                    ? '소셜 계정 사진이 자동 적용됐어요. 바꾸려면 탭하세요'
+                    : '언제든지 변경할 수 있어요',
                 style: AppTypography.bodyMedium(subTextColor),
               ),
 
@@ -151,6 +157,20 @@ class _OnboardingPhotoScreenState extends ConsumerState<OnboardingPhotoScreen> {
                                       height: 130,
                                     ),
                                   )
+                                : _oauthAvatarUrl != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      _oauthAvatarUrl!,
+                                      fit: BoxFit.cover,
+                                      width: 130,
+                                      height: 130,
+                                      errorBuilder: (c, e, s) => const Icon(
+                                        Icons.person,
+                                        size: 64,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  )
                                 : const Icon(
                                     Icons.person,
                                     size: 64,
@@ -185,11 +205,13 @@ class _OnboardingPhotoScreenState extends ConsumerState<OnboardingPhotoScreen> {
 
               const Spacer(),
 
-              // 다음 버튼 (사진 선택 시 활성화)
+              // 다음 버튼 — OAuth 프사가 있거나 갤러리 사진 골랐으면 활성화
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _imageBytes != null ? _handleNext : null,
+                  onPressed: (_imageBytes != null || _oauthAvatarUrl != null)
+                      ? _handleNext
+                      : null,
                   child: Text('다음', style: AppTypography.button(Colors.white)),
                 ),
               ),
