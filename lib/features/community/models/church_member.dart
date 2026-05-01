@@ -2,6 +2,7 @@
 class ChurchMember {
   final String id;
   final String displayName;
+  final String? avatarUrl;
   final int currentLevel;
   final int currentStreak;
   final int faithPoints;
@@ -18,6 +19,7 @@ class ChurchMember {
   const ChurchMember({
     required this.id,
     required this.displayName,
+    this.avatarUrl,
     this.currentLevel = 1,
     this.currentStreak = 0,
     this.faithPoints = 0,
@@ -27,6 +29,7 @@ class ChurchMember {
     return ChurchMember(
       id: json['id'] as String,
       displayName: json['display_name'] as String? ?? '',
+      avatarUrl: json['avatar_url'] as String?,
       currentLevel: json['current_level'] as int? ?? 1,
       currentStreak: json['current_streak'] as int? ?? 0,
       faithPoints: json['faith_points'] as int? ?? 0,

@@ -63,11 +63,22 @@ class MemberCard extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.person,
-              color: AppColors.primaryDark,
-              size: 24,
-            ),
+            clipBehavior: Clip.antiAlias,
+            child: member.avatarUrl != null
+                ? Image.network(
+                    member.avatarUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (c, e, s) => const Icon(
+                      Icons.person,
+                      color: AppColors.primaryDark,
+                      size: 24,
+                    ),
+                  )
+                : const Icon(
+                    Icons.person,
+                    color: AppColors.primaryDark,
+                    size: 24,
+                  ),
           ),
           const SizedBox(width: AppTheme.spacingMD),
 

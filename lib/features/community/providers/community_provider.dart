@@ -172,7 +172,7 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
         data = await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
             .select(
-              'id, display_name, current_level, current_streak, faith_points',
+              'id, display_name, avatar_url, current_level, current_streak, faith_points',
             )
             .eq('church_id', profile.churchId!)
             .order('current_streak', ascending: false);
@@ -180,7 +180,7 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
         data = await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
             .select(
-              'id, display_name, current_level, current_streak, faith_points',
+              'id, display_name, avatar_url, current_level, current_streak, faith_points',
             )
             .eq('church_name', profile.churchName!)
             .order('current_streak', ascending: false);
@@ -236,7 +236,7 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
         final friendData = await SupabaseService.client
             .from(SupabaseConstants.tableProfiles)
             .select(
-              'id, display_name, current_level, current_streak, faith_points',
+              'id, display_name, avatar_url, current_level, current_streak, faith_points',
             )
             .inFilter('id', friendIds);
 
@@ -328,7 +328,7 @@ class CommunityNotifier extends StateNotifier<CommunityState> {
       final data = await SupabaseService.client
           .from(SupabaseConstants.tableProfiles)
           .select(
-            'id, display_name, current_level, current_streak, faith_points',
+            'id, display_name, avatar_url, current_level, current_streak, faith_points',
           )
           .order(orderCol, ascending: false)
           .limit(50);
