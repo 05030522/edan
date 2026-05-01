@@ -11,7 +11,7 @@ import '../../../shared/widgets/glass_card.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../store/providers/store_provider.dart';
-import '../../store/screens/store_screen.dart';
+import '../../store/screens/store_screen.dart' show findStoreItem;
 
 /// 프로필 화면
 class ProfileScreen extends ConsumerStatefulWidget {

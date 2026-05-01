@@ -349,7 +349,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
 
-      // ─── 상점 (풀스크린) ───
+      // ─── 상점 (풀스크린) — v1 출시에서 숨김 처리됨 ───
+      // UI 진입점은 home_screen에서 제거됨 (달란트 pill 비활성화).
+      // 라우트와 화면 코드는 유지 — 향후 재활성화 시 home_screen의 GestureDetector 복구만 하면 됨.
+      // 미래 아이디어: 다마고찌/도트 픽셀 스타일 전환 검토 (정원/홈 자체 적용 가능성도).
       GoRoute(
         path: '/store',
         parentNavigatorKey: _rootNavigatorKey,

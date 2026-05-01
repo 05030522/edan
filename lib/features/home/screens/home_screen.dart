@@ -248,28 +248,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         const SizedBox(width: 8),
 
-        // 달란트 pill - 상점으로 이동
-        GestureDetector(
-          onTap: () => context.push('/store'),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.gold.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppTheme.radiusRound),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const TalentIcon(size: 18),
-                const SizedBox(width: 4),
-                Text(
-                  _formatNumber(faithPoints),
-                  style: AppTypography.label(
-                    AppColors.goldDark,
-                  ).copyWith(fontWeight: FontWeight.w700, fontSize: 13),
-                ),
-              ],
-            ),
+        // 달란트 pill — 누적 표시만 (상점 기능 v1 출시 이후 재활성화 예정)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.gold.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const TalentIcon(size: 18),
+              const SizedBox(width: 4),
+              Text(
+                _formatNumber(faithPoints),
+                style: AppTypography.label(
+                  AppColors.goldDark,
+                ).copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+              ),
+            ],
           ),
         ),
       ],
