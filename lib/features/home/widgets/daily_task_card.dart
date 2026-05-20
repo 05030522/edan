@@ -59,7 +59,8 @@ class DailyTaskCard extends StatelessWidget {
       case DailyTaskType.meditation:
         return Icons.auto_stories;
       case DailyTaskType.prayer:
-        return Icons.volunteer_activism;
+        // 묵상하기 카드 (저널/반성)
+        return Icons.edit_note;
       case DailyTaskType.bibleReading:
         return Icons.menu_book;
     }
@@ -81,9 +82,9 @@ class DailyTaskCard extends StatelessWidget {
       case DailyTaskType.meditation:
         return '말씀 새기기';
       case DailyTaskType.prayer:
-        return '기도하기';
+        return '묵상하기';
       case DailyTaskType.bibleReading:
-        return '성경으로 이동';
+        return '성경 읽기';
     }
   }
 

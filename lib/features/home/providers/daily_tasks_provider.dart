@@ -80,9 +80,18 @@ LessonContent todayMatthewLesson() {
 }
 
 /// 오늘의 태스크 빌드 (날짜 기반 동적 콘텐츠)
+/// 순서: 말씀 읽기 → 오늘의 말씀 새기기 → 묵상하기
+/// - meditation 타입: '오늘의 말씀 새기기' — 마태복음 일별 레슨 + 퀴즈
+/// - prayer 타입: '묵상하기' — 묵상 저널 (반성 질문 3개)
 List<DailyTask> _buildTodayTasks() {
   final lesson = todayMatthewLesson();
   return [
+    const DailyTask(
+      type: DailyTaskType.bibleReading,
+      title: '말씀 읽기',
+      subtitle: '오늘의 말씀 한 구절',
+      rewardFp: 5,
+    ),
     DailyTask(
       type: DailyTaskType.meditation,
       title: '오늘의 말씀 새기기',
@@ -91,16 +100,10 @@ List<DailyTask> _buildTodayTasks() {
     ),
     DailyTask(
       type: DailyTaskType.prayer,
-      title: '기도하기',
-      subtitle: '주님과 나란히 걷는 여정',
+      title: '묵상하기',
+      subtitle: lesson.title,
       rewardFp: 5,
       isPaid: true,
-    ),
-    const DailyTask(
-      type: DailyTaskType.bibleReading,
-      title: '말씀 읽기',
-      subtitle: '창세기 1장',
-      rewardFp: 5,
     ),
   ];
 }

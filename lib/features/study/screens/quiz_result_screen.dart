@@ -13,6 +13,7 @@ import '../../../core/services/sound_service.dart';
 import '../../../shared/widgets/luyang_image.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../home/providers/daily_tasks_provider.dart';
 import '../providers/quiz_provider.dart';
 import '../providers/study_progress_provider.dart';
 
@@ -46,7 +47,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
     SoundService.instance.playComplete();
     HapticFeedback.heavyImpact();
 
-    // 퀴즈 달란트를 프로필에 반영 + 레슨 진척도 저장
+    // 퀴즈 달란트를 프로필에 반영 + 레슨 진척도 저장 + 일일 태스크 완료
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final quizState = ref.read(quizProvider(widget.lessonId));
       final fp = quizState.totalFpEarned;
@@ -57,6 +58,14 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
       ref
           .read(studyProgressProvider.notifier)
           .completeLesson(widget.pathId, widget.lessonId);
+
+      // 일일 태스크 '오늘의 말씀 새기기' 완료 (멱등 — 이미 완료면 0 반환)
+      final taskReward = ref
+          .read(dailyTasksProvider.notifier)
+          .completeTask(DailyTaskType.meditation);
+      if (taskReward > 0) {
+        ref.read(authProvider.notifier).addFaithPoints(taskReward);
+      }
     });
 
     _scoreController = AnimationController(

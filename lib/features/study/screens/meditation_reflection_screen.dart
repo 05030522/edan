@@ -70,10 +70,10 @@ class _MeditationReflectionScreenState
   }
 
   Future<void> _finishMeditation() async {
-    // 일일 태스크: 묵상 완료 + 달란트 보상
+    // 일일 태스크 '묵상하기' 완료 처리 (prayer 타입을 묵상하기 카드로 사용)
     final reward = ref
         .read(dailyTasksProvider.notifier)
-        .completeTask(DailyTaskType.meditation);
+        .completeTask(DailyTaskType.prayer);
     if (reward > 0) {
       ref.read(authProvider.notifier).addFaithPoints(reward);
     }

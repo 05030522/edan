@@ -489,13 +489,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               if (task.isCompleted) return;
               switch (task.type) {
                 case DailyTaskType.meditation:
+                  // 오늘의 말씀 새기기 — 마태복음 일별 레슨 (본문 + 해설 + 퀴즈)
                   final lesson = todayMatthewLesson();
                   context.push(
                     '/study/${lesson.pathId}/${lesson.lessonId}/scripture',
                   );
                   break;
                 case DailyTaskType.prayer:
-                  context.push('/prayer');
+                  // 묵상하기 (저널/반성) — 같은 마태복음 레슨의 reflect 화면
+                  final lesson = todayMatthewLesson();
+                  context.push(
+                    '/study/${lesson.pathId}/${lesson.lessonId}/reflect',
+                  );
                   break;
                 case DailyTaskType.bibleReading:
                   context.push('/bible-reading');
