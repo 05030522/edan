@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../study/data/matthew_meditation_data.dart';
+import '../../study/models/lesson_data.dart';
+
 /// 일일 태스크 타입
 enum DailyTaskType {
-  meditation, // 묵상하기
+  meditation, // 오늘의 말씀 새기기
   prayer, // 기도하기
   bibleReading, // 말씀 읽기
 }
@@ -15,6 +18,7 @@ class DailyTask {
   final String subtitle;
   final int rewardFp;
   final bool isCompleted;
+  final bool isPaid;
 
   const DailyTask({
     required this.type,
@@ -22,6 +26,7 @@ class DailyTask {
     required this.subtitle,
     required this.rewardFp,
     this.isCompleted = false,
+    this.isPaid = false,
   });
 
   DailyTask copyWith({bool? isCompleted}) {
@@ -31,6 +36,7 @@ class DailyTask {
       subtitle: subtitle,
       rewardFp: rewardFp,
       isCompleted: isCompleted ?? this.isCompleted,
+      isPaid: isPaid,
     );
   }
 }
@@ -63,35 +69,51 @@ class DailyTasksState {
   bool get allCompleted => tasks.every((t) => t.isCompleted);
 }
 
-/// 기본 태스크 목록
-const _defaultTasks = [
-  DailyTask(
-    type: DailyTaskType.meditation,
-    title: '묵상하기',
-    subtitle: '홍해를 여시는 하나님',
-    rewardFp: 10,
-  ),
-  DailyTask(
-    type: DailyTaskType.prayer,
-    title: '기도하기',
-    subtitle: '주님과 나란히 걷는 여정',
-    rewardFp: 5,
-  ),
-  DailyTask(
-    type: DailyTaskType.bibleReading,
-    title: '말씀 읽기',
-    subtitle: '창세기 1장',
-    rewardFp: 5,
-  ),
-];
+/// 오늘의 마태복음 레슨 (날짜 기반 순환)
+LessonContent todayMatthewLesson() {
+  final lessons = MatthewMeditationData.lessons;
+  if (lessons.isEmpty) return LessonDataStore.defaultLesson;
+  final dayOfYear = DateTime.now()
+      .difference(DateTime(DateTime.now().year, 1, 1))
+      .inDays;
+  return lessons[dayOfYear % lessons.length];
+}
+
+/// 오늘의 태스크 빌드 (날짜 기반 동적 콘텐츠)
+List<DailyTask> _buildTodayTasks() {
+  final lesson = todayMatthewLesson();
+  return [
+    DailyTask(
+      type: DailyTaskType.meditation,
+      title: '오늘의 말씀 새기기',
+      subtitle: lesson.title,
+      rewardFp: 10,
+    ),
+    DailyTask(
+      type: DailyTaskType.prayer,
+      title: '기도하기',
+      subtitle: '주님과 나란히 걷는 여정',
+      rewardFp: 5,
+      isPaid: true,
+    ),
+    const DailyTask(
+      type: DailyTaskType.bibleReading,
+      title: '말씀 읽기',
+      subtitle: '창세기 1장',
+      rewardFp: 5,
+    ),
+  ];
+}
 
 /// 일일 태스크 프로바이더
 class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
   DailyTasksNotifier()
     : super(
-        DailyTasksState(tasks: _defaultTasks, lastResetDate: DateTime.now()),
+        DailyTasksState(
+          tasks: _buildTodayTasks(),
+          lastResetDate: DateTime.now(),
+        ),
       ) {
-    // 초기화 시 날짜 체크
     _checkAndResetIfNewDay();
   }
 
@@ -111,7 +133,7 @@ class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
 
     // 새 날 → 리셋
     state = DailyTasksState(
-      tasks: _defaultTasks,
+      tasks: _buildTodayTasks(),
       totalFpEarned: 0,
       lastResetDate: today,
     );
@@ -124,7 +146,7 @@ class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
 
   /// 태스크 완료 처리 → 보상 달란트 반환
   int completeTask(DailyTaskType type) {
-    _checkAndResetIfNewDay(); // 혹시 날짜가 바뀌었으면 리셋
+    _checkAndResetIfNewDay();
 
     final tasks = [...state.tasks];
     final index = tasks.indexWhere((t) => t.type == type);
@@ -138,7 +160,6 @@ class DailyTasksNotifier extends StateNotifier<DailyTasksState> {
       totalFpEarned: state.totalFpEarned + reward,
     );
 
-    // 활동 카운터 증가 (업적용)
     _incrementCounter(type);
 
     return reward;

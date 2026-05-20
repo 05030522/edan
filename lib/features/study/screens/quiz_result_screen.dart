@@ -287,17 +287,17 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen>
               padding: const EdgeInsets.all(AppTheme.spacingXL),
               child: Column(
                 children: [
-                  // 공유카드 버튼
+                  // 묵상하러 가기 버튼
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton.icon(
                       onPressed: () => context.go(
-                        '/study/${widget.pathId}/${widget.lessonId}/share',
+                        '/study/${widget.pathId}/${widget.lessonId}/reflect',
                       ),
-                      icon: const Icon(Icons.share, size: 20),
+                      icon: const Icon(Icons.edit_note, size: 22),
                       label: Text(
-                        '묵상 카드 공유하기',
+                        '묵상하러 가기',
                         style: AppTypography.button(Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(

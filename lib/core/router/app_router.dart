@@ -20,6 +20,7 @@ import '../../features/study/screens/lesson_scripture_screen.dart';
 import '../../features/study/screens/quiz_screen.dart';
 import '../../features/study/screens/quiz_result_screen.dart';
 import '../../features/study/screens/share_card_screen.dart';
+import '../../features/study/screens/meditation_reflection_screen.dart';
 import '../../features/quests/screens/quests_screen.dart';
 import '../../features/community/screens/community_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
@@ -30,7 +31,6 @@ import '../../features/prayer/screens/prayer_screen.dart';
 import '../../features/bible/screens/bible_reading_screen.dart';
 import '../../features/bible/screens/bible_books_screen.dart';
 import '../../features/bible/screens/bible_chapter_screen.dart';
-import '../../features/meditation/screens/meditation_screen.dart';
 import '../../features/store/screens/store_screen.dart';
 import '../../features/garden/screens/garden_screen.dart';
 import '../../features/achievements/screens/achievements_screen.dart';
@@ -224,6 +224,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // ─── 묵상하기 (저널/반성, 풀스크린) ───
+      GoRoute(
+        path: '/study/:pathId/:lessonId/reflect',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final pathId = state.pathParameters['pathId'] ?? 'path-1';
+          final lessonId = state.pathParameters['lessonId'] ?? 'lesson-1';
+          return MeditationReflectionScreen(pathId: pathId, lessonId: lessonId);
+        },
+      ),
+
       // ─── 묵상 완료 공유카드 (풀스크린) ───
       GoRoute(
         path: '/study/:pathId/:lessonId/share',
@@ -328,26 +339,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
 
-      // ─── 묵상하기 (풀스크린) ───
-      GoRoute(
-        path: '/meditation',
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => CustomTransitionPage(
-          child: const MeditationScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(0, 1),
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeOut),
-                  ),
-              child: child,
-            );
-          },
-        ),
-      ),
+      // 구 /meditation 라우트는 제거됨 (2026-05-20):
+      // 홈 카드 "오늘의 말씀 새기기"는 /study/path-matthew/...로 직행,
+      // 묵상 탭은 LearningPathsScreen(/study)을 사용. 구 MeditationScreen 화면도 함께 삭제.
 
       // ─── 상점 (풀스크린) — v1 출시에서 숨김 처리됨 ───
       // UI 진입점은 home_screen에서 제거됨 (달란트 pill 비활성화).

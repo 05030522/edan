@@ -6,6 +6,40 @@ import '../../../shared/utils/context_theme.dart';
 import '../../../shared/widgets/talent_icon.dart';
 import '../providers/daily_tasks_provider.dart';
 
+/// 무료/유료 콘텐츠 배지
+class _ContentBadge extends StatelessWidget {
+  const _ContentBadge({required this.isPaid});
+
+  final bool isPaid;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isPaid ? AppColors.gold : AppColors.primaryDark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (isPaid) ...[
+            Icon(Icons.lock_outline, color: color, size: 10),
+            const SizedBox(width: 2),
+          ],
+          Text(
+            isPaid ? '유료' : '무료',
+            style: AppTypography.label(
+              color,
+            ).copyWith(fontSize: 10, fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// 일일 태스크 카드 위젯
 /// 묵상/기도/말씀읽기 각 태스크를 표시
 class DailyTaskCard extends StatelessWidget {
@@ -45,7 +79,7 @@ class DailyTaskCard extends StatelessWidget {
   String get _ctaText {
     switch (task.type) {
       case DailyTaskType.meditation:
-        return '시작하기';
+        return '말씀 새기기';
       case DailyTaskType.prayer:
         return '기도하기';
       case DailyTaskType.bibleReading:
@@ -96,9 +130,18 @@ class DailyTaskCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      task.title,
-                      style: AppTypography.titleMedium(textColor),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            task.title,
+                            style: AppTypography.titleMedium(textColor),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        _ContentBadge(isPaid: task.isPaid),
+                      ],
                     ),
                     const SizedBox(height: 2),
                     Text(

@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
 import '../models/bible_book.dart';
 import '../providers/bible_provider.dart';
+import '../providers/bible_progress_provider.dart';
 
 /// 성경 전문 보기 - 장 선택 + 본문 읽기 화면
 class BibleChapterScreen extends ConsumerStatefulWidget {
@@ -123,6 +124,9 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
                     ref
                         .read(bibleNavigationProvider.notifier)
                         .selectChapter(chapter);
+                    ref
+                        .read(bibleProgressProvider.notifier)
+                        .markRead(book.name, chapter);
                   },
                   child: Center(
                     child: Text(
@@ -234,9 +238,14 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             // 이전 장
             TextButton.icon(
               onPressed: hasPrev
-                  ? () => ref
-                        .read(bibleNavigationProvider.notifier)
-                        .selectChapter(chapter - 1)
+                  ? () {
+                      ref
+                          .read(bibleNavigationProvider.notifier)
+                          .selectChapter(chapter - 1);
+                      ref
+                          .read(bibleProgressProvider.notifier)
+                          .markRead(book.name, chapter - 1);
+                    }
                   : null,
               icon: const Icon(Icons.chevron_left, size: 18),
               label: Text(
@@ -256,9 +265,14 @@ class _BibleChapterScreenState extends ConsumerState<BibleChapterScreen> {
             // 다음 장
             TextButton.icon(
               onPressed: hasNext
-                  ? () => ref
-                        .read(bibleNavigationProvider.notifier)
-                        .selectChapter(chapter + 1)
+                  ? () {
+                      ref
+                          .read(bibleNavigationProvider.notifier)
+                          .selectChapter(chapter + 1);
+                      ref
+                          .read(bibleProgressProvider.notifier)
+                          .markRead(book.name, chapter + 1);
+                    }
                   : null,
               icon: Text(
                 hasNext ? '${chapter + 1}장' : '',

@@ -13,6 +13,7 @@ import '../../../shared/widgets/talent_icon.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../shared/utils/streak_helper.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../bible/providers/bible_progress_provider.dart';
 import '../../streak/providers/streak_goal_provider.dart';
 import '../../streak/widgets/streak_broken_dialog.dart';
 import '../providers/daily_tasks_provider.dart';
@@ -363,7 +364,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// 성경 전문 보기 버튼
+  /// 성경 통독 챌린지 카드 (진행률 표시)
   Widget _buildBibleFullButton(
     BuildContext context, {
     required Color textColor,
@@ -372,6 +373,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final subTextColor = isDark
         ? AppColors.darkTextSecondary
         : AppColors.lightTextSecondary;
+    final progressState = ref.watch(bibleProgressProvider);
+    final readCount = progressState.readCount;
+    final totalChapters = progressState.totalChapters;
+    final progress = progressState.progress;
+    final percent = (progress * 100).toStringAsFixed(1);
 
     return Material(
       color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.white,
@@ -381,42 +387,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onTap: () => context.push('/bible-full'),
         child: Padding(
           padding: const EdgeInsets.all(AppTheme.spacingLG),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                ),
-                child: const Icon(
-                  Icons.menu_book_rounded,
-                  color: AppColors.gold,
-                  size: 24,
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(
+                        AppTheme.radiusMedium,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.menu_book_rounded,
+                      color: AppColors.gold,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: AppTheme.spacingMD),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '성경 통독 챌린지',
+                          style: AppTypography.titleMedium(textColor),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '구약 · 신약 66권 · $totalChapters장',
+                          style: AppTypography.bodySmall(subTextColor),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    color: subTextColor.withValues(alpha: 0.5),
+                    size: 20,
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppTheme.spacingMD),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppTheme.radiusRound),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  minHeight: 8,
+                  backgroundColor: AppColors.gold.withValues(alpha: 0.12),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.gold,
+                  ),
                 ),
               ),
-              const SizedBox(width: AppTheme.spacingMD),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '성경 전문 읽기',
-                      style: AppTypography.titleMedium(textColor),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '구약 · 신약 66권',
-                      style: AppTypography.bodySmall(subTextColor),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: subTextColor.withValues(alpha: 0.5),
-                size: 20,
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '$readCount / $totalChapters장',
+                    style: AppTypography.label(subTextColor),
+                  ),
+                  Text(
+                    '$percent%',
+                    style: AppTypography.label(
+                      AppColors.goldDark,
+                    ).copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ],
               ),
             ],
           ),
@@ -448,7 +489,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               if (task.isCompleted) return;
               switch (task.type) {
                 case DailyTaskType.meditation:
-                  context.push('/meditation');
+                  final lesson = todayMatthewLesson();
+                  context.push(
+                    '/study/${lesson.pathId}/${lesson.lessonId}/scripture',
+                  );
                   break;
                 case DailyTaskType.prayer:
                   context.push('/prayer');
