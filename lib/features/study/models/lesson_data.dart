@@ -3,14 +3,23 @@ import '../data/luke_meditation_data.dart';
 import '../data/mark_meditation_data.dart';
 import '../data/matthew_meditation_data.dart';
 
+/// 묵상 질문 하나 (학습 단위당 3개)
+class MeditationQuestion {
+  final String question;
+  final String guide;
+
+  const MeditationQuestion({required this.question, required this.guide});
+}
+
 /// 레슨 콘텐츠 데이터 모델
 class LessonContent {
   final String lessonId;
   final String pathId;
-  final String title;
+  final String title; // 시트의 '핵심 내용'
   final String scriptureReference;
-  final String scriptureText;
-  final String? meditationGuide;
+  final String scriptureText; // 시트의 '내용 해설'
+  final String? meditationGuide; // 레거시 단일 가이드 — 미사용 시 첫 질문 사용
+  final List<MeditationQuestion> meditationQuestions; // 시트 '묵상 주제/도움말' 3개
 
   const LessonContent({
     required this.lessonId,
@@ -19,6 +28,7 @@ class LessonContent {
     required this.scriptureReference,
     required this.scriptureText,
     this.meditationGuide,
+    this.meditationQuestions = const [],
   });
 }
 

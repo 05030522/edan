@@ -40,8 +40,20 @@ class _MeditationReflectionScreenState
   final _q3 = TextEditingController();
   bool _completed = false;
 
-  /// 묵상 질문 3개 (Q1=레슨 가이드, Q2/Q3=공통 템플릿)
+  /// 묵상 질문 3개 — Google 시트의 lesson.meditationQuestions 우선,
+  /// 시트 데이터가 없는 레슨은 폴백 템플릿 사용
   List<_ReflectionQuestion> _buildQuestions(LessonContent lesson) {
+    final fromSheet = lesson.meditationQuestions;
+    if (fromSheet.length >= 3) {
+      return [
+        for (var i = 0; i < 3; i++)
+          _ReflectionQuestion(
+            title: '묵상 질문 ${i + 1}',
+            question: fromSheet[i].question,
+            hint: fromSheet[i].guide,
+          ),
+      ];
+    }
     return [
       _ReflectionQuestion(
         title: '묵상 질문 1',
